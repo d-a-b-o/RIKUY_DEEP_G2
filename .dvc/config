@@ -1,0 +1,4 @@
+[core]
+    remote = drive
+['remote "drive"']
+    url = /content/drive/MyDrive/ColabNotebooks/RIKUY_DEEP_G2/dvc_remote
