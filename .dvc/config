@@ -1,5 +1,4 @@
 [core]
     remote = drive
-
 ['remote "drive"']
-    url = gdrive://1FE-LAXHWX5pgQvY-Ds1_HQVtZKKDrNgP/dvc_remote
+    url = /content/drive/MyDrive/ColabNotebooks/RIKUY_DEEP_G2/dvc_remote
