@@ -1,0 +1,6 @@
+outs:
+- md5: d9b7673ca5e8f685de9e90599a9c35f2.dir
+  size: 95232950
+  nfiles: 21
+  hash: md5
+  path: mobilenetv2_hpo_20261031T202900Z
