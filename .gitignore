@@ -1,3 +1,25 @@
 /data/
 /dvc_remote/
 .dvcignore
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# MLflow (local runs)
+mlruns/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
