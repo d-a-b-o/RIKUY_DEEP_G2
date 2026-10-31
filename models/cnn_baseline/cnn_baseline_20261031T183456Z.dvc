@@ -1,0 +1,6 @@
+outs:
+- md5: 4c159a0d2136ceaab88887269938c7d0.dir
+  size: 3420132
+  nfiles: 4
+  hash: md5
+  path: cnn_baseline_20261031T183456Z

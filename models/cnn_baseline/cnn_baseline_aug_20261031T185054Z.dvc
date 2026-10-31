@@ -1,0 +1,6 @@
+outs:
+- md5: fea97f6996450ba0fd7a92d68e89a2ea.dir
+  size: 3432956
+  nfiles: 4
+  hash: md5
+  path: cnn_baseline_aug_20261031T185054Z
