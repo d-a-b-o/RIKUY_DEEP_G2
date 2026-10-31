@@ -1,0 +1,132 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  changes:
+    name: Detectar cambios
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      web: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.web == 'true' }}
+      ml: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.ml == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            web:
+              - "apps/web/**"
+              - ".github/workflows/ci.yml"
+            ml:
+              - "ml/**"
+              - ".github/workflows/ci.yml"
+
+  web:
+    name: Web · lint, typecheck, test y build
+    needs: changes
+    if: needs.changes.outputs.web == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Cache de Next.js
+        uses: actions/cache@v4
+        with:
+          path: apps/web/.next/cache
+          key: nextjs-${{ runner.os }}-${{ hashFiles('apps/web/package-lock.json') }}-${{ hashFiles('apps/web/src/**') }}
+          restore-keys: |
+            nextjs-${{ runner.os }}-${{ hashFiles('apps/web/package-lock.json') }}-
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+  ml:
+    name: ML · ruff y pytest
+    needs: changes
+    if: needs.changes.outputs.ml == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: ml
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: ml/requirements-ci.txt
+
+      - name: Instalar dependencias
+        run: pip install -r requirements-ci.txt
+
+      - name: Ruff (lint)
+        run: ruff check --output-format=github .
+
+      - name: Ruff (formato)
+        run: ruff format --check .
+
+      - name: Pytest
+        run: pytest
+
+  # Job puerta: es el único check que debe marcarse como obligatorio en la
+  # protección de main. Siempre se ejecuta y falla si algún job falló o se
+  # canceló; los jobs omitidos por no tener cambios cuentan como éxito.
+  ci:
+    name: CI
+    needs: [changes, web, ml]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verificar resultado de los jobs
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "Resultados: $RESULTS"
+          for result in $RESULTS; do
+            if [ "$result" = "failure" ] || [ "$result" = "cancelled" ]; then
+              echo "::error::Al menos un job de CI falló o se canceló."
+              exit 1
+            fi
+          done
