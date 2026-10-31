@@ -3,9 +3,11 @@ Entrada: imagen decodificada RGB. Resize bilinear a 400x400. RGB float32 en [0,1
 TensorFlow.js: tf.image.resizeBilinear(rgb, [400, 400]).div(255).
 Augmentation solo se activa con training=True en el conjunto train.
 """
+
 from pathlib import Path
+
 import numpy as np
-from PIL import Image, ImageOps, ImageEnhance
+from PIL import Image, ImageEnhance, ImageOps
 
 TARGET_SIZE = (400, 400)
 
@@ -28,14 +30,16 @@ def augment_training_image(image, seed=None):
     rng = np.random.default_rng(seed)
     if rng.random() < 0.5:
         image = ImageOps.mirror(image)
-    image = image.rotate(float(rng.uniform(-12.0, 12.0)), resample=Image.Resampling.BILINEAR,
-                         expand=False, fillcolor=(0, 0, 0))
+    image = image.rotate(
+        float(rng.uniform(-12.0, 12.0)), resample=Image.Resampling.BILINEAR, expand=False, fillcolor=(0, 0, 0)
+    )
     return ImageEnhance.Brightness(image).enhance(float(rng.uniform(0.85, 1.15)))
 
 
 def make_tf_dataset(paths, labels, training=False, batch_size=32, seed=42):
     """Dataset tf.data; flip/rotacion/brillo ocurren unicamente si training=True."""
     import tensorflow as tf
+
     paths = [str(p) for p in paths]
     labels = np.asarray(labels, dtype=np.int32)
     ds = tf.data.Dataset.from_tensor_slices((paths, labels))
