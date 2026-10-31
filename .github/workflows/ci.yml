@@ -67,6 +67,9 @@ jobs:
       - name: Instalar dependencias
         run: npm ci
 
+      - name: Auditoría de dependencias de producción
+        run: npm audit --omit=dev --audit-level=high
+
       - name: Lint
         run: npm run lint
 
@@ -109,12 +112,73 @@ jobs:
       - name: Pytest
         run: pytest
 
+  convenciones:
+    name: Convenciones de la PR
+    if: github.event_name == 'pull_request' && github.event.pull_request.user.type != 'Bot'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verificar clave de Jira en el título o la rama
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BRANCH: ${{ github.head_ref }}
+        run: |
+          if printf '%s\n%s\n' "$PR_TITLE" "$PR_BRANCH" | grep -Eq 'RIKDP-[0-9]+'; then
+            echo "Clave de Jira encontrada."
+          else
+            echo "::error::El título o la rama de la PR debe incluir la clave de Jira (por ejemplo RIKDP-123)."
+            exit 1
+          fi
+
+  archivos:
+    name: Archivos grandes
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      MAX_KB: 5120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Rechazar archivos de más de 5 MB (usar DVC)
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          status=0
+          while IFS= read -r -d '' file; do
+            [ -f "$file" ] || continue
+            size_kb=$(( $(stat -c %s "$file") / 1024 ))
+            if [ "$size_kb" -gt "$MAX_KB" ]; then
+              echo "::error file=$file::$file pesa ${size_kb} KB (máximo ${MAX_KB} KB). Versiónalo con DVC."
+              status=1
+            fi
+          done < <(git diff -z --name-only --diff-filter=AM "$BASE_SHA" HEAD)
+          exit $status
+
+  dependencias:
+    name: Revisión de dependencias
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+          comment-summary-in-pr: on-failure
+
   # Job puerta: es el único check que debe marcarse como obligatorio en la
   # protección de main. Siempre se ejecuta y falla si algún job falló o se
-  # canceló; los jobs omitidos por no tener cambios cuentan como éxito.
+  # canceló; los jobs omitidos (sin cambios o fuera de una PR) cuentan como éxito.
   ci:
     name: CI
-    needs: [changes, web, ml]
+    needs: [changes, web, ml, convenciones, archivos, dependencias]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5
