@@ -1,26 +1,109 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * Tokens de diseño de RikuyDeep.
+ * Guía completa: docs/identidad-visual.md
+ *
+ * 1. Escalas de marca (fijas): acero (primario) y colada (acento).
+ * 2. Tokens semánticos (cambian con el tema claro/oscuro): úsalos en los
+ *    componentes en lugar de las escalas, p. ej. bg-surface, text-muted-foreground.
+ *
+ * Los pares de color semánticos se validan contra WCAG AA en
+ * src/styles/tokens.test.ts. Si cambias un valor, ejecuta `npm test`.
+ */
+
+@theme {
+  --color-acero-50: #eef4f8;
+  --color-acero-100: #d5e3ee;
+  --color-acero-200: #a9c6dc;
+  --color-acero-300: #74a2c3;
+  --color-acero-400: #4680a9;
+  --color-acero-500: #2a658f;
+  --color-acero-600: #1f5075;
+  --color-acero-700: #1a405e;
+  --color-acero-800: #16344c;
+  --color-acero-900: #122a3d;
+  --color-acero-950: #0b1b29;
+
+  --color-colada-50: #fff4ed;
+  --color-colada-100: #ffe6d4;
+  --color-colada-200: #ffc9a8;
+  --color-colada-300: #ffa370;
+  --color-colada-400: #ff8a4c;
+  --color-colada-500: #f55a16;
+  --color-colada-600: #e2550f;
+  --color-colada-700: #c2410c;
+  --color-colada-800: #952812;
+  --color-colada-900: #792412;
+  --color-colada-950: #410e07;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+:root {
+  --background: #ffffff;
+  --surface: #f4f7fa;
+  --foreground: #122a3d;
+  --muted-foreground: #4a5d6e;
+  --border: #cfd9e2;
+  --primary: #1f5075;
+  --primary-foreground: #ffffff;
+  --accent: #c2410c;
+  --accent-foreground: #ffffff;
+  --ok: #15803d;
+  --defect: #b91c1c;
+  --warning: #a16207;
+  --ring: #e2550f;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0b1b29;
+    --surface: #122a3d;
+    --foreground: #e8eef3;
+    --muted-foreground: #a9b8c6;
+    --border: #2b4458;
+    --primary: #74a2c3;
+    --primary-foreground: #0b1b29;
+    --accent: #ff8a4c;
+    --accent-foreground: #0b1b29;
+    --ok: #4ade80;
+    --defect: #f87171;
+    --warning: #facc15;
+    --ring: #ff8a4c;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-ok: var(--ok);
+  --color-defect: var(--defect);
+  --color-warning: var(--warning);
+  --color-ring: var(--ring);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+@layer base {
+  html {
+    color-scheme: light dark;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+  }
 }
