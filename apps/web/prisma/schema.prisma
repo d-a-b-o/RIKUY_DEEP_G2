@@ -1,0 +1,467 @@
+// Esquema de datos de RikuyDeep.
+// Diseño: docs/arquitectura/modelo-datos.md (ER), ADR 0003 (multiempresa),
+// ADR 0004 (trazabilidad inmutable) y ADR 0007 (estación automática).
+//
+// Convenciones: modelos en PascalCase y tablas/columnas en snake_case (@@map/@map).
+// Las tablas User, Session, Account, Verification y TwoFactor siguen el esquema de
+// Better Auth (HU19, HU29).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enumeraciones ──────────────────────────────────────────────────────────
+
+enum CompanyStatus {
+  ACTIVE
+  INACTIVE
+
+  @@map("company_status")
+}
+
+enum Role {
+  SUPERADMIN
+  ADMIN
+  INSPECTOR
+  VIEWER
+  STATION
+
+  @@map("role")
+}
+
+enum BatchStatus {
+  OPEN
+  CLOSED
+
+  @@map("batch_status")
+}
+
+enum InspectionSource {
+  LINE
+  CAMERA
+  BATCH
+  UPLOAD
+
+  @@map("inspection_source")
+}
+
+enum Verdict {
+  OK
+  DEFECTIVE
+
+  @@map("verdict")
+}
+
+enum InferenceBackend {
+  WEBGL
+  WASM
+
+  @@map("inference_backend")
+}
+
+enum InspectionEventType {
+  CREATED
+  CORRECTED
+  FLAGGED_FOR_RETRAINING
+
+  @@map("inspection_event_type")
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  DISCARDED
+
+  @@map("lead_status")
+}
+
+enum TelemetryType {
+  INFERENCE
+  LOAD_ERROR
+
+  @@map("telemetry_type")
+}
+
+// ─── Empresas y usuarios ────────────────────────────────────────────────────
+
+model Company {
+  id                   String        @id @default(uuid(7))
+  name                 String
+  taxId                String?       @unique @map("tax_id")
+  status               CompanyStatus @default(ACTIVE)
+  requireTwoFactor     Boolean       @default(false) @map("require_two_factor")
+  timezone             String        @default("America/Lima")
+  /// Fracción máxima de defectuosas (0–1) para recomendar liberar un lote.
+  batchRejectThreshold Decimal       @default(0.05) @map("batch_reject_threshold") @db.Decimal(5, 4)
+  createdAt            DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt            DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  users            User[]
+  invitations      Invitation[]
+  parts            Part[]
+  molds            Mold[]
+  shifts           Shift[]
+  batches          Batch[]
+  stations         Station[]
+  inspections      Inspection[]
+  inspectionEvents InspectionEvent[]
+
+  @@map("company")
+}
+
+model User {
+  id               String    @id
+  companyId        String?   @map("company_id")
+  name             String
+  email            String    @unique
+  emailVerified    Boolean   @default(false) @map("email_verified")
+  image            String?
+  role             Role      @default(VIEWER)
+  active           Boolean   @default(true)
+  twoFactorEnabled Boolean   @default(false) @map("two_factor_enabled")
+  failedLoginCount Int       @default(0) @map("failed_login_count")
+  lockedUntil      DateTime? @map("locked_until") @db.Timestamptz(3)
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  company             Company?          @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  sessions            Session[]
+  accounts            Account[]
+  twoFactor           TwoFactor?
+  invitationsSent     Invitation[]
+  station             Station?
+  batchesOpened       Batch[]
+  inspections         Inspection[]
+  inspectionEvents    InspectionEvent[]
+  accessDeniedEntries AccessDeniedLog[]
+
+  @@index([companyId, role])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  userId    String   @map("user_id")
+  token     String   @unique
+  expiresAt DateTime @map("expires_at") @db.Timestamptz(3)
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  userId                String    @map("user_id")
+  accountId             String    @map("account_id")
+  providerId            String    @map("provider_id")
+  accessToken           String?   @map("access_token")
+  refreshToken          String?   @map("refresh_token")
+  idToken               String?   @map("id_token")
+  accessTokenExpiresAt  DateTime? @map("access_token_expires_at") @db.Timestamptz(3)
+  refreshTokenExpiresAt DateTime? @map("refresh_token_expires_at") @db.Timestamptz(3)
+  scope                 String?
+  /// Hash de la contraseña (proveedor "credential").
+  password              String?
+  createdAt             DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt             DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime @map("expires_at") @db.Timestamptz(3)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+model TwoFactor {
+  id          String @id
+  userId      String @unique @map("user_id")
+  secret      String
+  backupCodes String @map("backup_codes")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("two_factor")
+}
+
+model Invitation {
+  id          String    @id @default(uuid(7))
+  companyId   String    @map("company_id")
+  email       String
+  role        Role
+  tokenHash   String    @unique @map("token_hash")
+  invitedById String    @map("invited_by_id")
+  expiresAt   DateTime  @map("expires_at") @db.Timestamptz(3)
+  acceptedAt  DateTime? @map("accepted_at") @db.Timestamptz(3)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  invitedBy User    @relation(fields: [invitedById], references: [id], onDelete: Restrict)
+
+  @@index([companyId, email])
+  @@map("invitation")
+}
+
+// ─── Catálogos ──────────────────────────────────────────────────────────────
+
+model Part {
+  id          String   @id @default(uuid(7))
+  companyId   String   @map("company_id")
+  code        String
+  name        String
+  description String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  company     Company      @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  molds       Mold[]
+  inspections Inspection[]
+
+  @@unique([companyId, code])
+  @@map("part")
+}
+
+model Mold {
+  id        String   @id @default(uuid(7))
+  companyId String   @map("company_id")
+  partId    String   @map("part_id")
+  code      String
+  cavities  Int      @default(1)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  company     Company      @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  part        Part         @relation(fields: [partId], references: [id], onDelete: Restrict)
+  batches     Batch[]
+  inspections Inspection[]
+
+  @@unique([companyId, code])
+  @@index([partId])
+  @@map("mold")
+}
+
+model Shift {
+  id        String   @id @default(uuid(7))
+  companyId String   @map("company_id")
+  name      String
+  /// Hora local de la empresa. Si endTime < startTime, el turno cruza la medianoche.
+  startTime DateTime @map("start_time") @db.Time(0)
+  endTime   DateTime @map("end_time") @db.Time(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  company     Company      @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  inspections Inspection[]
+
+  @@unique([companyId, name])
+  @@map("shift")
+}
+
+model Batch {
+  id         String      @id @default(uuid(7))
+  companyId  String      @map("company_id")
+  moldId     String      @map("mold_id")
+  code       String
+  status     BatchStatus @default(OPEN)
+  openedById String?     @map("opened_by_id")
+  openedAt   DateTime    @default(now()) @map("opened_at") @db.Timestamptz(3)
+  closedAt   DateTime?   @map("closed_at") @db.Timestamptz(3)
+
+  company     Company      @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  mold        Mold         @relation(fields: [moldId], references: [id], onDelete: Restrict)
+  openedBy    User?        @relation(fields: [openedById], references: [id], onDelete: SetNull)
+  stations    Station[]
+  inspections Inspection[]
+
+  @@unique([companyId, code])
+  @@index([companyId, status])
+  @@map("batch")
+}
+
+// ─── Estaciones de inspección automática (ADR 0007) ─────────────────────────
+
+model Station {
+  id             String    @id @default(uuid(7))
+  companyId      String    @map("company_id")
+  /// Cuenta técnica con rol STATION.
+  userId         String?   @unique @map("user_id")
+  name           String
+  line           String
+  currentBatchId String?   @map("current_batch_id")
+  /// Umbrales de detección, okPhotoEvery y ritmo esperado (docs/arquitectura/inferencia-navegador.md).
+  config         Json      @default("{}")
+  active         Boolean   @default(true)
+  lastSeenAt     DateTime? @map("last_seen_at") @db.Timestamptz(3)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  company      Company      @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  user         User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  currentBatch Batch?       @relation(fields: [currentBatchId], references: [id], onDelete: SetNull)
+  inspections  Inspection[]
+
+  @@unique([companyId, name])
+  @@map("station")
+}
+
+// ─── Modelo de IA ───────────────────────────────────────────────────────────
+
+model ModelVersion {
+  id                String   @id @default(uuid(7))
+  version           String   @unique
+  artifactPath      String   @map("artifact_path")
+  inputSize         Int      @map("input_size")
+  decisionThreshold Decimal  @map("decision_threshold") @db.Decimal(5, 4)
+  recallDefective   Decimal? @map("recall_defective") @db.Decimal(5, 4)
+  accuracy          Decimal? @db.Decimal(5, 4)
+  mlflowRunId       String?  @map("mlflow_run_id")
+  publishedAt       DateTime @default(now()) @map("published_at") @db.Timestamptz(3)
+
+  inspections Inspection[]
+  telemetry   ModelTelemetry[]
+
+  @@map("model_version")
+}
+
+// ─── Inspecciones (inmutables, ADR 0004) ────────────────────────────────────
+
+model Inspection {
+  id               String           @id @default(uuid(7))
+  companyId        String           @map("company_id")
+  batchId          String           @map("batch_id")
+  shiftId          String           @map("shift_id")
+  /// Instantánea del molde y la pieza en el momento de la inspección.
+  moldId           String           @map("mold_id")
+  partId           String           @map("part_id")
+  /// Exactamente uno de inspectorId y stationId tiene valor.
+  inspectorId      String?          @map("inspector_id")
+  stationId        String?          @map("station_id")
+  pieceNumber      Int?             @map("piece_number")
+  modelVersionId   String           @map("model_version_id")
+  source           InspectionSource
+  predictedVerdict Verdict          @map("predicted_verdict")
+  confidence       Decimal          @db.Decimal(5, 4)
+  thresholdApplied Decimal          @map("threshold_applied") @db.Decimal(5, 4)
+  /// Clave del objeto en R2; nula si no se guardó foto (OK fuera de la muestra).
+  imageKey         String?          @map("image_key")
+  imageSha256      String?          @map("image_sha256")
+  inferenceMs      Int?             @map("inference_ms")
+  backend          InferenceBackend?
+  warnings         String[]         @default([])
+  capturedAt       DateTime         @map("captured_at") @db.Timestamptz(3)
+  createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+  /// Derivadas: veredicto vigente tras correcciones. Únicas columnas modificables.
+  currentVerdict   Verdict          @map("current_verdict")
+  correctedAt      DateTime?        @map("corrected_at") @db.Timestamptz(3)
+
+  company      Company           @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  batch        Batch             @relation(fields: [batchId], references: [id], onDelete: Restrict)
+  shift        Shift             @relation(fields: [shiftId], references: [id], onDelete: Restrict)
+  mold         Mold              @relation(fields: [moldId], references: [id], onDelete: Restrict)
+  part         Part              @relation(fields: [partId], references: [id], onDelete: Restrict)
+  inspector    User?             @relation(fields: [inspectorId], references: [id], onDelete: Restrict)
+  station      Station?          @relation(fields: [stationId], references: [id], onDelete: Restrict)
+  modelVersion ModelVersion      @relation(fields: [modelVersionId], references: [id], onDelete: Restrict)
+  events       InspectionEvent[]
+
+  @@index([companyId, capturedAt(sort: Desc)])
+  @@index([companyId, batchId])
+  @@index([companyId, shiftId, capturedAt])
+  @@index([companyId, moldId, currentVerdict])
+  @@index([companyId, stationId, capturedAt])
+  @@map("inspection")
+}
+
+model InspectionEvent {
+  id              String              @id @default(uuid(7))
+  companyId       String              @map("company_id")
+  inspectionId    String              @map("inspection_id")
+  type            InspectionEventType
+  previousVerdict Verdict?            @map("previous_verdict")
+  newVerdict      Verdict?            @map("new_verdict")
+  reason          String?
+  actorId         String?             @map("actor_id")
+  createdAt       DateTime            @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  company    Company    @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  inspection Inspection @relation(fields: [inspectionId], references: [id], onDelete: Restrict)
+  actor      User?      @relation(fields: [actorId], references: [id], onDelete: Restrict)
+
+  @@index([inspectionId, createdAt])
+  @@index([companyId, type, createdAt])
+  @@map("inspection_event")
+}
+
+// ─── Plataforma ─────────────────────────────────────────────────────────────
+
+model Lead {
+  id          String     @id @default(uuid(7))
+  name        String
+  email       String
+  companyName String     @map("company_name")
+  role        String?
+  phone       String?
+  message     String?
+  status      LeadStatus @default(NEW)
+  consentedAt DateTime   @map("consented_at") @db.Timestamptz(3)
+  createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([status, createdAt])
+  @@map("lead")
+}
+
+model AccessDeniedLog {
+  id        String   @id @default(uuid(7))
+  userId    String?  @map("user_id")
+  companyId String?  @map("company_id")
+  method    String
+  path      String
+  action    String?
+  ipHash    String?  @map("ip_hash")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([companyId, createdAt])
+  @@map("access_denied_log")
+}
+
+model ModelTelemetry {
+  id             String           @id @default(uuid(7))
+  companyId      String?          @map("company_id")
+  modelVersionId String?          @map("model_version_id")
+  type           TelemetryType
+  durationMs     Int?             @map("duration_ms")
+  backend        InferenceBackend?
+  message        String?
+  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  modelVersion ModelVersion? @relation(fields: [modelVersionId], references: [id], onDelete: SetNull)
+
+  @@index([type, createdAt])
+  @@map("model_telemetry")
+}
