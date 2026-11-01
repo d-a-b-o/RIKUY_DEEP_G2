@@ -94,6 +94,13 @@
 @layer base {
   html {
     color-scheme: light dark;
+    scroll-padding-top: 5rem;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
   }
 
   body {
