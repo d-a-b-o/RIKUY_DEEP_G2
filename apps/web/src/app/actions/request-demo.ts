@@ -1,5 +1,8 @@
 "use server";
 
+import { isDatabaseConfigured } from "@/lib/db";
+import { notifyNewLead } from "@/lib/leads/notify";
+import { saveLead } from "@/lib/leads/repository";
 import { demoRequestSchema, looksLikeSpam, type DemoRequestField } from "@/lib/leads/schema";
 
 /** Valores enviados, para volver a mostrarlos en el formulario tras la respuesta. */
@@ -9,6 +12,8 @@ export type DemoRequestState =
   | { status: "idle" }
   | { status: "invalid"; errors: Partial<Record<DemoRequestField, string>>; values: DemoRequestValues }
   | { status: "unavailable"; values: DemoRequestValues }
+  | { status: "error"; values: DemoRequestValues }
+  | { status: "sent" }
   | { status: "rejected" };
 
 const TEXT_FIELDS = ["name", "email", "company", "role", "phone", "message"] as const;
@@ -23,11 +28,11 @@ function readValues(formData: FormData): DemoRequestValues {
 }
 
 /**
- * Valida la solicitud de demo de la landing.
+ * Recibe la solicitud de demo de la landing: filtra spam, valida, guarda el lead
+ * (RIKDP-115) y avisa al equipo por correo (RIKDP-116).
  *
- * Guardar el lead (RIKDP-115) y avisar por correo (RIKDP-116) dependen de la
- * base de datos de HU13. Hasta entonces la acción valida y filtra spam, pero
- * responde "unavailable" para no dar por recibida una solicitud que no se guarda.
+ * Si el entorno no tiene base de datos, responde "unavailable" para no dar por
+ * recibida una solicitud que no se guarda. Un fallo del correo no invalida el lead.
  */
 export async function requestDemo(_previous: DemoRequestState, formData: FormData): Promise<DemoRequestState> {
   if (
@@ -59,5 +64,18 @@ export async function requestDemo(_previous: DemoRequestState, formData: FormDat
     return { status: "invalid", errors, values: readValues(formData) };
   }
 
-  return { status: "unavailable", values: readValues(formData) };
+  if (!isDatabaseConfigured()) {
+    return { status: "unavailable", values: readValues(formData) };
+  }
+
+  let lead: { id: string };
+  try {
+    lead = await saveLead(parsed.data);
+  } catch (error) {
+    console.error("No se pudo guardar la solicitud de demo", error);
+    return { status: "error", values: readValues(formData) };
+  }
+
+  await notifyNewLead({ ...parsed.data, id: lead.id });
+  return { status: "sent" };
 }

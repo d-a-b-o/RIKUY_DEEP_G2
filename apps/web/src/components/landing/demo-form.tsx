@@ -48,7 +48,19 @@ export function DemoForm() {
   const startedAt = useSyncExternalStore(subscribeNoop, getPageLoadedAt, getServerPageLoadedAt);
 
   const errors = state.status === "invalid" ? state.errors : {};
-  const values = state.status === "invalid" || state.status === "unavailable" ? state.values : {};
+  const values =
+    state.status === "invalid" || state.status === "unavailable" || state.status === "error" ? state.values : {};
+
+  if (state.status === "sent") {
+    return (
+      <div role="status" className="flex flex-col gap-3 py-6">
+        <p className="text-xl font-semibold">Recibimos tu solicitud</p>
+        <p className="leading-7 text-muted-foreground">
+          Gracias. Te escribiremos al correo que indicaste para coordinar la demo.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <form action={formAction} noValidate className="flex flex-col gap-5">
@@ -169,6 +181,12 @@ export function DemoForm() {
           <p className="rounded-lg border border-warning/40 bg-warning/5 px-4 py-3 text-sm text-foreground">
             Tus datos están completos, pero el envío de solicitudes todavía no está activo en este sitio, así que no
             se ha guardado nada. Vuelve a intentarlo en unos días.
+          </p>
+        ) : null}
+        {state.status === "error" ? (
+          <p className="rounded-lg border border-defect/40 bg-defect/5 px-4 py-3 text-sm text-defect">
+            No pudimos guardar tu solicitud por un problema nuestro. Tus datos siguen en el formulario: vuelve a
+            enviarlo en unos minutos.
           </p>
         ) : null}
         {state.status === "rejected" ? (
