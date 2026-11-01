@@ -44,6 +44,23 @@ jobs:
     if: needs.changes.outputs.web == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: rikuy
+          POSTGRES_PASSWORD: rikuy
+          POSTGRES_DB: rikuydeep
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U rikuy -d rikuydeep"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://rikuy:rikuy@localhost:5432/rikuydeep
+      DIRECT_URL: postgresql://rikuy:rikuy@localhost:5432/rikuydeep
     defaults:
       run:
         working-directory: apps/web
@@ -69,6 +86,12 @@ jobs:
 
       - name: Auditoría de dependencias de producción
         run: npm audit --omit=dev --audit-level=high
+
+      - name: Migraciones
+        run: npm run db:deploy
+
+      - name: Esquema y migraciones sincronizados
+        run: npm run db:check
 
       - name: Lint
         run: npm run lint
