@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="RikuyDeep">
+  <path d="M4 32C12.5 17.5 22 11 32 11s19.5 6.5 28 21c-8.5 14.5-18 21-28 21S12.5 46.5 4 32Z" fill="none" stroke="#1f5075" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M32 19.5 42.8 25.75v12.5L32 44.5 21.2 38.25v-12.5Z" fill="#c2410c"/>
+  <circle cx="32" cy="32" r="4.5" fill="#ffffff"/>
+</svg>
