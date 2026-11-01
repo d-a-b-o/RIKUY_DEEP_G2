@@ -1,19 +1,19 @@
 const steps = [
   {
-    title: "Configura tu planta",
-    body: "Registra piezas, moldes y turnos, e invita a tus inspectores por correo.",
+    title: "Instala la estación",
+    body: "Fija una cámara sobre la cinta, conecta un computador y calibra la estación con la cinta vacía.",
   },
   {
-    title: "Abre un lote",
-    body: "El inspector elige el lote y el turno activo antes de empezar a inspeccionar.",
+    title: "Asigna el lote",
+    body: "El supervisor asigna el lote a la estación. El turno se detecta solo por la hora.",
   },
   {
-    title: "Inspecciona",
-    body: "Encuadra la pieza frente a la cámara. El modelo da el veredicto y la inspección queda registrada con su foto.",
+    title: "Inspección automática",
+    body: "Cada pieza que pasa se detecta, se inspecciona una vez y queda registrada, sin intervención humana.",
   },
   {
-    title: "Revisa y decide",
-    body: "Consulta el dashboard, corrige veredictos con su motivo y descarga el reporte del turno.",
+    title: "Actúa y revisa",
+    body: "Retira las piezas que la alerta marca, consulta el dashboard y descarga el reporte del turno.",
   },
 ];
 
@@ -24,7 +24,7 @@ export function HowItWorks() {
         <div className="flex max-w-2xl flex-col gap-4">
           <p className="font-mono text-xs uppercase tracking-[0.14em] text-colada-400">Cómo funciona</p>
           <h2 className="text-balance text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            De la configuración al reporte del turno en cuatro pasos
+            De la instalación al reporte del turno en cuatro pasos
           </h2>
         </div>
         <ol className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">

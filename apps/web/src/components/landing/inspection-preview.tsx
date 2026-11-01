@@ -9,16 +9,16 @@ export function InspectionPreview() {
     <figure className="relative w-full max-w-[34rem]">
       <div className="overflow-hidden rounded-2xl border border-border bg-acero-950 shadow-xl shadow-acero-950/20">
         <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-2.5 text-xs text-acero-200">
-          <span className="min-w-0 truncate font-mono">LOTE L-0417 · TURNO B · MOLDE M-12</span>
+          <span className="min-w-0 truncate font-mono">ESTACIÓN L2-01 · LOTE L-0417 · TURNO B</span>
           <span className="flex flex-none items-center gap-1.5 whitespace-nowrap">
-            <span className="h-2 w-2 rounded-full bg-colada-400" aria-hidden="true" />
-            Cámara 1
+            <span className="h-2 w-2 rounded-full bg-[#4ade80]" aria-hidden="true" />
+            En línea
           </span>
         </div>
 
         <svg viewBox="0 0 400 300" className="block w-full" role="img" aria-labelledby="preview-title">
           <title id="preview-title">
-            Impulsor de fundición en la guía de encuadre, con un poro marcado y el veredicto «Defectuosa»
+            Impulsor de fundición pasando por la estación, con un poro marcado y el veredicto «Defectuosa»
           </title>
           <defs>
             <radialGradient id="metal" cx="45%" cy="40%" r="65%">
@@ -72,16 +72,16 @@ export function InspectionPreview() {
 
         <div className="grid grid-cols-3 border-t border-white/10 text-xs text-acero-200">
           <div className="px-4 py-3">
+            <div className="text-acero-300">Pieza</div>
+            <div className="mt-0.5 font-mono text-sm text-white tabular-nums">#1.284</div>
+          </div>
+          <div className="border-x border-white/10 px-4 py-3">
             <div className="text-acero-300">Confianza</div>
             <div className="mt-0.5 font-mono text-sm text-white tabular-nums">0,94</div>
           </div>
-          <div className="border-x border-white/10 px-4 py-3">
-            <div className="text-acero-300">Tiempo</div>
-            <div className="mt-0.5 font-mono text-sm text-white tabular-nums">312 ms</div>
-          </div>
           <div className="px-4 py-3">
-            <div className="text-acero-300">Modelo</div>
-            <div className="mt-0.5 font-mono text-sm text-white">v1.0.0</div>
+            <div className="text-acero-300">Defectos hoy</div>
+            <div className="mt-0.5 font-mono text-sm text-white tabular-nums">1,6 %</div>
           </div>
         </div>
       </div>
@@ -94,7 +94,7 @@ export function InspectionPreview() {
       </div>
 
       <figcaption className="sr-only">
-        Ejemplo de inspección: el modelo marca la pieza como defectuosa con confianza 0,94 en 312 milisegundos.
+        Ejemplo de estación automática: la pieza 1.284 del turno se marca como defectuosa con confianza 0,94.
       </figcaption>
     </figure>
   );

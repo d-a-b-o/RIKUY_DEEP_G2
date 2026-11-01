@@ -40,10 +40,10 @@ export default function OpengraphImage() {
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
           <div style={{ fontSize: 66, fontWeight: 700, lineHeight: 1.1, maxWidth: 980 }}>
-            Detecta piezas defectuosas antes de que salgan de tu planta
+            {"Inspecciona el 100\u00a0% de tus piezas, no solo una muestra"}
           </div>
           <div style={{ fontSize: 30, color: "#a9b8c6" }}>
-            Inspección visual con IA para fundición · Veredicto en menos de 2 segundos
+            Inspección automática con IA sobre la línea de fundición
           </div>
         </div>
       </div>

@@ -1,15 +1,15 @@
 const problems = [
   {
+    title: "Se revisa una muestra, no todo",
+    body: "Cuando la producción no da tiempo para mirar cada pieza, se inspecciona una de cada cierta cantidad. Los defectos que caen entre muestra y muestra salen de la planta.",
+  },
+  {
     title: "El criterio cambia con el cansancio",
     body: "Un inspector revisa cientos de piezas por turno. A la sexta hora, un poro pequeño o una rebaba se escapan con más facilidad que a la primera.",
   },
   {
-    title: "No queda evidencia",
-    body: "El veredicto se anota en una planilla, sin foto. Cuando un cliente reclama, no hay forma de saber qué se vio, quién lo vio ni en qué lote.",
-  },
-  {
     title: "El defecto aparece en el cliente",
-    body: "Una pieza defectuosa que sale de la planta vuelve como devolución, reproceso o penalidad, y desgasta la confianza del cliente.",
+    body: "El veredicto se anota en una planilla, sin foto. La pieza que se escapó vuelve como devolución o penalidad, y no hay forma de saber en qué lote ni turno pasó.",
   },
 ];
 
@@ -20,11 +20,11 @@ export function Problem() {
         <div className="flex max-w-2xl flex-col gap-4">
           <p className="font-mono text-xs uppercase tracking-[0.14em] text-accent">El problema</p>
           <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
-            La inspección visual manual no escala con la producción
+            Revisar una muestra deja pasar defectos
           </h2>
           <p className="text-lg leading-8 text-muted-foreground">
-            En la mayoría de plantas de fundición, la calidad final depende de los ojos de una persona al final de
-            la línea.
+            En la mayoría de plantas de fundición, la calidad final depende de una persona que revisa lo que alcanza
+            al final de la línea.
           </p>
         </div>
         <ul className="grid gap-px overflow-hidden rounded-xl border border-border bg-border md:grid-cols-3">

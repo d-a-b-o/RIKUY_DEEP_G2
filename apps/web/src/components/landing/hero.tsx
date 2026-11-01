@@ -6,14 +6,15 @@ export function Hero() {
       <div className="mx-auto grid max-w-6xl items-center gap-14 px-4 pb-20 pt-14 sm:px-6 lg:grid-cols-[1.05fr_1fr] lg:pb-24 lg:pt-20">
         <div className="flex flex-col gap-7">
           <p className="font-mono text-xs uppercase tracking-[0.14em] text-accent">
-            Inspección visual con IA para fundición
+            Inspección automática con IA para fundición
           </p>
           <h1 className="text-balance text-4xl font-bold leading-[1.08] tracking-tight sm:text-5xl lg:text-[3.4rem]">
-            Detecta piezas defectuosas antes de que salgan de tu planta
+            Inspecciona el 100{"\u00a0"}% de tus piezas, no solo una muestra
           </h1>
           <p className="max-w-xl text-lg leading-8 text-muted-foreground">
-            RikuyDeep revisa cada pieza con la cámara de un computador y un modelo de visión que funciona en el
-            navegador. Da el veredicto en menos de 2 segundos y guarda la evidencia por lote, turno y molde.
+            RikuyDeep se instala sobre tu línea de producción con una cámara y un computador. Detecta cada pieza que
+            pasa, la clasifica como OK o defectuosa en menos de un segundo y avisa al instante cuando encuentra un
+            defecto.
           </p>
           <div className="flex flex-wrap gap-3">
             <a
@@ -31,21 +32,21 @@ export function Hero() {
           </div>
           <dl className="grid max-w-xl grid-cols-3 gap-4 border-t border-border pt-6">
             <div>
+              <dt className="text-xs text-muted-foreground">Piezas inspeccionadas</dt>
+              <dd className="mt-1 text-2xl font-semibold tabular-nums">100 %</dd>
+            </div>
+            <div>
               <dt className="text-xs text-muted-foreground">Defectuosas detectadas</dt>
               <dd className="mt-1 text-2xl font-semibold tabular-nums">98,3 %</dd>
             </div>
             <div>
-              <dt className="text-xs text-muted-foreground">Exactitud</dt>
-              <dd className="mt-1 text-2xl font-semibold tabular-nums">99,0 %</dd>
-            </div>
-            <div>
-              <dt className="text-xs text-muted-foreground">Hardware extra</dt>
-              <dd className="mt-1 text-2xl font-semibold">Ninguno</dd>
+              <dt className="text-xs text-muted-foreground">Por estación</dt>
+              <dd className="mt-1 text-2xl font-semibold tabular-nums">60/min</dd>
             </div>
           </dl>
           <p className="-mt-3 text-xs text-muted-foreground">
-            Resultados del modelo en el conjunto de prueba: 195 impulsores de fundición, de los que detectó 115 de
-            117 defectuosos.
+            Detección medida en el conjunto de prueba: 115 de 117 impulsores defectuosos, con 99,0 % de exactitud.
+            Cada estación está diseñada para hasta una pieza por segundo.
           </p>
         </div>
         <div className="flex justify-center lg:justify-end">

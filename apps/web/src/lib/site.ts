@@ -13,8 +13,8 @@ export function getSiteUrl(): URL {
 
 export const siteConfig = {
   name: "RikuyDeep",
-  title: "RikuyDeep · Inspección visual con IA para fundición",
+  title: "RikuyDeep · Inspección automática con IA para fundición",
   description:
-    "Detecta piezas de fundición defectuosas con la cámara de un computador y un modelo de visión en el navegador. Veredicto en menos de 2 segundos y trazabilidad por lote, turno y molde.",
+    "Inspecciona el 100 % de tus piezas de fundición con una cámara sobre la línea y un modelo de IA en el navegador. Detección de defectos en menos de un segundo, alerta inmediata y trazabilidad por lote, turno y molde.",
   locale: "es_PE",
 } as const;
