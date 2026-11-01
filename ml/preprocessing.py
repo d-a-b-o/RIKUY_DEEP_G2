@@ -1,6 +1,7 @@
 """Preprocesamiento compartido HU06 para fundición.
 Entrada: imagen decodificada RGB. Resize bilinear a 400x400. RGB float32 en [0,1].
-TensorFlow.js: tf.image.resizeBilinear(rgb, [400, 400]).div(255).
+TensorFlow.js: recorte cuadrado centrado, canvas 400x400 con suavizado alto, fromPixels().div(255);
+ver docs/arquitectura/inferencia-navegador.md.
 Augmentation solo se activa con training=True en el conjunto train.
 """
 
