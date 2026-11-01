@@ -7,6 +7,8 @@ Tarea: RIKDP-86 (HU07-T01 · diagrama de arquitectura y ADR de stack), dentro de
 Documentos relacionados:
 
 - [Modelo de datos](modelo-datos.md) (RIKDP-87)
+- [Inferencia en el navegador y manifest de modelos](inferencia-navegador.md) (RIKDP-88)
+- [Acta de la revisión de arquitectura](revisiones/2026-11-01-hu08.md) (RIKDP-89)
 - [Decisiones de arquitectura (ADR)](../adr/README.md)
 - [Identidad visual](../identidad-visual.md)
 
@@ -122,7 +124,7 @@ flowchart LR
   F --> G["Navegadores cargan<br/>la nueva versión"]
 ```
 
-Volver a la versión anterior consiste en cambiar el manifest (HU25). El formato del manifest y el detalle de la inferencia en el navegador son la tarea RIKDP-88 (HU07-T03, Daniel Sánchez).
+Volver a la versión anterior consiste en cambiar el manifest (HU25). El formato del manifest y el detalle de la inferencia están en [inferencia en el navegador](inferencia-navegador.md) y en el [ADR 0006](../adr/0006-manifest-de-modelos.md).
 
 ## Seguridad
 
@@ -142,10 +144,13 @@ Volver a la versión anterior consiste en cambiar el manifest (HU25). El formato
 
 Las variables de entorno se configuran por entorno en Vercel; ningún secreto va en el repositorio (HU13).
 
-## Puntos abiertos
+## Decisiones de la revisión
 
-| Tema | Detalle | Responsable |
-| --- | --- | --- |
-| Tamaño de entrada del modelo | `ml/preprocessing.py` usa **400×400**; HU06 y HU26 dicen **224×224**. Hay que fijar uno solo, porque TF.js debe replicar el mismo preprocesamiento | RIKDP-88 / equipo de ML |
-| Formato del manifest | Campos, URL y caché del `manifest.json` | RIKDP-88 |
-| Carpeta `apps/inference` | HU01 la menciona, pero ya no hay servidor de inferencia (FastAPI) desde la reestructuración del 28/10. No se crea | Revisión de arquitectura (RIKDP-89) |
+Los puntos que quedaron abiertos se decidieron en la [revisión de arquitectura del 2026-11-01](revisiones/2026-11-01-hu08.md):
+
+| Tema | Decisión |
+| --- | --- |
+| Tamaño de entrada del modelo | **400×400**, el del modelo entrenado que cumple las métricas. HU06 y HU26 se corrigieron |
+| Formato del manifest | Definido en [inferencia en el navegador](inferencia-navegador.md) y [ADR 0006](../adr/0006-manifest-de-modelos.md) |
+| Carpeta `apps/inference` | No se crea: no hay servidor de inferencia |
+| `middleware.ts` en Next.js 16 | Se usa `proxy.ts` |

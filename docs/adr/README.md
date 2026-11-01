@@ -4,13 +4,14 @@ Cada decisión de arquitectura relevante se documenta en un archivo numerado con
 
 | ADR | Decisión | Estado |
 | --- | --- | --- |
-| [0001](0001-stack-tecnologico.md) | Stack tecnológico de la aplicación web | Propuesta |
-| [0002](0002-inferencia-en-el-navegador.md) | Inferencia del modelo en el navegador con TensorFlow.js | Propuesta |
-| [0003](0003-multiempresa-con-columna-company-id.md) | Multiempresa con base de datos compartida y columna `company_id` | Propuesta |
-| [0004](0004-trazabilidad-inmutable.md) | Trazabilidad inmutable de inspecciones con eventos | Propuesta |
-| [0005](0005-subida-directa-a-r2.md) | Subida de imágenes directa a R2 con URL prefirmada | Propuesta |
+| [0001](0001-stack-tecnologico.md) | Stack tecnológico de la aplicación web | Aceptada |
+| [0002](0002-inferencia-en-el-navegador.md) | Inferencia del modelo en el navegador con TensorFlow.js | Aceptada |
+| [0003](0003-multiempresa-con-columna-company-id.md) | Multiempresa con base de datos compartida y columna `company_id` | Aceptada |
+| [0004](0004-trazabilidad-inmutable.md) | Trazabilidad inmutable de inspecciones con eventos | Aceptada |
+| [0005](0005-subida-directa-a-r2.md) | Subida de imágenes directa a R2 con URL prefirmada | Aceptada |
+| [0006](0006-manifest-de-modelos.md) | Manifest de modelos para versionar y revertir sin desplegar | Aceptada |
 
-Los ADR pasan de **Propuesta** a **Aceptada** tras la revisión de arquitectura con el equipo (RIKDP-89).
+Los ADR 0001–0006 se aceptaron en la revisión de arquitectura del 2026-11-01 ([acta](../arquitectura/revisiones/2026-11-01-hu08.md)).
 
 ## Cómo escribir un ADR
 

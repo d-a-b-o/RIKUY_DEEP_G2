@@ -1,6 +1,6 @@
 # 0003 · Multiempresa con base de datos compartida y columna `company_id`
 
-- **Estado:** Propuesta
+- **Estado:** Aceptada (revisión de arquitectura del 2026-11-01, RIKDP-89)
 - **Fecha:** 2026-11-01
 - **Tareas:** RIKDP-86 (HU07-T01), RIKDP-87 (HU07-T02), HU23, HU30, HU31, HU32
 
