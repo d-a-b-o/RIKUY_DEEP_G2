@@ -1,6 +1,6 @@
 # 0004 · Trazabilidad inmutable de inspecciones con eventos
 
-- **Estado:** Propuesta
+- **Estado:** Aceptada (revisión de arquitectura del 2026-11-01, RIKDP-89)
 - **Fecha:** 2026-11-01
 - **Tareas:** RIKDP-87 (HU07-T02), HU24, HU40
 

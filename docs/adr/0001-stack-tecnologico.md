@@ -1,6 +1,6 @@
 # 0001 · Stack tecnológico de la aplicación web
 
-- **Estado:** Propuesta
+- **Estado:** Aceptada (revisión de arquitectura del 2026-11-01, RIKDP-89)
 - **Fecha:** 2026-11-01
 - **Tareas:** RIKDP-86 (HU07-T01), HU08
 

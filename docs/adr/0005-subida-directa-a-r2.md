@@ -1,6 +1,6 @@
 # 0005 · Subida de imágenes directa a R2 con URL prefirmada
 
-- **Estado:** Propuesta
+- **Estado:** Aceptada (revisión de arquitectura del 2026-11-01, RIKDP-89)
 - **Fecha:** 2026-11-01
 - **Tareas:** RIKDP-86 (HU07-T01), HU24, HU35, HU39
 

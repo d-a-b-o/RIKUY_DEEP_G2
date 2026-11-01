@@ -1,6 +1,6 @@
 # 0002 · Inferencia del modelo en el navegador con TensorFlow.js
 
-- **Estado:** Propuesta
+- **Estado:** Aceptada (revisión de arquitectura del 2026-11-01, RIKDP-89)
 - **Fecha:** 2026-11-01
 - **Tareas:** RIKDP-86 (HU07-T01), HU25, HU26, HU35, HU44
 
@@ -37,4 +37,4 @@ El modelo se exporta a **TensorFlow.js** (graph model) y se ejecuta en el navega
   - El modelo es descargable públicamente. Es aceptable: no contiene datos de clientes.
   - La CSP debe permitir WebGL y WASM (`'wasm-unsafe-eval'`, HU48).
   - Hay que garantizar la paridad Keras ↔ TF.js (HU25) y la ausencia de fugas de memoria liberando tensores (HU44).
-  - El tamaño de entrada del modelo debe quedar fijado. Hoy `ml/preprocessing.py` usa 400×400 y HU26 dice 224×224; se resuelve en RIKDP-88.
+  - El tamaño de entrada es 400×400, el del modelo entrenado que cumple las métricas (decidido en la revisión del 2026-11-01). Cuesta unas 3,2 veces más cómputo que 224×224; si no se alcanza el p95 < 500 ms, se cuantiza o se publica una versión a 224×224. Detalle en [inferencia en el navegador](../arquitectura/inferencia-navegador.md).
