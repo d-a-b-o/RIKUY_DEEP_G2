@@ -169,11 +169,81 @@ La función `classify()` de `apps/web/src/lib/model/manifest.ts` lo implementa y
 
 Con un umbral de 0,2649, una pieza con `p = 0,30` es **defectuosa con confianza 0,30**. Es lo esperado: el umbral bajo prioriza no dejar pasar defectos. La interfaz debe mostrar el veredicto de forma destacada y la confianza como dato secundario.
 
-## Video en tiempo real (HU44)
+## Estación de inspección automática (HU44)
 
-- Muestreo configurable (por defecto 2 fps) con `requestVideoFrameCallback`, y nunca más de una inferencia en curso a la vez.
-- Todo el preprocesamiento y la inferencia dentro de `tf.tidy()`; el resultado se lee con `await tensor.data()` y se libera con `dispose()`.
-- Prueba de fugas: `tf.memory().numTensors` debe quedar estable tras 200 fotogramas.
+La estación inspecciona sola cada pieza que pasa por la línea ([ADR 0007](../adr/0007-estacion-de-inspeccion-automatica.md)). El reto es inspeccionar **cada pieza exactamente una vez**: ni dos veces la misma pieza, ni una pieza movida o a medio entrar en el encuadre.
+
+### Detección de piezas
+
+La detección no usa el modelo de IA, que es costoso. Usa una comparación barata de fotogramas:
+
+- Cada 100 ms (10 fps) el fotograma se reduce a 64×64 en escala de grises con un `<canvas>`.
+- **Presencia:** diferencia media con la imagen de referencia de la cinta vacía, tomada al calibrar.
+- **Movimiento:** diferencia media con el fotograma anterior.
+
+```mermaid
+stateDiagram-v2
+  [*] --> Vacia
+  Vacia --> Llegando: presencia > umbral
+  Llegando --> Quieta: movimiento < umbral durante 3 fotogramas
+  Llegando --> Vacia: presencia < umbral
+  Quieta --> Inspeccionada: una inferencia con el modelo
+  Inspeccionada --> Saliendo: presencia baja o movimiento alto
+  Saliendo --> Vacia: presencia < umbral durante 3 fotogramas
+  Llegando --> Inspeccionada: no se detuvo en 2 s (inferencia con aviso)
+```
+
+- La inferencia ocurre **una sola vez por pieza**, en el estado *Quieta*. Hasta que la escena vuelve a *Vacía*, no se inspecciona otra.
+- Si la pieza no llega a detenerse en 2 s (la cinta no para), se infiere con el fotograma más nítido y la inspección se marca con un aviso de movimiento.
+- Si aparece una pieza nueva sin que la escena se vacíe entre ambas (piezas pegadas), se registra un aviso de conteo dudoso para revisarlo.
+
+### Parámetros por estación
+
+Se guardan en `station.config` y se ajustan al calibrar:
+
+| Parámetro | Por defecto | Para qué |
+| --- | --- | --- |
+| `presenceThreshold` | 0,12 | Diferencia con el fondo que indica que hay una pieza |
+| `motionThreshold` | 0,02 | Diferencia entre fotogramas por debajo de la cual la pieza está quieta |
+| `stableFrames` | 3 | Fotogramas quietos seguidos antes de inferir |
+| `maxWaitMs` | 2000 | Espera máxima antes de inferir con aviso de movimiento |
+| `okPhotoEvery` | 20 | Se guarda la foto de 1 de cada N piezas OK |
+| `targetPiecesPerSecond` | 1 | Ritmo esperado de la línea, para avisar si se supera |
+
+### Presupuesto de tiempo a 1 pieza por segundo
+
+| Paso | Tiempo |
+| --- | --- |
+| Llegada y espera a que la pieza quede quieta (3 fotogramas a 10 fps) | 300 ms |
+| Preprocesamiento y una inferencia a 400×400 en WebGL | 300 ms |
+| Registro local, alerta y pantalla | < 50 ms |
+| **Total por pieza** | **≈ 650 ms** |
+
+Queda margen hasta 1 pieza por segundo. Por encima, la estación avisa de que la línea va más rápido que su capacidad.
+
+### Pieza defectuosa
+
+- La pantalla completa pasa al color `defect` con el texto «DEFECTUOSA» en grande, el número de pieza y la confianza.
+- Un sonido corto se repite cada 2 s (Web Audio API) hasta que un operario pulsa **«Pieza retirada»** o una tecla.
+- El veredicto nunca depende solo del color: siempre hay texto.
+
+### Fotos y envío
+
+- Cada inspección se guarda primero en IndexedDB.
+- La foto se conserva si la pieza es **defectuosa** o es la OK número N desde la última guardada (`okPhotoEvery`).
+- Un proceso en segundo plano envía al servidor los registros en lotes (cada 5 s o cada 50 inspecciones) y sube las fotos a R2 con URL prefirmada ([ADR 0005](../adr/0005-subida-directa-a-r2.md)).
+- Si no hay red, la cola crece y la estación sigue inspeccionando. Si la cola supera un límite de almacenamiento, se avisa en pantalla.
+
+### Funcionamiento continuo
+
+- Pantalla siempre encendida con `navigator.wakeLock.request("screen")`, renovado al volver a la pestaña.
+- Todo el trabajo con tensores dentro de `tf.tidy()`, y los resultados se leen con `await tensor.data()`.
+- Prueba de fugas: `tf.memory().numTensors` debe permanecer estable durante una ejecución de 8 horas.
+- Si se pierde el contexto WebGL o la cámara se desconecta, la estación muestra el problema, espera y se recarga sola, conservando la cola pendiente.
+
+### Pantalla de la estación
+
+Contadores del turno siempre visibles: piezas inspeccionadas, OK, defectuosas, porcentaje de defectos y ritmo actual (piezas por minuto), junto con el lote, el turno y la versión del modelo.
 
 ## Telemetría (HU43)
 
