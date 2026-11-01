@@ -10,10 +10,10 @@ const plans: Plan[] = [
     name: "Piloto",
     audience: "Para validar RikuyDeep con tus propias piezas en una línea.",
     features: [
-      "Una planta y una línea de inspección",
-      "Inspección con cámara, por lote e imagen subida",
+      "Una estación automática en una línea",
+      "Alerta sonora y visual de pieza defectuosa",
       "Historial y trazabilidad de cada pieza",
-      "Acompañamiento en la puesta en marcha",
+      "Acompañamiento en la instalación y calibración",
     ],
   },
   {
@@ -21,9 +21,9 @@ const plans: Plan[] = [
     audience: "Para inspeccionar toda la producción de una planta.",
     features: [
       "Todo lo del plan Piloto",
-      "Varias líneas e inspectores",
-      "Dashboard de calidad y reporte de turno en PDF y Excel",
-      "Inspección en video en tiempo real",
+      "Varias estaciones y líneas",
+      "Dashboard por estación y reporte de turno en PDF y Excel",
+      "Inspección manual con webcam y subida de imágenes",
       "Corrección de veredictos y reentrenamiento del modelo",
     ],
     featured: true,
@@ -54,9 +54,9 @@ export function Plans() {
       <div className="mx-auto flex max-w-6xl flex-col gap-12 px-4 py-20 sm:px-6">
         <div className="flex max-w-2xl flex-col gap-4">
           <p className="font-mono text-xs uppercase tracking-[0.14em] text-accent">Planes</p>
-          <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">Empieza con una línea y crece a tu ritmo</h2>
+          <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">Empieza con una estación y crece a tu ritmo</h2>
           <p className="text-lg leading-8 text-muted-foreground">
-            El precio depende del volumen de piezas que inspeccionas. Solicita una demo y te enviamos una propuesta.
+            El precio depende del número de estaciones y del volumen de piezas. Solicita una demo y te enviamos una propuesta.
           </p>
         </div>
         <ul className="grid gap-6 lg:grid-cols-3">

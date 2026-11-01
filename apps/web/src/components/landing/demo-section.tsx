@@ -3,6 +3,7 @@ import { DemoForm } from "./demo-form";
 const expectations = [
   "Una videollamada de 30 minutos con tu equipo de calidad",
   "Una inspección en vivo con imágenes de piezas como las tuyas",
+  "Una evaluación de dónde instalar la estación en tu línea",
   "Una propuesta según tu volumen de producción",
 ];
 

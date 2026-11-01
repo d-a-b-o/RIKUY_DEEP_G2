@@ -1,6 +1,6 @@
 # Arquitectura de RikuyDeep
 
-RikuyDeep es una aplicación web multiempresa para la inspección visual de piezas de fundición. Un modelo de visión clasifica cada pieza como **OK** o **defectuosa** directamente en el navegador del inspector, y la aplicación guarda la trazabilidad de cada inspección para los dashboards y reportes de calidad.
+RikuyDeep es una aplicación web multiempresa para la inspección visual de piezas de fundición. Su modo principal es una **estación de inspección automática** instalada sobre la línea de producción: una cámara y un computador inspeccionan **el 100 % de las piezas** que pasan, sin que nadie las capture una a una ([ADR 0007](../adr/0007-estacion-de-inspeccion-automatica.md)). Un modelo de visión clasifica cada pieza como **OK** o **defectuosa** directamente en el navegador, y la aplicación guarda la trazabilidad de cada inspección para los dashboards y reportes de calidad. También hay un modo manual con webcam y subida de imágenes para revisiones puntuales.
 
 Tarea: RIKDP-86 (HU07-T01 · diagrama de arquitectura y ADR de stack), dentro de HU08 · Crear la aplicación web.
 
@@ -69,7 +69,8 @@ flowchart LR
 
 | Componente | Responsabilidad | Historias |
 | --- | --- | --- |
-| **Interfaz Next.js** | Pantallas (landing, login, inspección, historial, dashboard, administración). Captura de la webcam y subida de imágenes | HU12, HU35, HU37, HU39, HU40, HU44 |
+| **Interfaz Next.js** | Pantallas (landing, login, inspección manual, historial, dashboard, administración). Captura de la webcam y subida de imágenes | HU12, HU35, HU37, HU39, HU40 |
+| **Estación automática** | Pantalla en modo kiosco sobre la línea: detecta cada pieza, la inspecciona una vez, avisa si es defectuosa y envía los registros en lotes ([diseño](inferencia-navegador.md#estación-de-inspección-automática-hu44)) | HU44 |
 | **TensorFlow.js** | Carga el modelo indicado por el manifest, lo guarda en IndexedDB y ejecuta la inferencia. Preprocesamiento idéntico al de `ml/preprocessing.py` | HU26 |
 | **IndexedDB** | Caché del modelo y cola de capturas que aún no se han subido, para reintentar sin perder la imagen | HU26, HU35 |
 | **`proxy.ts`** (antes `middleware`) | Primera barrera: sesión válida y rol permitido para la ruta. No sustituye a la autorización en el servidor | HU32 |
@@ -83,7 +84,9 @@ flowchart LR
 | **GitHub Actions** | CI (`.github/workflows/ci.yml`) y, más adelante, regresión del modelo y publicación | HU02, HU22, HU25 |
 | **UptimeRobot** | Vigila la web y la URL del manifest, y avisa por correo | HU43 |
 
-## Flujo principal: inspeccionar una pieza
+## Flujo de registro de una inspección
+
+Este flujo es el mismo para una inspección manual y para una estación automática. La estación lo hace sin intervención humana y en lotes; la detección de cada pieza está en [inferencia en el navegador](inferencia-navegador.md#estación-de-inspección-automática-hu44).
 
 ```mermaid
 sequenceDiagram

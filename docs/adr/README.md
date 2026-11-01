@@ -10,8 +10,9 @@ Cada decisión de arquitectura relevante se documenta en un archivo numerado con
 | [0004](0004-trazabilidad-inmutable.md) | Trazabilidad inmutable de inspecciones con eventos | Aceptada |
 | [0005](0005-subida-directa-a-r2.md) | Subida de imágenes directa a R2 con URL prefirmada | Aceptada |
 | [0006](0006-manifest-de-modelos.md) | Manifest de modelos para versionar y revertir sin desplegar | Aceptada |
+| [0007](0007-estacion-de-inspeccion-automatica.md) | Estación de inspección automática en la línea de producción | Aceptada |
 
-Los ADR 0001–0006 se aceptaron en la revisión de arquitectura del 2026-11-01 ([acta](../arquitectura/revisiones/2026-11-01-hu08.md)).
+Los ADR 0001–0006 se aceptaron en la revisión de arquitectura del 2026-11-01 ([acta](../arquitectura/revisiones/2026-11-01-hu08.md)). El ADR 0007 se aceptó el mismo día al redefinir HU44 como inspección automática del 100 % de las piezas.
 
 ## Cómo escribir un ADR
 

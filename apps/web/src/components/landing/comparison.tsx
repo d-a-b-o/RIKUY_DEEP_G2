@@ -9,10 +9,16 @@ type Row = {
 
 const rows: Row[] = [
   {
+    criterion: "Piezas inspeccionadas",
+    manual: ["poor", "Una muestra o lo que se alcance"],
+    machineVision: ["good", "Todas"],
+    rikuy: ["good", "Todas"],
+  },
+  {
     criterion: "Inversión inicial",
     manual: ["good", "Baja"],
     machineVision: ["poor", "Alta: cámaras industriales, iluminación e integrador"],
-    rikuy: ["good", "Baja: webcam y computador"],
+    rikuy: ["good", "Baja: cámara y computador"],
   },
   {
     criterion: "Puesta en marcha",
@@ -24,13 +30,13 @@ const rows: Row[] = [
     criterion: "Criterio constante",
     manual: ["poor", "Varía con la persona y el cansancio"],
     machineVision: ["good", "Sí"],
-    rikuy: ["good", "Sí, el mismo modelo en todos los puestos"],
+    rikuy: ["good", "Sí, todo el turno y en todas las estaciones"],
   },
   {
     criterion: "Evidencia de cada pieza",
     manual: ["poor", "No"],
     machineVision: ["mixed", "Depende del sistema"],
-    rikuy: ["good", "Foto, veredicto, inspector y versión del modelo"],
+    rikuy: ["good", "Veredicto de todas; foto de las defectuosas y de una muestra de OK"],
   },
   {
     criterion: "Reportes por turno y molde",
