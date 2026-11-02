@@ -2,7 +2,7 @@
 # Tras validar en tu GPU/Colab, guarda pip freeze en los artefactos del experimento.
 tensorflow>=2.16,<2.22
 numpy>=1.26,<3
-pillow>=11,<13
+pillow>=13,<14
 scikit-learn>=1.5,<2
 pandas>=2.2,<4
 matplotlib>=3.9,<4
