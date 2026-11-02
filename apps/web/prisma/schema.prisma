@@ -434,6 +434,18 @@ model Lead {
   @@map("lead")
 }
 
+/// Contador del rate limit de Better Auth (RIKDP-134). Se guarda en la base para
+/// que el límite se respete entre las instancias serverless de Vercel.
+model RateLimit {
+  id          String @id
+  key         String @unique
+  count       Int
+  /// Instante de la última petición, en milisegundos desde epoch.
+  lastRequest BigInt @map("last_request")
+
+  @@map("rate_limit")
+}
+
 model AccessDeniedLog {
   id        String   @id @default(uuid(7))
   userId    String?  @map("user_id")
