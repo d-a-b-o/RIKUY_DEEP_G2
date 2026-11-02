@@ -9,7 +9,7 @@ import types
 import unittest
 from datetime import datetime, timezone
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, Mock, patch
 
 import numpy as np
 from PIL import Image
@@ -107,6 +107,33 @@ class OrderedNotebookTests(unittest.TestCase):
         Image.new("RGB", (8, 8), (255, 255, 255)).save(self.config.raw / "ok_front/00.png")
         with self.assertRaises(ValueError):
             self.ns["load_manifest"](self.config)
+
+    def test_eda_and_preview_accept_shared_manifest_or_load_it_once(self):
+        manifest = {"rows": [{"split": "train", "path": "sample.png", "label": 1}], "duplicates_removed": 0}
+        for name in ("show_eda", "preview_augmentation"):
+            for shared in (True, False):
+                with self.subTest(function=name, shared_manifest=shared):
+                    loader = Mock(return_value=manifest)
+                    plots = MagicMock()
+                    plots.subplots.return_value = (MagicMock(), [MagicMock(), MagicMock()])
+                    with (
+                        patch.dict(
+                            self.ns,
+                            {
+                                "load_manifest": loader,
+                                "pd": MagicMock(),
+                                "plt": plots,
+                                "make_tf_dataset": Mock(return_value=[(MagicMock(), 1)]),
+                            },
+                        ),
+                        contextlib.redirect_stdout(io.StringIO()),
+                    ):
+                        if shared:
+                            self.ns[name](self.config, manifest=manifest)
+                            loader.assert_not_called()
+                        else:
+                            self.ns[name](self.config)
+                            loader.assert_called_once_with(self.config)
 
     def test_augmentation_reaches_train_for_both_architectures_only(self):
         manifest = self.ns["prepare_data"](self.config)
