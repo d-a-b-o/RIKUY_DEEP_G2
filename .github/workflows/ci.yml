@@ -43,7 +43,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.web == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     services:
       postgres:
         image: postgres:16
@@ -104,6 +104,24 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Navegador de Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Prueba de humo (Playwright @smoke)
+        env:
+          E2E_EXPECT_DATABASE: "1"
+        run: npm run test:smoke
+
+      - name: Reporte de Playwright
+        if: failure()
+        uses: actions/upload-artifact@v5
+        with:
+          name: playwright-report
+          path: |
+            apps/web/playwright-report/
+            apps/web/test-results/
+          retention-days: 14
 
   ml:
     name: ML · ruff y pytest

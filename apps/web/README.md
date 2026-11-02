@@ -26,6 +26,8 @@ npm run build        # compilación de producción
 npm run lint         # ESLint
 npm run typecheck    # tipos (next typegen + tsc)
 npm test             # pruebas (Vitest); las de base de datos se ejecutan si hay DATABASE_URL
+npm run test:e2e     # pruebas de sistema (Playwright); requiere npm run build antes
+npm run test:smoke   # solo la prueba de humo (@smoke), la misma que corre en CI
 npm run db:migrate   # crea y aplica una migración tras cambiar prisma/schema.prisma
 npm run db:deploy    # aplica migraciones pendientes (CI y Vercel)
 npm run db:check     # falla si el esquema tiene cambios sin migración
@@ -36,6 +38,7 @@ npm run db:seed      # datos de demostración
 
 ```
 apps/web/
+├── e2e/                  # pruebas de sistema con Playwright (Page Objects en e2e/pages/)
 ├── prisma/
 │   ├── schema.prisma     # modelo de datos (docs/arquitectura/modelo-datos.md)
 │   ├── migrations/       # migraciones versionadas
@@ -45,9 +48,12 @@ apps/web/
 ├── src/lib/              # lógica compartida: db.ts, leads/, model/
 ├── src/generated/        # cliente de Prisma generado (no se versiona)
 ├── public/               # archivos estáticos
+├── playwright.config.ts
 ├── prisma.config.ts
 └── next.config.ts
 ```
+
+Estrategia, niveles y criterios de prueba: [docs/pruebas/plan-de-pruebas.md](../../docs/pruebas/plan-de-pruebas.md). La primera vez, instala el navegador con `npx playwright install chromium`.
 
 Alias de importación: `@/` apunta a `src/`, por ejemplo `import { authorize } from "@/lib/authz"`.
 
