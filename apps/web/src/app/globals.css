@@ -39,6 +39,50 @@
 }
 
 :root {
+  color-scheme: light;
+  --background: #f5f8fc;
+  --surface: #ffffff;
+  --foreground: #142238;
+  --muted-foreground: #495c73;
+  --border: #ced8e5;
+  --primary: #006779;
+  --primary-foreground: #ffffff;
+  --accent: #a33d08;
+  --accent-foreground: #ffffff;
+  --ok: #126b3c;
+  --defect: #b42332;
+  --warning: #704700;
+  --ring: #00758a;
+  --input-border: #74849a;
+  --surface-raised: #eaf0f7;
+  --primary-hover: #005465;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --primary-hover: #60d1e2;
+    --background: #101827;
+    --surface: #253349;
+    --foreground: #f1f5f9;
+    --muted-foreground: #b2c1d3;
+    --border: #3b4d65;
+    --primary: #22b8cf;
+    --primary-foreground: #101827;
+    --accent: #ffab72;
+    --accent-foreground: #101827;
+    --ok: #65dfa0;
+    --defect: #ff9393;
+    --warning: #f4ce77;
+    --ring: #45d9ed;
+    --input-border: #7b8da6;
+    --surface-raised: #1a273a;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --primary-hover: #60d1e2;
   --background: #101827;
   --surface: #253349;
   --foreground: #f1f5f9;
@@ -56,21 +100,21 @@
   --surface-raised: #1a273a;
 }
 
+.theme-sun {
+  display: none;
+}
+:root[data-theme="dark"] .theme-sun {
+  display: block;
+}
+:root[data-theme="dark"] .theme-moon {
+  display: none;
+}
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #101827;
-    --surface: #253349;
-    --foreground: #f1f5f9;
-    --muted-foreground: #b2c1d3;
-    --border: #3b4d65;
-    --primary: #22b8cf;
-    --primary-foreground: #101827;
-    --accent: #ffab72;
-    --accent-foreground: #101827;
-    --ok: #65dfa0;
-    --defect: #ff9393;
-    --warning: #f4ce77;
-    --ring: #45d9ed;
+  :root:not([data-theme="light"]) .theme-sun {
+    display: block;
+  }
+  :root:not([data-theme="light"]) .theme-moon {
+    display: none;
   }
 }
 
@@ -97,7 +141,6 @@
 
 @layer base {
   html {
-    color-scheme: dark;
     scroll-padding-top: 5rem;
   }
 
@@ -176,7 +219,7 @@
     transition-property: background, box-shadow, border-color, transform;
   }
   .ui-button:hover {
-    background: #60d1e2;
+    background: var(--primary-hover);
     box-shadow: 0 4px 24px #22b8cf15;
   }
   .ui-button:active {

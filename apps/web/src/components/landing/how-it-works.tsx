@@ -26,7 +26,7 @@ export function HowItWorks() {
       <div className="mx-auto flex max-w-7xl flex-col gap-12 px-5 py-16 sm:px-8 sm:py-20">
         <div className="flex max-w-2xl flex-col gap-4">
           <p className="ui-eyebrow">03 / Cómo funciona</p>
-          <h2 className="text-balance text-3xl font-bold tracking-tight text-white sm:text-4xl">
+          <h2 className="text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             De la instalación al reporte del turno en cuatro pasos
           </h2>
         </div>
@@ -42,7 +42,9 @@ export function HowItWorks() {
                   / Paso {index + 1}
                 </span>
               </span>
-              <h3 className="text-lg font-semibold text-white">{step.title}</h3>
+              <h3 className="text-lg font-semibold text-foreground">
+                {step.title}
+              </h3>
               <p className="leading-7 text-muted-foreground">{step.body}</p>
             </li>
           ))}

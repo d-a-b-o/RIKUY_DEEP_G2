@@ -1,4 +1,5 @@
 "use client";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 import Link from "next/link";
 import { useRef, useState } from "react";
@@ -16,7 +17,7 @@ export function SiteHeader() {
   const toggle = useRef<HTMLButtonElement>(null);
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-xl">
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-5 sm:px-8">
+      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-2 px-4 sm:gap-4 sm:px-8">
         <a
           href="#inicio"
           className="rounded-md text-xl"
@@ -94,7 +95,8 @@ export function SiteHeader() {
             </ul>
           </div>
         </nav>
-        <div className="ml-auto flex items-center gap-5 lg:ml-0">
+        <div className="ml-auto flex items-center gap-2 sm:gap-5 lg:ml-0">
+          <ThemeToggle />
           <Link
             href="/ingresar"
             className="inline-flex min-h-11 items-center text-sm font-medium hover:text-primary"

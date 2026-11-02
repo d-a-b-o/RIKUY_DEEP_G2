@@ -47,16 +47,27 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#101827",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f5f8fc" },
+    { media: "(prefers-color-scheme: dark)", color: "#101827" },
+  ],
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="es"
+      suppressHydrationWarning
       data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try { var t = localStorage.getItem("rikuy-theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch {}`,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

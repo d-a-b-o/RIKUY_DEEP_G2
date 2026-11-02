@@ -37,77 +37,112 @@ async function accessible(page: import("@playwright/test").Page) {
   ).toEqual([]);
 }
 
-for (const width of sizes) {
-  test.describe(`UI responsive ${width}px`, () => {
-    test.use({ viewport: { width, height: 900 } });
-    for (const [name, route] of [
-      ["landing", "/"],
-      ["ingresar", "/ingresar"],
-      ["recuperar", "/recuperar"],
-      ["restablecer", "/restablecer"],
-    ]) {
-      test(
-        `vista pública ${name}: contraste, etiquetas y sin overflow`,
-        { tag: ["@ui", "@smoke"] },
-        async ({ page }) => {
-          await page.goto(route);
-          await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-          expect(
-            await page.evaluate(
-              () => document.documentElement.scrollWidth <= window.innerWidth,
-            ),
-          ).toBe(true);
-          if (phase === "despues") await accessible(page);
-          await capture(page, name, width);
-        },
-      );
-    }
-    test.describe("área privada", () => {
-      test.skip(
-        !hasDatabase(),
-        "Necesita base de datos aislada para las cuentas ficticias.",
-      );
+for (const colorScheme of ["light", "dark"] as const) {
+  for (const width of sizes) {
+    test.describe(`UI responsive ${width}px ${colorScheme}`, () => {
+      test.use({ viewport: { width, height: 900 }, colorScheme });
       for (const [name, route] of [
-        ["panel", "/panel"],
-        ["inspeccion", "/panel/inspeccion"],
+        ["landing", "/"],
+        ["ingresar", "/ingresar"],
+        ["recuperar", "/recuperar"],
+        ["restablecer", "/restablecer"],
       ]) {
         test(
-          `vista privada ${name}: navegación, accesibilidad y sin overflow`,
+          `vista pública ${name}: contraste, etiquetas y sin overflow`,
           { tag: ["@ui", "@smoke"] },
-          async ({ page, signInPage, account }) => {
-            test.setTimeout(120_000);
-            await signInPage.goto(route);
-            await signInPage.signIn(account.email, account.password);
-            await expect(page).toHaveURL(new RegExp(`${route}$`));
+          async ({ page }) => {
+            await page.goto(route);
             await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-            if (
-              name === "inspeccion" &&
-              process.env.NEXT_PUBLIC_MODEL_MANIFEST_URL
-            ) {
-              await expect(
-                page.getByRole("main").getByRole("status"),
-              ).toContainText("Modelo", { timeout: 90_000 });
-            }
             expect(
               await page.evaluate(
                 () => document.documentElement.scrollWidth <= window.innerWidth,
               ),
             ).toBe(true);
-            if (phase === "despues") {
-              await expect(
-                page
-                  .getByRole("navigation", { name: "Panel" })
-                  .locator('[aria-current="page"]'),
-              ).toHaveCount(1);
-              await accessible(page);
-            }
-            await capture(page, name, width, account.email);
+            if (phase === "despues") await accessible(page);
+            await capture(page, `${name}-${colorScheme}`, width);
           },
         );
       }
+      test.describe("área privada", () => {
+        test.skip(
+          !hasDatabase(),
+          "Necesita base de datos aislada para las cuentas ficticias.",
+        );
+        for (const [name, route] of [
+          ["panel", "/panel"],
+          ["inspeccion", "/panel/inspeccion"],
+        ]) {
+          test(
+            `vista privada ${name}: navegación, accesibilidad y sin overflow`,
+            { tag: ["@ui", "@smoke"] },
+            async ({ page, signInPage, account }) => {
+              test.setTimeout(120_000);
+              await signInPage.goto(route);
+              await signInPage.signIn(account.email, account.password);
+              await expect(page).toHaveURL(new RegExp(`${route}$`));
+              await expect(
+                page.getByRole("heading", { level: 1 }),
+              ).toBeVisible();
+              if (
+                name === "inspeccion" &&
+                process.env.NEXT_PUBLIC_MODEL_MANIFEST_URL
+              ) {
+                await expect(
+                  page.getByRole("main").getByRole("status"),
+                ).toContainText("Modelo", { timeout: 90_000 });
+              }
+              expect(
+                await page.evaluate(
+                  () =>
+                    document.documentElement.scrollWidth <= window.innerWidth,
+                ),
+              ).toBe(true);
+              if (phase === "despues") {
+                await expect(
+                  page
+                    .getByRole("navigation", { name: "Panel" })
+                    .locator('[aria-current="page"]'),
+                ).toHaveCount(1);
+                await accessible(page);
+              }
+              await capture(
+                page,
+                `${name}-${colorScheme}`,
+                width,
+                account.email,
+              );
+            },
+          );
+        }
+      });
     });
-  });
+  }
 }
+
+test(
+  "tema: respeta el sistema y conserva la elección al navegar y recargar",
+  { tag: ["@ui", "@smoke"] },
+  async ({ page }) => {
+    await page.emulateMedia({ colorScheme: "light" });
+    await page.goto("/");
+    const scheme = () =>
+      page.locator("html").evaluate((el) => getComputedStyle(el).colorScheme);
+    expect(await scheme()).toBe("light");
+    const toggle = page.getByRole("button", { name: "Cambiar entre modo claro y oscuro" });
+    await toggle.focus();
+    await page.keyboard.press("Space");
+    expect(await scheme()).toBe("dark");
+    await page.getByRole("link", { name: "Ingresar", exact: true }).click();
+    expect(await scheme()).toBe("dark");
+    await page.reload();
+    expect(await scheme()).toBe("dark");
+    await page
+      .getByRole("button", { name: "Cambiar entre modo claro y oscuro" })
+      .click();
+    await page.reload();
+    expect(await scheme()).toBe("light");
+  },
+);
 
 test(
   "menú móvil: abre, cierra con Escape y navega a una sección",

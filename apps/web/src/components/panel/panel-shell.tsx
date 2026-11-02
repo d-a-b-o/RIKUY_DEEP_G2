@@ -1,3 +1,4 @@
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import Link from "next/link";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { Logo } from "@/components/brand/logo";
@@ -27,6 +28,9 @@ export function PanelShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
         <div className="px-4 pb-4 lg:pt-8">
+          <div className="mb-3 flex justify-end lg:hidden">
+            <ThemeToggle />
+          </div>
           <p className="mb-4 hidden px-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground lg:block">
             Espacio de trabajo
           </p>
@@ -54,6 +58,7 @@ export function PanelShell({ children }: { children: React.ReactNode }) {
             </span>
             <span>Control de calidad</span>
           </p>
+          <ThemeToggle />
           <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
             RikuyDeep / Visión industrial
           </p>

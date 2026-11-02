@@ -57,6 +57,8 @@ const pairs: Array<[string, string, number]> = [
   ["muted-foreground", "background", 4.5],
   ["muted-foreground", "surface", 4.5],
   ["primary", "background", 4.5],
+  ["primary", "surface", 4.5],
+  ["primary", "surface-raised", 4.5],
   ["primary-foreground", "primary", 4.5],
   ["accent", "background", 4.5],
   ["accent-foreground", "accent", 4.5],

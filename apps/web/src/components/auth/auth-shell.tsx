@@ -1,3 +1,4 @@
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import Link from "next/link";
 import { Logo } from "@/components/brand/logo";
 import { InspectionPreview } from "@/components/landing/inspection-preview";
@@ -48,12 +49,15 @@ export function AuthShell({
         </p>
       </aside>
       <div className="flex flex-col px-5 py-8 sm:px-10 lg:px-12">
-        <Link
-          href="/"
-          className="inline-flex min-h-11 w-fit items-center gap-2 rounded-md text-sm text-muted-foreground hover:text-primary"
-        >
-          <span aria-hidden="true">←</span> Volver al inicio
-        </Link>
+        <div className="flex items-center justify-between gap-4">
+          <Link
+            href="/"
+            className="inline-flex min-h-11 w-fit items-center gap-2 rounded-md text-sm text-muted-foreground hover:text-primary"
+          >
+            <span aria-hidden="true">←</span> Volver al inicio
+          </Link>
+          <ThemeToggle />
+        </div>
         <div className="mx-auto my-auto w-full max-w-md py-12">
           <Link
             href="/"

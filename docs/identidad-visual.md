@@ -40,9 +40,16 @@ Las escalas completas (50 a 950) están en `apps/web/src/app/globals.css` y se u
 
 ### Tokens semánticos · Industrial Tech (RIKDP-274)
 
-La interfaz usa una presentación oscura coherente con independencia de la preferencia
-del sistema. Se conservan el logo, Geist/Geist Mono y las escalas de marca originales.
-Las acciones usan cyan y el acento naranja identifica la marca. No se añade un selector de tema.
+La interfaz ofrece modo claro y oscuro. La primera visita sigue la preferencia del
+sistema; el selector de sol/luna conserva la elección en este navegador al navegar
+y recargar. Si el almacenamiento está bloqueado, el cambio sigue funcionando en la
+página actual. Se conservan el logo, Geist/Geist Mono y las escalas de marca originales.
+Las acciones usan cyan y el acento naranja identifica la marca.
+
+El modo claro usa fondo #f5f8fc, superficies #ffffff/#eaf0f7, texto #142238,
+texto secundario #495c73, primario #006779 y foco #00758a. Los estados se
+oscurecen para mantener contraste: OK #126b3c, defecto #b42332 y aviso #704700.
+La tabla siguiente detalla el modo oscuro.
 
 | Token | Valor | Uso |
 | --- | --- | --- |

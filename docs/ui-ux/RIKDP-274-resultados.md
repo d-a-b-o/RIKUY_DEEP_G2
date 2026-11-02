@@ -11,8 +11,11 @@ El PR se entrega abierto para revisión, sin aprobar, fusionar ni desplegar manu
 
 ## Cambios
 
-- Tokens oscuros constantes, cyan para acciones, acento naranja de marca conservado,
+- Temas claro y oscuro, cyan para acciones, acento naranja de marca conservado,
   superficies elevadas y tipografía Geist/Geist Mono. No se reemplaza el logo.
+- Selector sol/luna en landing, acceso y panel: sigue el sistema inicialmente y
+  guarda la elección en localStorage. Se aplica antes de la hidratación para
+  evitar un destello del tema predeterminado al recargar.
 - Hero con jerarquía y retícula industrial; secciones, beneficios, tabla comparativa,
   planes, demo y footer unificados. Menú móvil con aria-expanded, cierre con Escape
   y devolución del foco. Tabla desplazable con foco de teclado e indicación móvil.
@@ -45,16 +48,18 @@ No se iniciaron sesiones ni se enviaron formularios en producción.
 | npm run typecheck | Aprobado |
 | npm run build | Aprobado; todas las rutas existentes compiladas |
 | npm audit --omit=dev --audit-level=high | **0 vulnerabilidades productivas** |
-| npm test, con PostgreSQL temporal | **127 pruebas aprobadas**, 8 archivos |
-| Playwright completo | **33 pruebas aprobadas**, ninguna omitida |
+| npm test, con PostgreSQL temporal | **131 pruebas aprobadas**, 8 archivos |
+| Playwright completo anterior al selector | **33 pruebas aprobadas**, ninguna omitida |
+| Playwright completo con claro/oscuro | **52 pruebas aprobadas**, ninguna omitida; persistencia y teclado incluidos |
 | Playwright de main para capturas privadas | **6 aprobadas**, sin modificar main |
-| Responsive / axe | Seis pantallas a **360, 768 y 1280 px**, sin overflow horizontal ni infracciones de los criterios axe seleccionados |
+| Responsive / axe | Seis pantallas a **360, 768 y 1280 px** en claro y oscuro, sin overflow horizontal ni infracciones de los criterios axe seleccionados |
 | Contraste semántico | >=4.5:1 en texto, >=3:1 en foco y bordes de controles; superficies elevadas incluidas |
 | Teclado y movimiento reducido | Foco visible, menú/Escape, selector de archivo y prefers-reduced-motion aprobados |
 | Flujos | Login/logout, bloqueo, redirección segura, rutas protegidas, recuperación, validación y persistencia de demo aprobados |
 | Inspección | Clasificación real OK, archivos incorrectos/corruptos, carga/error y captura de cámara simulada aprobados |
 
-Los 18 casos responsive/axe y los dos de menú/teclado llevan @smoke, de modo que
+Los 36 casos responsive/axe (seis pantallas, tres anchos y dos temas), los dos de menú/teclado
+y el caso de persistencia del tema llevan @smoke, de modo que
 el workflow CI existente también los ejecuta en el PR. Los casos de archivo/cámara
 con modelo requieren los fixtures explícitos, como la prueba de inferencia original.
 
@@ -95,6 +100,13 @@ validación final se proporcionaron y se ejecutaron**.
 Para generar capturas, establecer UI_EVIDENCE_DIR; UI_EVIDENCE_PHASE distingue antes/después.
 
 ## Evidencias visuales
+
+La ampliación de temas añade 36 capturas (seis páginas × tres anchos × dos temas),
+para un total de **70 PNG** incluyendo las evidencias anteriores. Ejemplos:
+[inicio claro](evidencias/RIKDP-274/despues-landing-light-1280.png),
+[inicio oscuro](evidencias/RIKDP-274/despues-landing-dark-1280.png),
+[inspección clara móvil](evidencias/RIKDP-274/despues-inspeccion-light-360.png) y
+[inspección oscura móvil](evidencias/RIKDP-274/despues-inspeccion-dark-360.png).
 
 Directorio: [evidencias/RIKDP-274](evidencias/RIKDP-274/).
 Las capturas públicas anteriores provienen de la web publicada; las privadas,
