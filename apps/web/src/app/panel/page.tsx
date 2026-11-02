@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { SignOutButton } from "@/components/auth/sign-out-button";
-import { Logo } from "@/components/brand/logo";
+import Link from "next/link";
+import { PanelShell } from "@/components/panel/panel-shell";
 import { getCurrentUser } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
@@ -19,19 +19,11 @@ const roleLabels: Record<string, string> = {
 
 export default function PanelPage() {
   return (
-    <div className="flex min-h-dvh flex-col bg-surface">
-      <header className="border-b border-border bg-background">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-          <Logo />
-          <SignOutButton />
-        </div>
-      </header>
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6">
-        <Suspense fallback={<p className="text-muted-foreground">Cargando tu panel…</p>}>
-          <Welcome />
-        </Suspense>
-      </main>
-    </div>
+    <PanelShell>
+      <Suspense fallback={<p className="text-muted-foreground">Cargando tu panel…</p>}>
+        <Welcome />
+      </Suspense>
+    </PanelShell>
   );
 }
 
@@ -56,6 +48,12 @@ async function Welcome() {
           <dd className="break-all font-medium">{user.email}</dd>
         </div>
       </dl>
+      <Link
+        href="/panel/inspeccion"
+        className="mt-8 inline-flex h-11 items-center rounded-lg bg-accent px-5 font-semibold text-accent-foreground transition-opacity hover:opacity-90"
+      >
+        Inspeccionar una pieza
+      </Link>
     </section>
   );
 }
