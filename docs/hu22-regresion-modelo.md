@@ -2,129 +2,145 @@
 
 Subtareas: RIKDP-143 (conjunto dorado), RIKDP-144 (CI), RIKDP-273 (comparación).
 
-## Alcance y estado
+## Artefactos reales y decisión
 
-El repositorio contiene punteros DVC a datos/modelos pero no sus contenidos. El remoto
-actual es una carpeta de Google Drive montada en Colab, inaccesible para un runner
-de GitHub. No hay evidencia nueva de inferencia real. Las 50 imágenes reales y su
-validación quedan pendientes. No se han inventado etiquetas ni resultados reales.
+El usuario proporcionó las carpetas de Drive del proyecto y confirmó esta comparación:
 
-`golden/synthetic.dvc` versiona 50 imágenes RGB generadas de 32×32, con etiquetas
-alternantes exclusivamente para pruebas. No representan piezas de fundición ni
-ground truth. Se reconstruyen con `ml.golden`; no requieren secretos ni un remoto.
-El gate real rechaza explícitamente `kind: synthetic`.
+- Base: HU17 `run01_lr1e-4_unfreeze15_drop30/best_model.keras`.
+- Candidata: `mobilenetv2_af731904844ed80545ae/best.keras`.
+- Umbral fijo de la base para ambos: **0.26489877700805664**. No se usa el umbral
+  recalibrado de la candidata (0.24371959269046783).
+- Dataset: 50 imágenes originales, 25 por clase, tomadas del split **test** del
+  manifiesto existente `data/prepared/manifest.json`, ordenadas por ruta.
+  No se crea otro split ni se cambian etiquetas.
+- Resultado local real en CPU: **2 discrepancias / 50; aprobado** según HU22.
+  Los IDs hu22-010 y hu22-018 cambian de OK a defectuosa. Son imágenes etiquetadas OK.
+  El gate mide estabilidad de veredictos, no garantiza mejor precisión del candidato.
+
+Los hashes, IDs públicos de Drive y procedencia están en `ml/regression-sources.json`.
+El hash del checkpoint candidato coincide con su `completed.json` original.
+Los checkpoints declaran entrada [None,400,400,3], Rescaling(2,-1) interno y Dense sigmoid.
+La selección corresponde al split del manifiesto actual; no se ha reconstruido el
+split histórico usado al entrenar HU17. Esta comparación no constituye una medición
+independiente de generalización de ambos modelos.
 
 ## Arquitectura
 
-- `ml/golden.py`: selección determinista de 25 imágenes por clase del split test
-  existente, ordenadas por ruta; copia los bytes y etiquetas originales. Nunca crea
-  un split nuevo. La selección real exige revisar autorización y procedencia antes de usarla.
-- `manifest.json`: IDs únicos, etiqueta 0/1, origen y SHA256 por imagen, hash del
-  manifiesto fuente, clases y tipo de conjunto. El validador decodifica las imágenes,
-  comprueba hashes, rutas, cobertura, ambas clases y tamaño exacto de 50.
-- `ml/regression.py`: carga ambos checkpoints Keras, usa el mismo
-  `ml.preprocessing.preprocess_image` y aplica `probability >= threshold`.
-  RGB bilinear 400×400 float32 /255; no augmentation ni segunda normalización.
-  Los contratos deben declarar `ok_front=0`, `def_front=1`, el mismo preprocesamiento
-  y el mismo umbral. El ejemplo usa 0.2649; confirmar el valor exacto con el
-  `preprocessing.json` de los checkpoints, sin redondearlo.
-- Reportes ordenados por ID, sin timestamps variables, con hashes del manifiesto,
-  configuración y checkpoints. Esto compara versiones Keras; no sustituye el gate
-  de paridad Python/TF.js de HU25 ni evalúa métricas de calidad absolutas.
+- `ml/golden.py`: selección determinista de 25 imágenes test por clase y copia de
+  bytes/etiquetas originales. Valida SHA256, decodificación, IDs únicos y ambas clases.
+- `golden/real.dvc`: 50 imágenes reales y su manifiesto. `models/regression.dvc`:
+  checkpoints base y candidato. Sólo los punteros se guardan en Git.
+- `ml/regression-metadata/`: manifiesto y objetos de directorio DVC pequeños,
+  con fin de línea LF fijado para preservar sus hashes entre Windows y Linux.
+- `ml/regression_data.py`: descarga un paquete de objetos DVC desde Drive, verifica
+  **SHA256 del paquete y SHA256/MD5 de cada objeto**, reconstruye un remoto local
+  efímero y ejecuta `dvc pull` de los dos punteros. El paquete nuevo se guarda como
+  `hu22-dvc-reference.zip` dentro del `dvc_remote` compartido; no reemplaza artefactos previos.
+- `ml/regression.py`: carga los dos modelos Keras y compara por ID con cobertura
+  exacta, mismo contrato y umbral; salida sigmoid [1,1], probabilidades finitas [0,1].
+  Reutiliza `ml.preprocessing.preprocess_image`: RGB, resize bilinear 400×400,
+  float32 /255; sin augmentation ni segunda normalización.
+- `ml/regression-config.json`: rutas, contratos y SHA256 de los checkpoints.
+  Un cambio de base, conjunto o umbral debe revisarse expresamente en el PR.
+- Los 50 fixtures sintéticos siguen en `golden/synthetic.dvc`, separados y marcados
+  como sintéticos. El gate real los rechaza. Sus etiquetas alternantes son de prueba.
 
-## Ejecutar desde la raíz
+Se conserva el quality gate Python/TF.js existente sin modificarlo. HU22 compara
+versiones Keras, no el motor de navegador.
 
-```powershell
-py -3.11 -m venv .venv
-.venv/Scripts/python -m pip install -r ml/requirements-ci.txt
-.venv/Scripts/python -m pytest -c ml/pytest.ini ml/tests
-cd ml
-../.venv/Scripts/ruff check .
-../.venv/Scripts/ruff format --check .
-cd ..
-.venv/Scripts/python -m ml.golden --output golden/synthetic
-.venv/Scripts/dvc add golden/synthetic
-git diff --exit-code -- golden/synthetic.dvc
-.venv/Scripts/dvc checkout golden/synthetic.dvc
+## Recuperar y ejecutar
+
+Desde la raíz, con Python 3.11 y un entorno virtual activado:
+
+```bash
+pip install -r ml/requirements-regression.txt
+python -m ml.regression_data
+python -m ml.regression --config ml/regression-config.json --output reports/regression
 ```
 
-El generador exige un destino inexistente para no sobrescribir datos. En una máquina
-con cache DVC también se puede ejecutar directamente `dvc checkout`. Sin cache ni
-remoto, reconstruir los fixtures con el comando anterior y verificar el puntero.
-En Linux, usar `python`, `ruff` y `dvc` del entorno activado.
+La recuperación usa un paquete dentro del remoto que el usuario compartió mediante enlace público.
+No requiere cookies, OAuth, secretos ni la variable HU22_DVC_REMOTE_URL.
+El catálogo fija el paquete por ID/SHA256 y cada objeto por SHA256/MD5,
+incluyendo los metadatos que DVC necesita. También conserva los IDs originales
+para trazabilidad. Una sola descarga evita depender de 52 solicitudes consecutivas
+a Drive; no se extraen rutas arbitrarias del ZIP.
+El remoto `hu22-ci` se configura con `--local`, sin alterar `.dvc/config` versionado.
 
-## Habilitar imágenes y modelos reales
+El mecanismo anterior con la ruta `/content/drive/...` dependía de un montaje de
+Colab. Aquí el remoto efímero se hidrata con los archivos concretos compartidos.
+Si Drive revoca permisos, limita descargas, modifica bytes o falta un archivo,
+la recuperación falla y guarda JSON de error. Los reintentos de red son limitados.
+No es una garantía de disponibilidad del servicio de Drive.
 
-1. En el entorno autorizado de Colab, recuperar `data.dvc` y los checkpoints existentes.
-2. Revisar las etiquetas originales y la autorización de las imágenes. Ejecutar:
+Para preparar una actualización autorizada del conjunto, usar el manifiesto fuente:
 
-   ```bash
-   python -m ml.golden --source-manifest data/prepared/manifest.json --root . --output golden/real
-   dvc add golden/real
-   # Colocar checkpoints aprobados como baseline.keras y candidate.keras:
-   dvc add models/regression
-   ```
+```bash
+python -m ml.golden --source-manifest data/prepared/manifest.json --root . --output golden/nueva-referencia
+dvc add golden/nueva-referencia
+```
 
-3. Copiar `ml/regression-config.example.json` a `ml/regression-config.json`.
-   Completar SHA256 y contratos desde los artefactos reales. Mantener la referencia
-   aprobada fija: un cambio de baseline/dataset requiere revisión explícita del equipo.
-4. Configurar un remoto DVC accesible desde CI, subir ambos artefactos con
-   `dvc push -r <remoto> golden/real.dvc models/regression.dvc` y guardar los punteros
-   y el JSON en Git. No guardar credenciales. No publicar imágenes sensibles.
-5. Configurar la variable de repositorio `HU22_DVC_REMOTE_URL` con un remoto de lectura
-   autorizado sin credenciales (HTTP compatible con DVC). Si las imágenes son privadas,
-   se necesita antes diseñar una ejecución confiable con acceso privado; este workflow
-   de PR no recibe secretos. No usar `pull_request_target` para ejecutar código del PR.
-6. Instalar `ml/requirements-regression.txt` en un entorno separado Python 3.11 y ejecutar:
+No sobrescribir la referencia vigente automáticamente. Actualizar y revisar punteros,
+metadatos, catálogo, procedencia y hashes juntos. El generador exige un destino inexistente.
 
-   ```bash
-   python -m ml.regression --config ml/regression-config.json --output reports/regression
-   ```
+## Pruebas, lint y fixtures
 
-TensorFlow CPU y operaciones deterministas; sin entrenamiento. Confirmar compatibilidad
-de los checkpoints reales con el entorno fijado. No se ha probado su carga localmente.
-Para reproducir también las dependencias transitivas, conservar `pip freeze` con la evidencia.
+```bash
+pip install -r ml/requirements-ci.txt
+python -m pytest -c ml/pytest.ini ml/tests
+cd ml
+ruff check .
+ruff format --check .
+cd ..
+```
+
+Para reconstruir fixtures en un clon limpio:
+
+```bash
+python -m ml.golden --output golden/synthetic
+dvc add golden/synthetic
+git diff --exit-code -- golden/synthetic.dvc
+dvc checkout golden/synthetic.dvc
+```
+
+Pillow 13.0.0 en regresión y >=13,<14 en pruebas evitan las vulnerabilidades
+de <=12.3.0 detectadas por dependency-review (p. ej. GHSA-5x8w-8jj5-q52h).
 
 ## CI y reportes
 
-El entorno de regresión fija Pillow 13.0.0 y las pruebas usan Pillow >=13,<14,
-alineado con entrenamiento. Pillow <=12.3.0 es rechazado por la revisión de
-dependencias (entre otros, GHSA-5x8w-8jj5-q52h). No se omite ese control.
+`.github/workflows/model-regression.yml` corre en PR abierto, actualizado, reabierto,
+listo para revisión y manualmente. El job sintético prueba aceptación, errores y
+reproducción DVC. El job real recupera el conjunto y modelos fijados y ejecuta
+la comparación CPU con semilla fija y operaciones deterministas.
 
-`.github/workflows/model-regression.yml` corre en PR abierto, actualizado, reabierto
-o listo para revisión, además de ejecución manual. `regression-contract` ejecuta pruebas
-sintéticas y verifica la reconstrucción DVC. `model-regression` intenta recuperar
-los artefactos reales y ejecutar ambos modelos. Falta de remoto/configuración/datos
-produce fallo explícito; nunca se transforma en aprobación sintética ni en omisión.
-Los checks son independientes del workflow existente CI; configurar **HU22 real model
-gate** como check requerido si el equipo quiere bloquear integración por regresión.
+Regla: **0, 1 o 2 cambios aprueban; 3 o más rechazan**. Código de salida 0 aprueba,
+1 indica regresión y 2 error de configuración, integridad, recuperación o inferencia.
+Nunca se omite el gate por falta de recursos ni se transforma un error en aprobación.
 
-El artefacto de ejecución conserva reportes 14 días incluso tras fallo, sin imágenes
-ni pesos. `regression.json` incluye política, decisión, hashes y todas las comparaciones;
-`differences.csv` incluye ID, probabilidad original/nueva, veredicto original/nuevo y
-`changed`. Código de salida **0**: 0, 1 o 2 cambios; **1**: 3 o más; **2**: error de
-configuración, integridad o inferencia. Un fallo antes de predecir deja JSON de error.
+`regression.json` incluye decisión, discrepancias, contrato, hashes y todas las
+comparaciones. `differences.csv` incluye ID, probabilidad y veredicto original/nuevo
+y `changed`. Filas ordenadas por ID, sin timestamps variables. Los reportes no
+contienen imágenes ni pesos y se conservan como artefactos CI durante 14 días,
+incluso tras fallo. La ejecución local guarda también versiones de Python/TensorFlow.
 
-## Revisión manual de criterios
+## Verificación de aceptación
 
-Validación local realizada: suite ML completa **105 passed** (Python 3.11.4),
-Ruff lint/formato correctos en `ml/`, workflow validado con `actionlint` sin errores.
-JUnit local: `reports/hu22-tests.xml` (ignorado por Git). Los ensayos de inferencia
-de HU22 emplean predictores simulados; no son resultados experimentales del modelo.
-Se comprobó además la recuperación de las 50 imágenes sintéticas desde cache DVC
-con el directorio original retirado del destino y coincidencia SHA256 del manifiesto.
-Las dependencias instaladas están registradas localmente en `reports/hu22-environment.txt`.
-
-| Criterio | Verificación |
+| Criterio | Revisión |
 | --- | --- |
-| T01: reproducibilidad | Reconstruir fixtures en un clon limpio y comprobar que `git diff -- golden/synthetic.dvc` está vacío. Ejecutar `validate_golden`. |
-| T01: 50 imágenes reales | Pendiente: preparar/push/pull del conjunto autorizado y revisar procedencia/etiquetas. Los fixtures no satisfacen este criterio real. |
-| T02: eventos PR/evidencia | Abrir/actualizar PR; revisar ambos jobs y descargar artefactos, incluido el JSON de bloqueo cuando faltan recursos. |
-| T02/T03: 0–2 pasan, 3+ fallan | Ejecutar `test_acceptance_and_reports`; casos 0,1,2,3,10. Confirmar JSON y CSV. |
-| T03: correspondencia exacta | Ejecutar pruebas de IDs ausentes, repetidos, extraños; clases/contratos y umbral inválidos. |
-| Integridad | Ejecutar casos de archivo ausente/corrupto, hash incorrecto y ruta fuera del conjunto. |
-| Inferencia real | Pendiente: completar configuración y correr ambos checkpoints; revisar hashes y discrepancias en artefactos CI. |
+| T01: 50 imágenes reales | Recuperar con ml.regression_data y ejecutar validate_golden; 25 etiquetas de cada clase, hashes y origen en el manifiesto. |
+| T01: DVC reproducible | Recuperar en clon sin cache; comprobar dvc status sobre golden/real.dvc y models/regression.dvc, sin cambios. |
+| T02: PR y evidencia | Actualizar PR, revisar ambos jobs y descargar JSON/CSV aunque falle la comparación. |
+| T02/T03: frontera 2/3 | test_acceptance_and_reports cubre 0,1,2,3,10; test_runner_exit_codes_with_fake_keras verifica códigos del comando. |
+| T03: correspondencia | Pruebas de IDs ausentes, duplicados/extraños, probabilidades, clases/contratos y umbral inválidos. |
+| Integridad y descarga | test_regression_data cubre hashes, cache corrupta, descargas corruptas y rutas inválidas, sin red. |
+| Regresión real | Ejecutar ambos checkpoints con el umbral confirmado y revisar las dos discrepancias del reporte. |
+
+Las pruebas de contratos usan motores simulados y no se confunden con la ejecución
+real documentada. Evidencia local: `reports/hu22-tests.xml` y `reports/regression/`
+(ignorados por Git). La evidencia pública del PR proviene de los artefactos Actions.
+Se conservan también `docs/evidence/hu22/local-regression.json` y
+`local-differences.csv`: dos ejecuciones CPU con predicciones idénticas, incluida
+una recuperación desde entorno sin cache. La suite final ejecutó **121 pruebas,
+todas aprobadas**; Ruff y actionlint también pasaron.
 
 Referencias: [DVC pull](https://doc.dvc.org/command-reference/pull),
-[DVC checkout](https://doc.dvc.org/command-reference/checkout),
 [Keras load_model](https://www.tensorflow.org/api_docs/python/tf/keras/models/load_model).

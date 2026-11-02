@@ -5,6 +5,7 @@ import csv
 import hashlib
 import json
 import os
+import platform
 from pathlib import Path
 
 import numpy as np
@@ -154,6 +155,7 @@ def run(config_path, output):
         golden_manifest_sha256=sha256(golden / "manifest.json"),
         model_sha256={role: sha256(path) for role, path in paths.items()},
         config_sha256=sha256(config_path),
+        runtime={"python": platform.python_version(), "tensorflow": getattr(tf, "__version__", "simulated")},
     )
     reports(output, report)
     return 0 if report["passed"] else 1
