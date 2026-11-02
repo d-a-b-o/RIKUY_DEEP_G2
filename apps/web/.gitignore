@@ -50,3 +50,6 @@ next-env.d.ts
 /blob-report/
 /playwright/.cache/
 /e2e/.auth/
+
+# Binarios WASM de TensorFlow.js (se copian en postinstall)
+/public/tfjs-wasm/
