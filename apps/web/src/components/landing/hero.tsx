@@ -3,7 +3,7 @@ import { InspectionPreview } from "./inspection-preview";
 export function Hero() {
   return (
     <section id="inicio" className="relative overflow-hidden border-b border-border">
-      <div className="mx-auto grid max-w-6xl items-center gap-14 px-4 pb-20 pt-14 sm:px-6 lg:grid-cols-[1.05fr_1fr] lg:pb-24 lg:pt-20">
+      <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-14 px-4 pb-20 pt-14 sm:px-6 lg:grid-cols-[1.05fr_1fr] lg:pb-24 lg:pt-20">
         <div className="flex flex-col gap-7">
           <p className="font-mono text-xs uppercase tracking-[0.14em] text-accent">
             Inspección automática con IA para fundición
@@ -49,7 +49,7 @@ export function Hero() {
             Cada estación está diseñada para hasta una pieza por segundo.
           </p>
         </div>
-        <div className="flex justify-center lg:justify-end">
+        <div className="flex min-w-0 justify-center lg:justify-end">
           <InspectionPreview />
         </div>
       </div>

@@ -33,14 +33,16 @@ export function LogoMark({ className, title = "RikuyDeep" }: LogoMarkProps) {
 
 type LogoProps = {
   className?: string;
+  /** Clases del nombre «RikuyDeep», por ejemplo para ocultarlo en pantallas estrechas. */
+  wordmarkClassName?: string;
 };
 
 /** Logo completo: marca + nombre. */
-export function Logo({ className }: LogoProps) {
+export function Logo({ className, wordmarkClassName }: LogoProps) {
   return (
     <span className={`inline-flex items-center gap-2 font-semibold tracking-tight ${className ?? ""}`}>
       <LogoMark className="h-[1.6em] w-[1.6em]" title="" />
-      <span>
+      <span className={wordmarkClassName}>
         <span className="text-foreground">Rikuy</span>
         <span className="text-accent">Deep</span>
       </span>
