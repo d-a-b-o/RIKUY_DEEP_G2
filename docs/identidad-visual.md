@@ -38,38 +38,42 @@ Para regenerar `favicon.ico` y `apple-icon.png` después de cambiar `icon.svg`, 
 
 Las escalas completas (50 a 950) están en `apps/web/src/app/globals.css` y se usan como cualquier color de Tailwind: `bg-acero-900`, `text-colada-700`.
 
-### Tokens semánticos
+### Tokens semánticos · Industrial Tech (RIKDP-274)
 
-En los componentes se usan **los tokens semánticos, no las escalas**: así el tema oscuro funciona sin tocar cada componente.
+La interfaz usa una presentación oscura coherente con independencia de la preferencia
+del sistema. Se conservan el logo, Geist/Geist Mono y las escalas de marca originales.
+Las acciones usan cyan y el acento naranja identifica la marca. No se añade un selector de tema.
 
-| Token | Utilidad de Tailwind | Claro | Oscuro | Uso |
-| --- | --- | --- | --- | --- |
-| `background` | `bg-background` | `#ffffff` | `#0b1b29` | Fondo de página |
-| `surface` | `bg-surface` | `#f4f7fa` | `#122a3d` | Tarjetas, paneles, inputs |
-| `foreground` | `text-foreground` | `#122a3d` | `#e8eef3` | Texto principal |
-| `muted-foreground` | `text-muted-foreground` | `#4a5d6e` | `#a9b8c6` | Texto secundario |
-| `border` | `border-border` | `#cfd9e2` | `#2b4458` | Bordes y separadores |
-| `primary` | `bg-primary`, `text-primary` | `#1f5075` | `#74a2c3` | Botón principal, enlaces |
-| `primary-foreground` | `text-primary-foreground` | `#ffffff` | `#0b1b29` | Texto sobre `primary` |
-| `accent` | `bg-accent`, `text-accent` | `#c2410c` | `#ff8a4c` | Llamadas a la acción destacadas |
-| `accent-foreground` | `text-accent-foreground` | `#ffffff` | `#0b1b29` | Texto sobre `accent` |
-| `ok` | `text-ok`, `bg-ok` | `#15803d` | `#4ade80` | Veredicto **OK** |
-| `defect` | `text-defect`, `bg-defect` | `#b91c1c` | `#f87171` | Veredicto **defectuosa**, errores |
-| `warning` | `text-warning`, `bg-warning` | `#a16207` | `#facc15` | Avisos, baja confianza |
-| `ring` | `outline-ring` | `#e2550f` | `#ff8a4c` | Foco de teclado |
+| Token | Valor | Uso |
+| --- | --- | --- |
+| background | #101827 | Fondo principal |
+| surface | #253349 | Paneles y estados de interacción |
+| surface-raised | #1a273a | Tarjetas, formulario y navegación lateral |
+| foreground | #f1f5f9 | Texto principal |
+| muted-foreground | #b2c1d3 | Texto secundario |
+| border | #3b4d65 | Separadores y bordes decorativos |
+| input-border | #7b8da6 | Contorno distinguible de campos y controles |
+| primary / primary-foreground | #22b8cf / #101827 | Acciones principales y enlaces |
+| accent / accent-foreground | #ffab72 / #101827 | Acento de la marca |
+| ok | #65dfa0 | Estado OK |
+| defect | #ff9393 | Estado defectuoso y errores |
+| warning | #f4ce77 | Advertencias |
+| ring | #45d9ed | Foco visible |
 
-El foco de teclado (`:focus-visible`) ya tiene un contorno de 2 px en `ring` para toda la app.
+Los tonos de estado se aclaran respecto de la paleta de referencia para conservar
+contraste AA sobre fondos oscuros. Los veredictos usan texto e icono sobre fondos
+tenues del mismo estado, sin depender exclusivamente del color.
 
-El veredicto nunca se comunica solo con color: va siempre acompañado de texto («OK», «Defectuosa») o de un icono, para usuarios con daltonismo.
+Las clases compartidas `ui-button`, `ui-button-secondary`, `ui-input`, `ui-card`
+y `ui-eyebrow` están en la capa components de globals.css; las utilidades Tailwind
+pueden ajustar sus dimensiones. Las transiciones respetan prefers-reduced-motion.
 
-### Contraste (WCAG 2.1 AA)
+### Contraste y accesibilidad
 
-`apps/web/src/styles/tokens.test.ts` lee `globals.css` y comprueba en ambos temas:
-
-- 4.5:1 para texto sobre `background` y `surface`, y para el texto sobre `primary` y `accent`.
-- 3:1 para el indicador de foco (`ring`) sobre `background`.
-
-Si un cambio de color rompe el contraste, `npm test` falla y el CI bloquea la PR. Esta prueba cubre la parte estática de RIKDP-92 (PT5 · contraste de la paleta WCAG AA).
+`src/styles/tokens.test.ts` comprueba 4.5:1 para texto y 3:1 para foco y bordes
+de controles, incluidas las superficies elevadas. Playwright y axe revisan las seis
+pantallas a 360, 768 y 1280 px. Son comprobaciones automatizadas y de teclado;
+no sustituyen una auditoría completa con tecnologías de asistencia.
 
 ## Tipografía
 

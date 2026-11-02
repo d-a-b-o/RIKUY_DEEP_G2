@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { PanelShell } from "@/components/panel/panel-shell";
 import { getCurrentUser } from "@/lib/auth/session";
+import { Icon } from "@/components/ui/icon";
 
 export const metadata: Metadata = {
   title: "Panel",
@@ -20,7 +21,9 @@ const roleLabels: Record<string, string> = {
 export default function PanelPage() {
   return (
     <PanelShell>
-      <Suspense fallback={<p className="text-muted-foreground">Cargando tu panel…</p>}>
+      <Suspense
+        fallback={<p className="text-muted-foreground">Cargando tu panel…</p>}
+      >
         <Welcome />
       </Suspense>
     </PanelShell>
@@ -30,30 +33,52 @@ export default function PanelPage() {
 async function Welcome() {
   const user = await getCurrentUser("/panel");
   return (
-    <section aria-labelledby="bienvenida" className="rounded-2xl border border-border bg-background p-6 sm:p-8">
-      <h1 id="bienvenida" className="text-2xl font-bold tracking-tight">
-        Hola, {user.name}
-      </h1>
-      <dl className="mt-6 grid gap-4 sm:grid-cols-3">
+    <section aria-labelledby="bienvenida" className="ui-card overflow-hidden">
+      <div className="industrial-grid border-b border-border p-6 sm:p-9">
+        <p className="ui-eyebrow mb-5">Tu espacio de trabajo</p>
+        <h1
+          id="bienvenida"
+          className="text-3xl font-semibold tracking-tight sm:text-4xl"
+        >
+          Hola, {user.name}
+        </h1>
+        <p className="mt-3 max-w-xl leading-7 text-muted-foreground">
+          Todo listo para mirar cada pieza con el mismo criterio de calidad.
+        </p>
+      </div>
+      <dl className="grid gap-6 p-6 sm:grid-cols-3 sm:p-9 [&_dd]:mt-2 [&_dd]:text-base">
         <div>
           <dt className="text-sm text-muted-foreground">Rol</dt>
           <dd className="font-medium">{roleLabels[user.role] ?? user.role}</dd>
         </div>
         <div>
           <dt className="text-sm text-muted-foreground">Empresa</dt>
-          <dd className="font-medium">{user.companyName ?? "Todas (superadministrador)"}</dd>
+          <dd className="font-medium">
+            {user.companyName ?? "Todas (superadministrador)"}
+          </dd>
         </div>
         <div>
           <dt className="text-sm text-muted-foreground">Correo</dt>
           <dd className="break-all font-medium">{user.email}</dd>
         </div>
       </dl>
-      <Link
-        href="/panel/inspeccion"
-        className="mt-8 inline-flex h-11 items-center rounded-lg bg-accent px-5 font-semibold text-accent-foreground transition-opacity hover:opacity-90"
-      >
-        Inspeccionar una pieza
-      </Link>
+      <div className="mx-6 mb-6 flex flex-col gap-6 rounded-xl border border-primary/30 bg-primary/5 p-6 sm:mx-9 sm:mb-9 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-start gap-4">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <Icon name="scan" className="h-6 w-6" />
+          </span>
+          <div>
+            <h2 className="font-semibold">Empieza una inspección</h2>
+            <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">
+              Sube una imagen o utiliza la cámara para analizar una pieza.
+            </p>
+          </div>
+        </div>
+        <Link href="/panel/inspeccion" className="ui-button shrink-0">
+          Inspeccionar una pieza
+          <Icon name="arrow" />
+        </Link>
+      </div>
     </section>
   );
 }

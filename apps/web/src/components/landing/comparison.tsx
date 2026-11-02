@@ -17,7 +17,10 @@ const rows: Row[] = [
   {
     criterion: "Inversión inicial",
     manual: ["good", "Baja"],
-    machineVision: ["poor", "Alta: cámaras industriales, iluminación e integrador"],
+    machineVision: [
+      "poor",
+      "Alta: cámaras industriales, iluminación e integrador",
+    ],
     rikuy: ["good", "Baja: cámara y computador"],
   },
   {
@@ -36,7 +39,10 @@ const rows: Row[] = [
     criterion: "Evidencia de cada pieza",
     manual: ["poor", "No"],
     machineVision: ["mixed", "Depende del sistema"],
-    rikuy: ["good", "Veredicto de todas; foto de las defectuosas y de una muestra de OK"],
+    rikuy: [
+      "good",
+      "Veredicto de todas; foto de las defectuosas y de una muestra de OK",
+    ],
   },
   {
     criterion: "Reportes por turno y molde",
@@ -52,35 +58,68 @@ const rows: Row[] = [
   },
 ];
 
-const ratingLabel: Record<Rating, string> = { good: "Ventaja", mixed: "Parcial", poor: "Desventaja" };
+const ratingLabel: Record<Rating, string> = {
+  good: "Ventaja",
+  mixed: "Parcial",
+  poor: "Desventaja",
+};
 
 function RatingIcon({ rating }: { rating: Rating }) {
-  const common = { viewBox: "0 0 16 16", className: "mt-0.5 h-4 w-4 flex-none", "aria-hidden": true };
+  const common = {
+    viewBox: "0 0 16 16",
+    className: "mt-0.5 h-4 w-4 flex-none",
+    "aria-hidden": true,
+  };
   if (rating === "good") {
     return (
       <svg {...common} className={`${common.className} text-ok`}>
-        <path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <path
+          d="M3 8.5l3 3 7-7"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
       </svg>
     );
   }
   if (rating === "mixed") {
     return (
       <svg {...common} className={`${common.className} text-warning`}>
-        <path d="M3 8h10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        <path
+          d="M3 8h10"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
       </svg>
     );
   }
   return (
     <svg {...common} className={`${common.className} text-defect`}>
-      <path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <path
+        d="M4 4l8 8M12 4l-8 8"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
 
-function Cell({ value, highlight = false }: { value: [Rating, string]; highlight?: boolean }) {
+function Cell({
+  value,
+  highlight = false,
+}: {
+  value: [Rating, string];
+  highlight?: boolean;
+}) {
   const [rating, text] = value;
   return (
-    <td className={`px-5 py-4 align-top ${highlight ? "bg-acero-50/60 dark:bg-acero-900/40" : ""}`}>
+    <td className={`px-5 py-4 align-top ${highlight ? "bg-primary/5" : ""}`}>
       <span className="flex gap-2">
         <RatingIcon rating={rating} />
         <span>
@@ -95,19 +134,32 @@ function Cell({ value, highlight = false }: { value: [Rating, string]; highlight
 export function Comparison() {
   return (
     <section id="comparativa" className="border-b border-border">
-      <div className="mx-auto flex max-w-6xl flex-col gap-10 px-4 py-20 sm:px-6">
+      <div className="mx-auto flex max-w-7xl flex-col gap-10 px-5 py-16 sm:px-8 sm:py-20">
         <div className="flex max-w-2xl flex-col gap-4">
-          <p className="font-mono text-xs uppercase tracking-[0.14em] text-accent">Comparativa</p>
+          <p className="ui-eyebrow">04 / Comparativa</p>
           <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
             La consistencia de la visión artificial, sin su costo de entrada
           </h2>
         </div>
-        <div className="relative overflow-x-auto rounded-xl border border-border">
+        <p
+          id="comparison-help"
+          className="-mb-6 text-xs text-muted-foreground sm:hidden"
+        >
+          Desliza la tabla para comparar las tres alternativas.
+        </p>
+        <div
+          role="region"
+          aria-label="Comparativa de alternativas"
+          aria-describedby="comparison-help"
+          tabIndex={0}
+          className="relative overflow-x-auto rounded-xl border border-border"
+        >
           <table className="w-full min-w-[44rem] border-collapse text-left text-sm leading-6">
             <caption className="sr-only">
-              Comparación entre inspección manual, visión artificial tradicional y RikuyDeep
+              Comparación entre inspección manual, visión artificial tradicional
+              y RikuyDeep
             </caption>
-            <thead className="bg-surface text-xs uppercase tracking-wider text-muted-foreground">
+            <thead className="bg-surface-raised text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
                 <th scope="col" className="w-[22%] px-5 py-3 font-semibold">
                   Criterio
@@ -118,7 +170,10 @@ export function Comparison() {
                 <th scope="col" className="px-5 py-3 font-semibold">
                   Visión artificial tradicional
                 </th>
-                <th scope="col" className="bg-acero-50/60 px-5 py-3 font-semibold text-primary dark:bg-acero-900/40">
+                <th
+                  scope="col"
+                  className="bg-primary/10 px-5 py-3 font-semibold text-primary"
+                >
                   RikuyDeep
                 </th>
               </tr>

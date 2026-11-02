@@ -5,8 +5,8 @@
  * Guía completa: docs/identidad-visual.md
  *
  * 1. Escalas de marca (fijas): acero (primario) y colada (acento).
- * 2. Tokens semánticos (cambian con el tema claro/oscuro): úsalos en los
- *    componentes en lugar de las escalas, p. ej. bg-surface, text-muted-foreground.
+ * 2. Tokens semánticos Industrial Tech: úsalos en los componentes en lugar de
+ *    las escalas, p. ej. bg-surface, text-muted-foreground.
  *
  * Los pares de color semánticos se validan contra WCAG AA en
  * src/styles/tokens.test.ts. Si cambias un valor, ejecuta `npm test`.
@@ -39,36 +39,38 @@
 }
 
 :root {
-  --background: #ffffff;
-  --surface: #f4f7fa;
-  --foreground: #122a3d;
-  --muted-foreground: #4a5d6e;
-  --border: #cfd9e2;
-  --primary: #1f5075;
-  --primary-foreground: #ffffff;
-  --accent: #c2410c;
-  --accent-foreground: #ffffff;
-  --ok: #15803d;
-  --defect: #b91c1c;
-  --warning: #a16207;
-  --ring: #e2550f;
+  --background: #101827;
+  --surface: #253349;
+  --foreground: #f1f5f9;
+  --muted-foreground: #b2c1d3;
+  --border: #3b4d65;
+  --primary: #22b8cf;
+  --primary-foreground: #101827;
+  --accent: #ffab72;
+  --accent-foreground: #101827;
+  --ok: #65dfa0;
+  --defect: #ff9393;
+  --warning: #f4ce77;
+  --ring: #45d9ed;
+  --input-border: #7b8da6;
+  --surface-raised: #1a273a;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0b1b29;
-    --surface: #122a3d;
-    --foreground: #e8eef3;
-    --muted-foreground: #a9b8c6;
-    --border: #2b4458;
-    --primary: #74a2c3;
-    --primary-foreground: #0b1b29;
-    --accent: #ff8a4c;
-    --accent-foreground: #0b1b29;
-    --ok: #4ade80;
-    --defect: #f87171;
-    --warning: #facc15;
-    --ring: #ff8a4c;
+    --background: #101827;
+    --surface: #253349;
+    --foreground: #f1f5f9;
+    --muted-foreground: #b2c1d3;
+    --border: #3b4d65;
+    --primary: #22b8cf;
+    --primary-foreground: #101827;
+    --accent: #ffab72;
+    --accent-foreground: #101827;
+    --ok: #65dfa0;
+    --defect: #ff9393;
+    --warning: #f4ce77;
+    --ring: #45d9ed;
   }
 }
 
@@ -86,6 +88,8 @@
   --color-defect: var(--defect);
   --color-warning: var(--warning);
   --color-ring: var(--ring);
+  --color-input-border: var(--input-border);
+  --color-surface-raised: var(--surface-raised);
 
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
@@ -93,7 +97,7 @@
 
 @layer base {
   html {
-    color-scheme: light dark;
+    color-scheme: dark;
     scroll-padding-top: 5rem;
   }
 
@@ -109,8 +113,134 @@
     font-family: var(--font-sans);
   }
 
+  ::selection {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+  button:not(:disabled),
+  summary,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+  a,
+  button,
+  input,
+  textarea,
+  summary {
+    transition-duration: 160ms;
+  }
+  button,
+  summary,
+  input[type="checkbox"] {
+    touch-action: manipulation;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
   :focus-visible {
     outline: 2px solid var(--color-ring);
     outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .ui-button {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    border: 1px solid transparent;
+    border-radius: 0.625rem;
+    padding: 0.75rem 1.25rem;
+    background: var(--primary);
+    color: var(--primary-foreground);
+    font-weight: 650;
+    font-size: 0.875rem;
+    transition-property: background, box-shadow, border-color, transform;
+  }
+  .ui-button:hover {
+    background: #60d1e2;
+    box-shadow: 0 4px 24px #22b8cf15;
+  }
+  .ui-button:active {
+    transform: translateY(1px);
+  }
+  .ui-button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+  .ui-button-secondary {
+    background: transparent;
+    border-color: var(--input-border);
+    color: var(--foreground);
+  }
+  .ui-button-secondary:hover {
+    background: var(--surface);
+    border-color: var(--primary);
+  }
+  .ui-input {
+    width: 100%;
+    min-height: 3rem;
+    border-radius: 0.625rem;
+    border: 1px solid var(--input-border);
+    background: var(--background);
+    padding: 0.75rem 0.875rem;
+    color: var(--foreground);
+    font-size: 1rem;
+    transition-property: border-color, box-shadow;
+  }
+  .ui-input::placeholder {
+    color: var(--muted-foreground);
+    opacity: 0.8;
+  }
+  .ui-input:focus-visible {
+    border-color: var(--ring);
+    box-shadow: 0 0 0 3px #22b8cf15;
+  }
+  .ui-input[aria-invalid="true"] {
+    border-color: var(--defect);
+  }
+  .ui-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    color: var(--primary);
+    font: 500 0.7rem var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+  }
+  .ui-eyebrow::before {
+    content: "";
+    width: 1.5rem;
+    height: 1px;
+    background: currentColor;
+  }
+  .industrial-grid {
+    background-image:
+      linear-gradient(#b2c1d308 1px, transparent 1px),
+      linear-gradient(90deg, #b2c1d308 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+  .ui-card {
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    background: var(--surface-raised);
   }
 }

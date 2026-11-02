@@ -19,7 +19,7 @@ export function SignOutButton() {
           router.refresh();
         })
       }
-      className="inline-flex h-10 items-center rounded-lg border border-border bg-background px-4 text-sm font-semibold transition-colors hover:border-primary disabled:cursor-wait disabled:opacity-70"
+      className="ui-button ui-button-secondary"
     >
       {pending ? "Cerrando…" : "Cerrar sesión"}
     </button>
