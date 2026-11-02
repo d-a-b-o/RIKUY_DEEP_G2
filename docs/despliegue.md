@@ -67,6 +67,7 @@ El repositorio no contiene ningún secreto: las variables se configuran en Verce
    | `DATABASE_URL` | Neon `main` con pooler | Neon `dev` con pooler | Neon `dev` con pooler |
    | `DIRECT_URL` | Neon `main` directa | Neon `dev` directa | Neon `dev` directa |
    | `BETTER_AUTH_SECRET` | Secreto propio | Otro secreto propio | Otro secreto propio |
+   | `NEXT_PUBLIC_MODEL_MANIFEST_URL` | URL del manifest en R2 | La misma | La misma |
    | `RESEND_API_KEY` | Clave de producción | Clave de pruebas (opcional) | — |
    | `LEAD_NOTIFICATION_TO` | Correo del equipo comercial | Correo del equipo | — |
    | `LEAD_NOTIFICATION_FROM` | Remitente verificado | `RikuyDeep <onboarding@resend.dev>` | — |
@@ -82,13 +83,53 @@ El repositorio no contiene ningún secreto: las variables se configuran en Verce
 
 En vez de compartir la rama `dev` entre todas las previews, la [integración de Neon con Vercel](https://vercel.com/integrations/neon) crea una rama de base de datos por cada preview y configura sola sus variables, `DATABASE_URL` y `DATABASE_URL_UNPOOLED`. Prisma acepta ambas (`prisma.config.ts`), así que no hay que tocar código. Evita que dos PRs con migraciones distintas se pisen en la misma base.
 
-## 3. Correo con Resend (aviso de solicitudes de demo)
+## 3. Modelos de IA en Cloudflare R2
+
+El navegador descarga el modelo TF.js desde un bucket público de R2 ([ADR 0006](adr/0006-manifest-de-modelos.md), [inferencia en el navegador](arquitectura/inferencia-navegador.md)).
+
+| Dato | Valor |
+| --- | --- |
+| URL pública | `https://bucket.d-a-b-o.dev` (dominio propio conectado al bucket) |
+| Manifest oficial | `manifest.json` en la raíz: lo escribe la publicación del notebook tras el quality gate (HU25) |
+| Manifest provisional | `dev/manifest.json` con la versión 0.9.0, sin quality gate, para demos y desarrollo |
+
+Configuración del bucket:
+
+1. **Acceso público** por el dominio propio (*Settings → Public access → Custom domains*). `r2.dev` sirve para pruebas pero tiene límites de uso.
+2. **CORS** (*Settings → CORS Policy*): solo lectura para cualquier origen. El contenido es público y la escritura la protege el token, así que restringir orígenes solo rompería las previews de Vercel.
+
+   ```json
+   [
+     {
+       "AllowedOrigins": ["*"],
+       "AllowedMethods": ["GET", "HEAD"],
+       "AllowedHeaders": ["*"],
+       "ExposeHeaders": ["ETag", "Content-Length"],
+       "MaxAgeSeconds": 86400
+     }
+   ]
+   ```
+
+3. **Sin desafíos de Cloudflare** en ese subdominio. TF.js descarga con `fetch` y no puede resolver un desafío de bots: si el dominio tiene reglas de seguridad, añadir una regla WAF que haga *Skip* para `bucket.d-a-b-o.dev`.
+4. **Token de publicación** (*R2 → Manage R2 API Tokens*): permiso *Object Read & Write* solo sobre este bucket. Sus cuatro valores (`R2_ENDPOINT_URL`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_MODELS_BUCKET`) van en los secretos de Colab, nunca en el repositorio ni en Vercel. `R2_ENDPOINT_URL` es `https://<account-id>.r2.cloudflarestorage.com`, sin el nombre del bucket.
+
+Comprobación:
+
+```bash
+curl -sI -H "Origin: https://ejemplo.com" https://bucket.d-a-b-o.dev/dev/v0.9.0/model.json
+```
+
+Debe responder `200`, `access-control-allow-origin: *` y `cache-control: public, max-age=31536000, immutable`.
+
+En Vercel, `NEXT_PUBLIC_MODEL_MANIFEST_URL` apunta al manifest. Como empieza por `NEXT_PUBLIC_`, se fija al compilar: después de cambiarla hay que volver a desplegar.
+
+## 4. Correo con Resend (aviso de solicitudes de demo)
 
 1. Crea una cuenta en [resend.com](https://resend.com) y una API key con permiso de envío.
 2. Para enviar desde un dominio propio, verifícalo en *Domains* y usa ese remitente en `LEAD_NOTIFICATION_FROM`. Sin dominio, `onboarding@resend.dev` solo puede enviar al correo de la cuenta de Resend.
 3. Sin `RESEND_API_KEY`, las solicitudes de demo **se guardan igual** en la tabla `lead`; solo se omite el aviso por correo.
 
-## 4. Variables de entorno
+## 5. Variables de entorno
 
 Referencia completa con valores de ejemplo en [`apps/web/.env.example`](../apps/web/.env.example).
 
@@ -103,10 +144,11 @@ Referencia completa con valores de ejemplo en [`apps/web/.env.example`](../apps/
 | `LEAD_NOTIFICATION_TO` | Con Resend | Destinatarios del aviso, separados por comas |
 | `LEAD_NOTIFICATION_FROM` | No | Remitente del aviso |
 | `NEXT_PUBLIC_SITE_URL` | No | URL pública para metadatos y sitemap. En Vercel se deduce del dominio de producción |
+| `NEXT_PUBLIC_MODEL_MANIFEST_URL` | Para inspeccionar | URL del manifest de modelos en R2. Sin ella, `/panel/inspeccion` avisa de que falta |
 
 Sin `DATABASE_URL`, la web funciona pero el formulario de demo avisa de que el envío no está activo y no guarda nada.
 
-## 5. Cambiar el esquema
+## 6. Cambiar el esquema
 
 1. Edita `apps/web/prisma/schema.prisma`.
 2. Ejecuta `npm run db:migrate -- --name descripcion-del-cambio`: crea la migración en `prisma/migrations/` y la aplica a tu base local.
@@ -115,7 +157,7 @@ Sin `DATABASE_URL`, la web funciona pero el formulario de demo avisa de que el e
 
 La migración inicial añade reglas que Prisma no expresa, escritas a mano en SQL: los triggers de inmutabilidad de `inspection` e `inspection_event` (ADR 0004) y las restricciones de integridad. Están cubiertas por `apps/web/prisma/integrity.test.ts`. Prisma no las elimina en migraciones posteriores.
 
-## 6. Comprobación tras el primer despliegue
+## 7. Comprobación tras el primer despliegue
 
 - [ ] La URL de producción carga la landing.
 - [ ] `/robots.txt` y `/sitemap.xml` usan el dominio de producción.
@@ -125,3 +167,4 @@ La migración inicial añade reglas que Prisma no expresa, escritas a mano en SQ
 - [ ] Una PR nueva recibe su URL de preview.
 - [ ] `/ingresar` permite entrar con un usuario creado por el seed (en `dev`) y `/panel` muestra su nombre y rol.
 - [ ] «¿Olvidaste tu contraseña?» envía el correo de recuperación (con Resend configurado).
+- [ ] `/panel/inspeccion` carga el modelo y clasifica una foto de una pieza.

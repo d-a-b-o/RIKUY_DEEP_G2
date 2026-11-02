@@ -29,6 +29,7 @@ npm run typecheck    # tipos (next typegen + tsc)
 npm test             # pruebas (Vitest); las de base de datos se ejecutan si hay DATABASE_URL
 npm run test:e2e     # pruebas de sistema (Playwright); requiere npm run build antes
 npm run test:smoke   # solo la prueba de humo (@smoke), la misma que corre en CI
+                     # la prueba del modelo real necesita E2E_MODEL_DIR con una copia del bucket
 npm run db:migrate   # crea y aplica una migración tras cambiar prisma/schema.prisma
 npm run db:deploy    # aplica migraciones pendientes (CI y Vercel)
 npm run db:check     # falla si el esquema tiene cambios sin migración
@@ -70,6 +71,7 @@ Al importar el repositorio en Vercel, configurar **Root Directory = `apps/web`**
 | `/ingresar` | Inicio de sesión (HU19) |
 | `/recuperar`, `/restablecer` | Recuperación de contraseña (HU19) |
 | `/panel` | Área privada; requiere sesión |
+| `/panel/inspeccion` | Inspección con el modelo TF.js en el navegador: foto o cámara (HU26) |
 | `/api/auth/*` | API de Better Auth |
 
 Detalle de la autenticación en [docs/arquitectura/autenticacion.md](../../docs/arquitectura/autenticacion.md).
