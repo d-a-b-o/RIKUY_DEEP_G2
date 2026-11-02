@@ -2,14 +2,16 @@
  * Datos de demostración para desarrollo y previews.
  *
  * Es idempotente: se puede ejecutar varias veces sin duplicar datos.
- * No crea usuarios: las cuentas se crean con Better Auth (HU19) para que las
- * contraseñas queden con el hash correcto.
+ * Usuarios de demostración (uno por rol) solo si SEED_DEMO_PASSWORD está
+ * definida; la contraseña se guarda con el mismo hash que usa Better Auth.
  *
  * Uso: npx prisma db seed
  */
+import { randomUUID } from "node:crypto";
+import { hashPassword } from "better-auth/crypto";
 import { config } from "dotenv";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../src/generated/prisma/client";
+import { PrismaClient, type Role } from "../src/generated/prisma/client";
 
 config({ path: [".env.local", ".env"], quiet: true });
 
@@ -115,6 +117,32 @@ async function main() {
     },
   });
 
+  const demoPassword = process.env.SEED_DEMO_PASSWORD;
+  if (demoPassword) {
+    const demoUsers: { email: string; name: string; role: Role; companyId: string | null }[] = [
+      { email: "superadmin@demo.rikuydeep.test", name: "Sofía Superadmin", role: "SUPERADMIN", companyId: null },
+      { email: "admin@demo.rikuydeep.test", name: "Ana Administradora", role: "ADMIN", companyId: company.id },
+      { email: "inspector@demo.rikuydeep.test", name: "Iván Inspector", role: "INSPECTOR", companyId: company.id },
+      { email: "consulta@demo.rikuydeep.test", name: "Carla Consulta", role: "VIEWER", companyId: company.id },
+    ];
+    const password = await hashPassword(demoPassword);
+    for (const demo of demoUsers) {
+      const id = randomUUID();
+      await db.user.upsert({
+        where: { email: demo.email },
+        update: {},
+        create: {
+          id,
+          ...demo,
+          emailVerified: true,
+          accounts: { create: { id: randomUUID(), accountId: id, providerId: "credential", password } },
+        },
+      });
+    }
+  } else {
+    console.log("Sin SEED_DEMO_PASSWORD: no se crean usuarios de demostración.");
+  }
+
   const counts = {
     empresas: await db.company.count(),
     piezas: await db.part.count(),
@@ -123,6 +151,7 @@ async function main() {
     lotes: await db.batch.count(),
     estaciones: await db.station.count(),
     modelos: await db.modelVersion.count(),
+    usuarios: await db.user.count(),
   };
   console.log("Seed completado:", counts);
 }

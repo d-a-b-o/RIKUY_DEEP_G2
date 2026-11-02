@@ -309,7 +309,7 @@ npm run test:smoke
 | --- | --- | --- |
 | @smoke sobre el preview de Vercel | @smoke en el job de CI contra la compilación de producción y Postgres 16 | El preview no está disponible para GitHub Actions sin un token de Vercel. La configuración ya acepta `PLAYWRIGHT_BASE_URL` para apuntar al preview cuando se conecte (PT4, RIKDP-263). |
 | Proyectos chromium y msedge | chromium siempre; msedge opcional con `PLAYWRIGHT_EDGE=1` | Los runners de CI no traen Edge. Se activa en la regresión de la Semana 15. |
-| Preprocesamiento 224×224×3 (RIKDP-84) | El modelo usa entrada **400×400×3** | Decisión de HU17/HU08 ([ADR 0006](../adr/0006-manifest-de-modelos.md), [inferencia en el navegador](../arquitectura/inferencia-navegador.md)). El caso se ejecuta con la forma del modelo activo. |
+| Preprocesamiento 224×224×3 (RIKDP-84) | El modelo usa entrada **400×400×3**; RIKDP-84 ya está corregido en Jira | Decisión de HU17/HU08 ([ADR 0006](../adr/0006-manifest-de-modelos.md), [inferencia en el navegador](../arquitectura/inferencia-navegador.md)). |
 | Code review aprobado por 1 revisor | La PR se fusiona sola cuando el check `CI` pasa (auto-merge, sin aprobación obligatoria) | Decisión del equipo por trabajar en horarios distintos. La revisión sigue en la DoD, pero no bloquea la fusión: sus hallazgos se registran como Error. |
 | Inspección en video (HU44) | HU44 es la estación automática que inspecciona el 100 % de las piezas en la línea | [ADR 0007](../adr/0007-estacion-de-inspeccion-automatica.md). Los casos RIKDP-229, RIKDP-230 y RIKDP-260 se aplican a esa estación. |
 
@@ -319,7 +319,7 @@ npm run test:smoke
 
 | Clave | PT | Nivel | Caso de prueba | Herramienta | Resp. | HU |
 | --- | --- | --- | --- | --- | --- | --- |
-| RIKDP-84 | PT1 | Componente | Forma y rango del preprocesamiento (224×224×3) | pytest | A. Chumbiraico | HU06 |
+| RIKDP-84 | PT1 | Componente | Forma y rango del preprocesamiento (400×400×3) | pytest | A. Chumbiraico | HU06 |
 | RIKDP-85 | PT1 | Integración | Paridad del preprocesamiento Python ↔ TF.js (misma imagen, mismo tensor) | pytest + tfjs-node | D. Sánchez | HU06 |
 | RIKDP-96 | PT1 | Componente | Validación de datos con imágenes corruptas y duplicadas de muestra | pytest | D. Sánchez | HU10 |
 | RIKDP-101 | PT1 | Componente | Reproducibilidad: dos corridas con la misma semilla dan las mismas métricas | pytest | D. Bravo | HU10 |

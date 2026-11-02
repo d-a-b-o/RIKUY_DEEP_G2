@@ -63,6 +63,8 @@ jobs:
     env:
       DATABASE_URL: postgresql://rikuy:rikuy@localhost:5432/rikuydeep
       DIRECT_URL: postgresql://rikuy:rikuy@localhost:5432/rikuydeep
+      # Solo para la base efímera de CI; producción usa su propio secreto en Vercel.
+      BETTER_AUTH_SECRET: ci-solo-pruebas-no-usar-en-produccion-0000
     defaults:
       run:
         working-directory: apps/web

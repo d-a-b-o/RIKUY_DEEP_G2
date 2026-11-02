@@ -14,6 +14,7 @@ cp .env.example .env.local   # completa DATABASE_URL y DIRECT_URL
 npm install                  # también genera el cliente de Prisma
 npm run db:migrate           # aplica las migraciones a tu base de datos
 npm run db:seed              # datos de demostración (idempotente)
+                             # con SEED_DEMO_PASSWORD crea un usuario por rol para probar /ingresar
 ```
 
 La base de datos puede ser la rama `dev` de Neon o un PostgreSQL 16 local. Detalle en [docs/despliegue.md](../../docs/despliegue.md).
@@ -45,7 +46,7 @@ apps/web/
 │   └── seed.ts           # datos de demostración
 ├── src/app/              # rutas (App Router)
 ├── src/components/       # componentes (landing, marca)
-├── src/lib/              # lógica compartida: db.ts, leads/, model/
+├── src/lib/              # lógica compartida: db.ts, auth/, leads/, model/
 ├── src/generated/        # cliente de Prisma generado (no se versiona)
 ├── public/               # archivos estáticos
 ├── playwright.config.ts
@@ -61,6 +62,18 @@ Alias de importación: `@/` apunta a `src/`, por ejemplo `import { authorize } f
 
 Al importar el repositorio en Vercel, configurar **Root Directory = `apps/web`** y **Build Command = `npm run build:vercel`**, que aplica las migraciones antes de compilar. Variables de entorno y pasos completos en [docs/despliegue.md](../../docs/despliegue.md).
 
+## Rutas
+
+| Ruta | Qué es |
+| --- | --- |
+| `/` | Landing (HU12) |
+| `/ingresar` | Inicio de sesión (HU19) |
+| `/recuperar`, `/restablecer` | Recuperación de contraseña (HU19) |
+| `/panel` | Área privada; requiere sesión |
+| `/api/auth/*` | API de Better Auth |
+
+Detalle de la autenticación en [docs/arquitectura/autenticacion.md](../../docs/arquitectura/autenticacion.md).
+
 ## Nota sobre Next.js 16
 
-El antiguo `middleware.ts` ahora se llama **`proxy.ts`** (va en `src/proxy.ts`). Las protecciones por rol de HU32 deben ir ahí.
+El antiguo `middleware.ts` ahora se llama **`proxy.ts`** (`src/proxy.ts`). Hoy hace la comprobación optimista de sesión en `/panel`. Las protecciones por rol de HU32 también van ahí.
