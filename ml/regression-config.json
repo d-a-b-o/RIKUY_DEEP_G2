@@ -1,0 +1,35 @@
+{
+  "baseline": {
+    "contract": {
+      "classes": {
+        "def_front": 1,
+        "ok_front": 0
+      },
+      "preprocessing": "ml.preprocessing.preprocess_image:rgb-bilinear-400x400-float32-0-1:v1",
+      "threshold": 0.26489877700805664
+    },
+    "path": "../models/regression/baseline.keras",
+    "sha256": "9664b2497f6b578e2f68a6b147cf991e1cbb8d2987d09c41222502346bfa05a1"
+  },
+  "candidate": {
+    "contract": {
+      "classes": {
+        "def_front": 1,
+        "ok_front": 0
+      },
+      "preprocessing": "ml.preprocessing.preprocess_image:rgb-bilinear-400x400-float32-0-1:v1",
+      "threshold": 0.26489877700805664
+    },
+    "path": "../models/regression/candidate.keras",
+    "sha256": "28f54a232e3dbdf2498cba8a5d8aa2002d9a312c560ce3acd818023b77ba949e"
+  },
+  "contract": {
+    "classes": {
+      "def_front": 1,
+      "ok_front": 0
+    },
+    "preprocessing": "ml.preprocessing.preprocess_image:rgb-bilinear-400x400-float32-0-1:v1",
+    "threshold": 0.26489877700805664
+  },
+  "golden": "../golden/real"
+}

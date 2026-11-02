@@ -1,0 +1,60 @@
+name: HU22 model regression
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  regression-contract:
+    name: HU22 synthetic contract tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - run: pip install -r ml/requirements-ci.txt
+      - run: python -m pytest -c ml/pytest.ini ml/tests/test_regression.py ml/tests/test_regression_data.py --junitxml=reports/regression-unit.xml
+      - name: Reconstruct DVC synthetic fixtures (no remote required)
+        run: |
+          python -m ml.golden --output golden/synthetic
+          dvc add golden/synthetic
+          git diff --exit-code -- golden/synthetic.dvc
+          dvc checkout golden/synthetic.dvc
+          python -c "from ml.regression import validate_golden; validate_golden('golden/synthetic')"
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: hu22-contract-evidence
+          path: reports/
+          retention-days: 14
+
+  model-regression:
+    name: HU22 real model gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CUDA_VISIBLE_DEVICES: '-1'
+      TF_ENABLE_ONEDNN_OPTS: '0'
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: pip install -r ml/requirements-regression.txt
+      - name: Retrieve public Drive objects, verify hashes and pull with DVC
+        run: python -m ml.regression_data
+      - name: Compare baseline and candidate (0-2 pass; 3+ fail)
+        run: python -m ml.regression
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: hu22-real-regression-evidence
+          path: reports/regression/
+          retention-days: 14
+          if-no-files-found: error

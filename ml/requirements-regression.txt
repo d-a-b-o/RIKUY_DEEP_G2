@@ -1,0 +1,6 @@
+# CPU Keras inference, separate from the lightweight unit test environment.
+tensorflow-cpu==2.20.0
+keras==3.15.1
+numpy==2.2.6
+pillow==13.0.0
+dvc==3.67.1
