@@ -6,9 +6,21 @@ Tarea: RIKDP-88 (HU07-T03 · diseño de la inferencia en el navegador y del mani
 
 Decisiones relacionadas: [ADR 0002 · inferencia en el navegador](../adr/0002-inferencia-en-el-navegador.md) y [ADR 0006 · manifest de modelos](../adr/0006-manifest-de-modelos.md).
 
+## Implementación (HU26)
+
+| Pieza | Archivo |
+| --- | --- |
+| Manifest, versión activa y veredicto | `apps/web/src/lib/model/manifest.ts` |
+| Carga: manifest sin caché, hash, IndexedDB, WebGL → WASM → CPU, calentamiento | `apps/web/src/lib/model/loader.ts` |
+| Recorte cuadrado centrado y canvas a 400×400 | `apps/web/src/lib/model/preprocess.ts` |
+| Pantalla `/panel/inspeccion`: foto subida o cámara | `apps/web/src/components/inspection/inspector.tsx` |
+| Binarios WASM servidos desde el propio dominio | `apps/web/scripts/copy-tfjs-wasm.mjs` → `public/tfjs-wasm/` |
+
+Versión publicada hoy: **0.9.0 provisional** en `https://bucket.d-a-b-o.dev/dev/manifest.json`. Es la exportación `9f8457f52f63…` (umbral 0,2437), subida sin el quality gate para demos y desarrollo; en la pantalla aparece como «Provisional». La versión oficial 1.0.0 se publicará en el manifest de la raíz desde el notebook, tras el quality gate (HU25).
+
 ## El modelo actual
 
-Datos del notebook `RIKUY_DEEP_G2.ipynb` (HU17, corrida `run01_lr1e-4_unfreeze15_drop30`):
+Datos del notebook `RIKUY_DEEP_G2.ipynb` (HU17, corrida `run01_lr1e-4_unfreeze15_drop30`). La exportación final publicada como 0.9.0 usa otra corrida con umbral **0,2437**; sus métricas se actualizarán con el reporte del quality gate:
 
 | Propiedad | Valor |
 | --- | --- |
