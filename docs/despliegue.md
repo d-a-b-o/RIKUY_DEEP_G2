@@ -2,7 +2,7 @@
 
 Cómo poner en marcha la base de datos en Neon y el despliegue automático en Vercel.
 
-Tareas: HU13 (RIKDP-24): RIKDP-110 (Neon), RIKDP-111 (esquema y migración), RIKDP-112 (seed), RIKDP-118 (Vercel) y RIKDP-119 (variables de entorno).
+Tareas: HU13 (RIKDP-24): RIKDP-110 (Neon), RIKDP-111 (esquema y migración), RIKDP-112 (seed), RIKDP-118 (Vercel) y RIKDP-119 (variables de entorno). Autenticación: HU19 (RIKDP-30).
 
 ## Resumen
 
@@ -43,6 +43,8 @@ El repositorio no contiene ningún secreto: las variables se configuran en Verce
 
    El seed se niega a ejecutarse en producción salvo que se fuerce con `ALLOW_PRODUCTION_SEED=true`.
 
+   Con `SEED_DEMO_PASSWORD="<contraseña>"` crea además un usuario por rol para probar el login: `superadmin@`, `admin@`, `inspector@` y `consulta@demo.rikuydeep.test`, todos con esa contraseña.
+
 ## 2. Vercel (RIKDP-118)
 
 1. En [vercel.com/new](https://vercel.com/new), importa el repositorio `d-a-b-o/RIKUY_DEEP_G2`.
@@ -64,10 +66,13 @@ El repositorio no contiene ningún secreto: las variables se configuran en Verce
    | --- | --- | --- | --- |
    | `DATABASE_URL` | Neon `main` con pooler | Neon `dev` con pooler | Neon `dev` con pooler |
    | `DIRECT_URL` | Neon `main` directa | Neon `dev` directa | Neon `dev` directa |
+   | `BETTER_AUTH_SECRET` | Secreto propio | Otro secreto propio | Otro secreto propio |
    | `RESEND_API_KEY` | Clave de producción | Clave de pruebas (opcional) | — |
    | `LEAD_NOTIFICATION_TO` | Correo del equipo comercial | Correo del equipo | — |
    | `LEAD_NOTIFICATION_FROM` | Remitente verificado | `RikuyDeep <onboarding@resend.dev>` | — |
    | `NEXT_PUBLIC_SITE_URL` | Dominio propio, si lo hay | — | — |
+
+   `BETTER_AUTH_SECRET` es **obligatoria**: sin ella el sitio compila, pero el login y `/panel` fallan en producción. Genera un valor distinto para cada entorno con `openssl rand -base64 32`. Si se cambia, se cierran todas las sesiones abiertas.
 
 4. Despliega. Desde ahí:
    - cada PR recibe una **URL de preview** que Vercel comenta en la PR;
@@ -91,7 +96,10 @@ Referencia completa con valores de ejemplo en [`apps/web/.env.example`](../apps/
 | --- | --- | --- |
 | `DATABASE_URL` | Sí | Conexión de la aplicación (con pooler en Neon) |
 | `DIRECT_URL` | Para migraciones y seed | Conexión directa para Prisma Migrate. Si falta, se usa `DATABASE_URL_UNPOOLED` o `DATABASE_URL` |
-| `RESEND_API_KEY` | No | Envío del aviso de nuevos leads |
+| `BETTER_AUTH_SECRET` | Sí, en producción | Firma de sesiones y tokens de Better Auth (HU19) |
+| `AUTH_EMAIL_FROM` | No | Remitente del correo de recuperación de contraseña. Si falta, se usa `LEAD_NOTIFICATION_FROM` |
+| `SEED_DEMO_PASSWORD` | No | Contraseña de los usuarios de demostración del seed |
+| `RESEND_API_KEY` | No | Envío del aviso de nuevos leads y del correo de recuperación de contraseña. Sin ella, en desarrollo el enlace de recuperación se escribe en la consola |
 | `LEAD_NOTIFICATION_TO` | Con Resend | Destinatarios del aviso, separados por comas |
 | `LEAD_NOTIFICATION_FROM` | No | Remitente del aviso |
 | `NEXT_PUBLIC_SITE_URL` | No | URL pública para metadatos y sitemap. En Vercel se deduce del dominio de producción |
@@ -115,3 +123,5 @@ La migración inicial añade reglas que Prisma no expresa, escritas a mano en SQ
 - [ ] El lead aparece en la tabla `lead` de la rama `main` (*Neon → Tables*).
 - [ ] Si Resend está configurado, llega el correo de aviso.
 - [ ] Una PR nueva recibe su URL de preview.
+- [ ] `/ingresar` permite entrar con un usuario creado por el seed (en `dev`) y `/panel` muestra su nombre y rol.
+- [ ] «¿Olvidaste tu contraseña?» envía el correo de recuperación (con Resend configurado).

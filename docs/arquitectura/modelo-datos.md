@@ -269,6 +269,7 @@ erDiagram
 | `inspection_event` | Historial de la inspección: creación, correcciones con motivo y marca para reentrenamiento | HU24, HU40 |
 | `lead` | Solicitud de demo desde la landing | HU14 |
 | `access_denied_log` | Registro de cada acceso no autorizado (403) | HU32 |
+| `rate_limit` | Contadores del rate limit de Better Auth por IP y ruta. Se añadió en la migración `auth_rate_limit` | HU19 |
 | `model_telemetry` | Tiempos de inferencia y errores de carga del modelo reportados por el navegador | HU43 |
 
 ## Reglas de negocio que el esquema debe garantizar
