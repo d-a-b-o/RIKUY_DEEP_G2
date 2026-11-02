@@ -13,7 +13,7 @@ export default defineConfig({
     },
   },
   test: {
-    exclude: ["**/node_modules/**", "**/.next/**", "src/generated/**"],
+    exclude: ["**/node_modules/**", "**/.next/**", "src/generated/**", "e2e/**"],
     // Las pruebas de integración comparten la base de datos.
     fileParallelism: false,
   },
