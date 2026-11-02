@@ -1,0 +1,6 @@
+outs:
+- md5: 3a580d2ac8e5b52726e37b9bdb6e4caf.dir
+  size: 170374
+  nfiles: 51
+  hash: md5
+  path: synthetic
