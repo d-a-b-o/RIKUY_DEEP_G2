@@ -7,7 +7,7 @@ Una historia de usuario está **terminada** cuando cumple todo lo siguiente. La 
 ### Código y PR
 
 - [ ] El trabajo está en una rama `RIKDP-<clave>-HU<nn>-<Titulo>` creada desde `main`.
-- [ ] La PR lleva la clave de Jira en el título o la rama (lo comprueba el job *Convenciones de la PR*).
+- [ ] La PR lleva la clave de Jira en el título o la rama; para mantenimiento sin HU se acepta una rama `<autor>-<descripcion>-<numero>` (lo comprueba el job *Convenciones de la PR*).
 - [ ] El check **`CI`** está en verde. Incluye:
   - lint (ESLint, Ruff) y typecheck sin errores;
   - pruebas de componente e integración (Vitest, pytest) en verde;

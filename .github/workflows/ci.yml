@@ -159,19 +159,21 @@ jobs:
 
   convenciones:
     name: Convenciones de la PR
-    if: github.event_name == 'pull_request' && github.event.pull_request.user.type != 'Bot'
+    needs: changes
+    if: github.event_name == 'pull_request' && github.event.pull_request.user.type != 'Bot' && (needs.changes.outputs.web == 'true' || needs.changes.outputs.ml == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Verificar clave de Jira en el título o la rama
+      - name: Verificar convención en el título o la rama
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
           PR_BRANCH: ${{ github.head_ref }}
         run: |
-          if printf '%s\n%s\n' "$PR_TITLE" "$PR_BRANCH" | grep -Eq 'RIKDP-[0-9]+'; then
-            echo "Clave de Jira encontrada."
+          if printf '%s\n%s\n' "$PR_TITLE" "$PR_BRANCH" | grep -Eq 'RIKDP-[0-9]+' \
+            || printf '%s\n' "$PR_BRANCH" | grep -Eq '^[[:alnum:]_.-]+-[[:alnum:]_.-]+-[0-9]+$'; then
+            echo "Convención de PR válida."
           else
-            echo "::error::El título o la rama de la PR debe incluir la clave de Jira (por ejemplo RIKDP-123)."
+            echo "::error::El título o la rama debe incluir la clave de Jira (por ejemplo RIKDP-123) o usar una rama descriptiva con sufijo numérico (por ejemplo usuario-cambio-1)."
             exit 1
           fi
 
