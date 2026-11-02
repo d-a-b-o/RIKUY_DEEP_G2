@@ -1,7 +1,7 @@
 """Preprocesamiento compartido HU06 para fundición.
 Entrada: imagen decodificada RGB. Resize bilinear a 400x400. RGB float32 en [0,1].
-TensorFlow.js: recorte cuadrado centrado, canvas 400x400 con suavizado alto, fromPixels().div(255);
-ver docs/arquitectura/inferencia-navegador.md.
+Este módulo no recorta; verificar equivalencia con el recorte de la web antes de exportar.
+Ver docs/arquitectura/inferencia-navegador.md.
 Augmentation solo se activa con training=True en el conjunto train.
 """
 
@@ -16,7 +16,8 @@ TARGET_SIZE = (400, 400)
 def preprocess_image(image):
     """Acepta ruta, PIL.Image o ndarray RGB; retorna float32 (400,400,3) en [0,1]."""
     if isinstance(image, (str, Path)):
-        image = Image.open(image)
+        with Image.open(image) as source:
+            image = source.convert("RGB")
     elif isinstance(image, np.ndarray):
         image = Image.fromarray(np.asarray(image, dtype=np.uint8))
     image = image.convert("RGB").resize(TARGET_SIZE, Image.Resampling.BILINEAR)
@@ -26,7 +27,8 @@ def preprocess_image(image):
 def augment_training_image(image, seed=None):
     """Rotacion, flip horizontal y brillo; llamar solo con ejemplos de train."""
     if isinstance(image, (str, Path)):
-        image = Image.open(image)
+        with Image.open(image) as source:
+            image = source.convert("RGB")
     image = image.convert("RGB")
     rng = np.random.default_rng(seed)
     if rng.random() < 0.5:
@@ -37,12 +39,17 @@ def augment_training_image(image, seed=None):
     return ImageEnhance.Brightness(image).enhance(float(rng.uniform(0.85, 1.15)))
 
 
-def make_tf_dataset(paths, labels, training=False, batch_size=32, seed=42):
-    """Dataset tf.data; flip/rotacion/brillo ocurren unicamente si training=True."""
+def make_tf_dataset(paths, labels, training=False, batch_size=32, seed=42, augment=None):
+    """Shuffle sólo en train; augment=None conserva compatibilidad con training."""
     import tensorflow as tf
 
     paths = [str(p) for p in paths]
     labels = np.asarray(labels, dtype=np.int32)
+    augment = training if augment is None else augment
+    if augment and not training:
+        raise ValueError("Augmentation sólo está permitida en train.")
+    if not paths or len(paths) != len(labels) or batch_size < 1:
+        raise ValueError("Paths/labels deben ser no vacíos, iguales en longitud; batch_size positivo.")
     ds = tf.data.Dataset.from_tensor_slices((paths, labels))
     if training:
         ds = ds.shuffle(len(paths), seed=seed, reshuffle_each_iteration=True)
@@ -53,7 +60,7 @@ def make_tf_dataset(paths, labels, training=False, batch_size=32, seed=42):
         image.set_shape([None, None, 3])
         image = tf.image.resize(image, TARGET_SIZE, method="bilinear")
         image = tf.cast(image, tf.float32) / 255.0
-        if training:
+        if augment:
             image = tf.image.random_flip_left_right(image, seed=seed)
             image = rotation(image, training=True)
             image = tf.image.random_brightness(image, max_delta=0.15, seed=seed)

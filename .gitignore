@@ -16,6 +16,9 @@ venv/
 # MLflow (local runs)
 mlruns/
 
+# Corridas locales: los punteros .dvc hermanos sí se guardan con Git.
+/models/experiments/*/
+
 # Environment variables
 .env
 .env.*

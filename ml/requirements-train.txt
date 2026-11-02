@@ -1,0 +1,13 @@
+# Entorno de entrenamiento separado del conversor TF.js.
+# Tras validar en tu GPU/Colab, guarda pip freeze en los artefactos del experimento.
+tensorflow>=2.16,<2.22
+numpy>=1.26,<3
+pillow>=13,<14
+scikit-learn>=1.5,<2
+pandas>=2.2,<4
+matplotlib>=3.9,<4
+kagglehub>=0.3,<1
+dvc>=3,<4
+dvc-gdrive>=3,<4
+ipykernel>=6,<8
+nbformat>=5,<6

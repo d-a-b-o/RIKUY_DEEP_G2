@@ -3,5 +3,10 @@
 # y las pruebas unitarias no lo usan.
 numpy>=2.0,<3
 pillow>=11,<13
+scikit-learn>=1.5,<2
 pytest>=8,<10
 ruff>=0.16,<0.17
+kagglehub
+dvc
+dvc-gdrive
+mlflow
