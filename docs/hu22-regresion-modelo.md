@@ -87,6 +87,10 @@ Para reproducir también las dependencias transitivas, conservar `pip freeze` co
 
 ## CI y reportes
 
+El entorno de regresión fija Pillow 13.0.0 y las pruebas usan Pillow >=13,<14,
+alineado con entrenamiento. Pillow <=12.3.0 es rechazado por la revisión de
+dependencias (entre otros, GHSA-5x8w-8jj5-q52h). No se omite ese control.
+
 `.github/workflows/model-regression.yml` corre en PR abierto, actualizado, reabierto
 o listo para revisión, además de ejecución manual. `regression-contract` ejecuta pruebas
 sintéticas y verifica la reconstrucción DVC. `model-regression` intenta recuperar
