@@ -123,6 +123,29 @@ Debe responder `200`, `access-control-allow-origin: *` y `cache-control: public,
 
 En Vercel, `NEXT_PUBLIC_MODEL_MANIFEST_URL` apunta al manifest. Como empieza por `NEXT_PUBLIC_`, se fija al compilar: después de cambiarla hay que volver a desplegar.
 
+### Imágenes de inspección (HU24, RIKDP-150)
+
+Las fotos de las inspecciones van en un bucket **distinto y privado** ([ADR 0005](adr/0005-subida-directa-a-r2.md)). El navegador nunca recibe credenciales: el servidor firma URLs que caducan a los 5 minutos (`src/lib/storage/r2.ts`) y decide la clave del objeto (`companies/{company_id}/inspections/{yyyy}/{mm}/{uuid}.jpg`).
+
+1. **Bucket privado**, sin acceso público ni dominio propio (por ejemplo `rikuy-imagenes` y `rikuy-imagenes-dev`).
+2. **CORS** para que el navegador suba la foto con `PUT`. Aquí sí se restringen los orígenes, porque la URL firmada permite escribir:
+
+   ```json
+   [
+     {
+       "AllowedOrigins": ["https://<dominio-de-produccion>", "https://*.vercel.app", "http://localhost:3000"],
+       "AllowedMethods": ["PUT", "GET", "HEAD"],
+       "AllowedHeaders": ["content-type"],
+       "MaxAgeSeconds": 3600
+     }
+   ]
+   ```
+
+3. **Token** con permiso *Object Read & Write* solo sobre el bucket de imágenes. En Vercel, por entorno: `R2_ENDPOINT_URL`, `R2_IMAGES_BUCKET`, `R2_ACCESS_KEY_ID` y `R2_SECRET_ACCESS_KEY`. Es un token distinto del de publicación de modelos, que vive en los secretos de Colab.
+4. **Regla de ciclo de vida** opcional para borrar objetos huérfanos (subidos pero nunca registrados), como indica el ADR 0005.
+
+Sin estas variables la app funciona, pero no puede registrar inspecciones que guardan foto: responde `STORAGE_NOT_CONFIGURED`.
+
 ## 4. Correo con Resend (aviso de solicitudes de demo)
 
 1. Crea una cuenta en [resend.com](https://resend.com) y una API key con permiso de envío.
