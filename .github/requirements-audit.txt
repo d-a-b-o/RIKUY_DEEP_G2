@@ -1,0 +1,2 @@
+# Entorno de herramientas separado de los entornos ML auditados.
+pip-audit==2.10.1

@@ -52,6 +52,9 @@ jobs:
               - "ml/**"
               - "RIKUY_DEEP_G2.ipynb"
               - ".github/workflows/ci.yml"
+              - ".github/requirements-audit.txt"
+              - ".github/scripts/audit_python.py"
+              - ".github/scripts/tests/test_audit_python.py"
 
   web:
     name: Web · lint, typecheck, test y build
@@ -141,11 +144,11 @@ jobs:
           retention-days: 14
 
   ml:
-    name: ML · ruff y pytest
+    name: ML · pip-audit, ruff y pytest
     needs: changes
     if: needs.changes.outputs.ml == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     defaults:
       run:
         working-directory: ml
@@ -157,6 +160,30 @@ jobs:
           python-version: "3.13"
           cache: pip
           cache-dependency-path: ml/requirements-ci.txt
+
+      - name: Instalar herramientas de auditoría en entorno separado
+        run: |
+          python -m venv "$RUNNER_TEMP/pip-audit-venv"
+          "$RUNNER_TEMP/pip-audit-venv/bin/python" -m pip install -r ../.github/requirements-audit.txt
+
+      - name: Probar política de severidad de Python
+        run: python -m unittest discover -s ../.github/scripts/tests -p test_audit_python.py -v
+
+      - name: Auditar todos los requirements de ML (umbral alto)
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >-
+          "$RUNNER_TEMP/pip-audit-venv/bin/python" ../.github/scripts/audit_python.py
+          --requirements-dir . --output "$RUNNER_TEMP/pip-audit-reports"
+
+      - name: Conservar reportes de auditoría Python
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v5
+        with:
+          name: pip-audit-reports
+          path: ${{ runner.temp }}/pip-audit-reports/*.json
+          if-no-files-found: error
+          retention-days: 14
 
       - name: Instalar dependencias
         run: pip install -r requirements-ci.txt
