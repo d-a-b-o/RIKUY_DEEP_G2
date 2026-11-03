@@ -29,6 +29,17 @@ class SeverityGateTests(unittest.TestCase):
         }]}
         (self.directory / filename).write_text(json.dumps(report), encoding='utf-8')
 
+    def report_with_extension_rule(self, score, *, filename='results.sarif'):
+        rule = {'id': 'ext/security', 'properties': {'security-severity': score}}
+        report = {'runs': [{
+            'tool': {
+                'driver': {'name': 'CodeQL', 'rules': []},
+                'extensions': [{'name': 'queries', 'rules': [rule]}],
+            },
+            'results': [{'ruleId': rule['id'], 'level': 'warning'}],
+        }]}
+        (self.directory / filename).write_text(json.dumps(report), encoding='utf-8')
+
     def test_high_and_critical_fail_even_when_sarif_level_is_warning(self):
         for score in ['7.0', '8.9', '9.0', '10.0']:
             with self.subTest(score=score):
@@ -48,6 +59,10 @@ class SeverityGateTests(unittest.TestCase):
     def test_any_report_can_block(self):
         self.report('2.0', filename='javascript.sarif')
         self.report('9.0', filename='python.sarif')
+        self.assertEqual(gate.check(self.directory), 1)
+
+    def test_rules_from_extensions_are_supported(self):
+        self.report_with_extension_rule('9.0')
         self.assertEqual(gate.check(self.directory), 1)
 
     def test_missing_report_fails_closed(self):

@@ -23,9 +23,17 @@ def check(directory: Path) -> int:
             for invocation in run.get('invocations', []):
                 if invocation.get('executionSuccessful') is False:
                     raise ValueError(f'{path.name}: ejecución de CodeQL incompleta.')
-            rules = {rule['id']: rule for rule in driver.get('rules', [])}
+            tool = run['tool']
+            rules = {}
+            for rule in driver.get('rules', []):
+                rules[rule['id']] = rule
+            for extension in tool.get('extensions', []):
+                for rule in extension.get('rules', []):
+                    rules[rule['id']] = rule
             for result in run.get('results', []):
                 rule_id = result['ruleId']
+                if rule_id not in rules:
+                    raise ValueError(f'{rule_id}: regla ausente en el SARIF.')
                 rule = rules[rule_id]
                 severity = rule.get('properties', {}).get('security-severity')
                 if severity is None:
