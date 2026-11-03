@@ -1,0 +1,7 @@
+title = "RIKDP-278: reglas estándar de Gitleaks"
+
+[extend]
+useDefault = true
+
+# Las excepciones se limitan a huellas exactas en .gitleaksignore.
+# No excluir carpetas, notebooks, archivos de prueba ni reglas completas.
