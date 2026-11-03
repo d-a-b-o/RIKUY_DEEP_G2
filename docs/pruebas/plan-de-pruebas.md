@@ -14,6 +14,10 @@ Este archivo es la versión del repositorio del *Plan de Pruebas v1.1*. Los caso
 
 Documentos relacionados: [Definition of Ready](definition-of-ready.md) · [Definition of Done](definition-of-done.md).
 
+Actualización local del 03/11/2026 (RIKDP-281): se añade el procedimiento de
+validación de HU50 y se amplía la evidencia de RIKDP-243. La sincronización de
+este procedimiento en Jira queda pendiente; no se modifican los 67 casos del catálogo.
+
 ## Resumen
 
 Las pruebas de RikuyDeep siguen los cuatro niveles del modelo en V (componente, integración, sistema y aceptación), más las revisiones estáticas del lado analítico. Hay **67 casos de prueba** en Jira: 65 agrupados en cinco tareas de prueba (PT1–PT5) y 2 de aceptación dentro de la UAT. Las pruebas formales se ejecutan en las **últimas tres semanas** (13 a 15); la aplicación de punta a punta se prueba con **Playwright** y el modelo corre en el navegador con **TensorFlow.js**.
@@ -313,6 +317,42 @@ npm run test:smoke
 | Code review aprobado por 1 revisor | La PR se fusiona sola cuando el check `CI` pasa (auto-merge, sin aprobación obligatoria) | Decisión del equipo por trabajar en horarios distintos. La revisión sigue en la DoD, pero no bloquea la fusión: sus hallazgos se registran como Error. |
 | Inspección en video (HU44) | HU44 es la estación automática que inspecciona el 100 % de las piezas en la línea | [ADR 0007](../adr/0007-estacion-de-inspeccion-automatica.md). Los casos RIKDP-229, RIKDP-230 y RIKDP-260 se aplican a esa estación. |
 
+### HU50 · Seguridad y job puerta CI (RIKDP-281 / RIKDP-243)
+
+La [guía de hallazgos](../hu50-seguridad-ci.md) define alcance, umbrales y
+responsables. RIKDP-243 mantiene su responsable **Daniel Sánchez**, PT5, Semana
+15 y origen HU48; HU50 aporta automatización y evidencia reutilizable de
+auditoría de dependencias. Andre Chumbiraico prepara la evidencia de integración.
+Los siguientes son escenarios del procedimiento, no nuevas tareas de Jira.
+
+| Escenario | Resultado esperado | Evidencia |
+| --- | --- | --- |
+| CodeQL emite severidad >= 7.0 en cualquiera de los dos lenguajes | CodeQL y CI fallan. | SARIF, ID de regla, job y commit. |
+| Gitleaks encuentra token sintético, incluso eliminado en otro commit del rango | Gitleaks y CI fallan; valores ocultos. | Reporte redactado y rango de commits. Nunca usar una credencial real de proveedor. |
+| pip-audit emite high/critical en requirements directos o transitivos | ML y CI fallan; se conservan reportes de los cuatro entornos. | `pip-audit-reports/summary.json`, GHSA/CVE, versión y corrección disponible. |
+| pip-audit emite solo low/moderate, o no emite avisos | La política de auditoría permite continuar; CI depende también del resto de jobs. | Resumen con severidad y decisión. |
+| npm audit o Dependency Review detecta high/critical | Web o Revisión de dependencias y CI fallan. | Paquete, versión, aviso y log de la PR. |
+| Resolución/API/permisos/reporte falla | No se aprueba CI ni se clasifica como falso positivo. | Error operativo y ejecución posterior correcta. |
+| Cualquier job falla o se cancela; falta un resultado esperado | Job puerta rechaza la ejecución. | Pruebas de `check_ci.py` y ejecución del workflow cuando corresponda. |
+| CodeQL/Gitleaks omitido, o ML omitido con filtro ml=true | CI falla por omisión inesperada. | Pruebas del contrato del job puerta. |
+| PR solo de documentación | Web/ML/Convenciones pueden omitirse; CodeQL, Gitleaks, archivos y revisión de dependencias deben pasar. | Filtros de rutas y jobs de la PR. |
+| PR de Dependabot con cambios ML o Web | Se audita el entorno afectado; solo Convenciones puede omitirse por ser bot. | Actor, rutas y resultados. |
+| Ejecución manual y push a main | Manual exige ML y Web; fuera de PR se permiten omisiones de controles exclusivos de PR. CodeQL/Gitleaks siempre pasan. | Evento y resultados. |
+| Falso positivo aprobado | Evidencia técnica, revisor independiente y exclusión mínima donde el control la soporte; una desestimación de UI no fuerza verde. | Registro Jira/PR y diff de la excepción. |
+| Secreto real descubierto durante el uso normal | Se revoca/rota y se verifica antes de cerrar. No se usa una exclusión para ocultarlo. | Constancia sin valores, responsable y fecha. |
+| Protección de main | Solo CI es obligatorio y el commit vigente sin aprobación de CI no puede fusionarse por el flujo normal. | Captura/configuración de la regla activa, sin usar bypass. |
+
+Antes de las pruebas formales ejecutar `python -m unittest discover -s
+.github/scripts/tests -v` desde la raíz. Las pruebas locales usan reportes y
+resultados simulados; no sustituyen las ejecuciones reales ni demuestran por sí
+solas la protección de `main`. Para probar el bloqueo remoto usar una PR temporal
+controlada y datos sintéticos; no fusionarla ni introducir secretos reales.
+
+Guardar fecha, SHA, URL de PR/run/job, resultados y aprobación de excepciones.
+Descargar evidencia antes de su expiración: CodeQL y pip-audit 14 días, Gitleaks
+7 días. El historial inicial de Gitleaks corresponde a RIKDP-278; un nuevo push
+o una ejecución manual debe comprobar las referencias disponibles en ese momento.
+
 ## Anexo A. Catálogo de casos de prueba en Jira
 
 67 casos ordenados por tarea de prueba. Los marcados con ★ son casos nuevos de la v1.1; el resto viene de las subtareas de prueba originales de cada historia.
@@ -379,7 +419,7 @@ npm run test:smoke
 | RIKDP-225 | PT5 | Sistema | Caída simulada genera alerta en UptimeRobot | UptimeRobot (manual) | D. Bravo | HU43 |
 | RIKDP-230 | PT5 | Sistema | Video a 2 fps durante 10 min sin fugas de memoria (tf.memory) | Playwright (tf.memory) | A. Chumbiraico | HU44 |
 | RIKDP-242 | PT5 | Sistema | Escaneo OWASP ZAP sin hallazgos altos | OWASP ZAP | A. Chumbiraico | HU48 |
-| RIKDP-243 | PT5 | Estática | Auditoría de dependencias (npm audit, pip-audit) | npm audit / pip-audit / Dependabot | D. Sánchez | HU48 |
+| RIKDP-243 | PT5 | Estática | Auditoría de dependencias (npm audit, pip-audit), umbral alto/crítico y propagación al CI; evidencia HU50 según sección 15 | npm audit / pip-audit / Dependabot | D. Sánchez | HU48 |
 | RIKDP-247 | PT5 | Sistema | Scripts k6 del dashboard y del registro de inspecciones | k6 | D. Sánchez | – |
 | RIKDP-248 | PT5 | Sistema | Ejecución de k6 y reporte de p95, throughput y errores | k6 | D. Sánchez | – |
 | RIKDP-249 | PT5 | Sistema | Revisión de resultados de rendimiento y recomendaciones | Revisión de reporte k6 | A. Chumbiraico | – |
