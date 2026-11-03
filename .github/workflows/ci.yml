@@ -14,6 +14,14 @@ permissions:
   contents: read
 
 jobs:
+  codeql:
+    name: Seguridad estática
+    uses: ./.github/workflows/codeql.yml
+    permissions:
+      contents: read
+      security-events: write
+      packages: read
+
   changes:
     name: Detectar cambios
     runs-on: ubuntu-latest
@@ -225,7 +233,7 @@ jobs:
   # canceló; los jobs omitidos (sin cambios o fuera de una PR) cuentan como éxito.
   ci:
     name: CI
-    needs: [changes, web, ml, convenciones, archivos, dependencias]
+    needs: [changes, web, ml, convenciones, archivos, dependencias, codeql]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5
