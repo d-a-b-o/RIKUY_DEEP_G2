@@ -262,7 +262,8 @@ jobs:
 
   # Job puerta: es el único check que debe marcarse como obligatorio en la
   # protección de main. Siempre se ejecuta y falla si algún job falló o se
-  # canceló; los jobs omitidos (sin cambios o fuera de una PR) cuentan como éxito.
+  # canceló. Solo admite omisiones justificadas por rutas o por el tipo de evento;
+  # CodeQL y Gitleaks nunca pueden omitirse. pip-audit cuenta mediante el job ML.
   ci:
     name: CI
     needs:
@@ -271,14 +272,20 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Probar el contrato del job puerta
+        run: python -m unittest discover -s .github/scripts/tests -p test_check_ci.py -v
+
       - name: Verificar resultado de los jobs
         env:
-          RESULTS: ${{ join(needs.*.result, ' ') }}
-        run: |
-          echo "Resultados: $RESULTS"
-          for result in $RESULTS; do
-            if [ "$result" = "failure" ] || [ "$result" = "cancelled" ]; then
-              echo "::error::Al menos un job de CI falló o se canceló."
-              exit 1
-            fi
-          done
+          NEEDS_JSON: ${{ toJSON(needs) }}
+          EVENT_NAME: ${{ github.event_name }}
+          AUTHOR_TYPE: ${{ github.event.pull_request.user.type }}
+        run: python .github/scripts/check_ci.py

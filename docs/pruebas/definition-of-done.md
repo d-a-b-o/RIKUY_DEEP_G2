@@ -14,7 +14,10 @@ Una historia de usuario está **terminada** cuando cumple todo lo siguiente. La 
   - migraciones aplicadas sobre una base vacía y esquema sin cambios pendientes;
   - build de producción;
   - **prueba de humo** de Playwright (`@smoke`) en verde;
-  - auditoría de dependencias sin vulnerabilidades altas y ningún archivo de más de 5 MB.
+  - CodeQL y Gitleaks ejecutados correctamente; CodeQL sin hallazgos altos/críticos y Gitleaks sin secretos no exceptuados;
+  - pip-audit dentro de ML y npm audit dentro de Web, según las rutas afectadas, sin vulnerabilidades altas/críticas ni auditorías incompletas;
+  - revisión de dependencias de la PR y ningún archivo de más de 5 MB.
+- [ ] **CI es el único check obligatorio** en la protección de `main`. No se omiten CodeQL o Gitleaks; ML/Web solo pueden omitirse cuando sus filtros no aplican. Una ejecución manual incluye ambos. Fallos o cancelaciones no aprueban el job puerta.
 - [ ] La PR está fusionada en `main`. Se fusiona sola con auto-merge cuando `CI` pasa.
 - [ ] Una persona distinta del autor revisó la PR. La aprobación no bloquea la fusión, así que la revisión puede ser posterior. Lo que encuentre se registra en Jira como **Error** con su severidad (S1–S4).
 
@@ -31,11 +34,14 @@ Una historia de usuario está **terminada** cuando cumple todo lo siguiente. La 
 - [ ] Las pantallas funcionan en 360, 768 y 1280 px sin scroll horizontal y respetan la [identidad visual](../identidad-visual.md) (contraste WCAG AA).
 - [ ] No hay defectos S1 ni S2 abiertos de la historia.
 - [ ] No hay secretos en el repositorio. Las variables nuevas están en `.env.example` y en [despliegue](../despliegue.md).
+- [ ] Todo secreto real detectado fue revocado/rotado y se verificó su reemplazo antes del cierre, sin publicar valores en la evidencia.
+- [ ] Los falsos positivos tienen evidencia y aprobación de una persona distinta del autor **antes del merge**; las exclusiones son mínimas y revisables. Desestimar una alerta en GitHub no equivale a aprobar CI. Se aplicó la [guía de hallazgos de HU50](../hu50-seguridad-ci.md).
 
 ### Documentación y Jira
 
 - [ ] Se actualizaron los documentos afectados: `docs/arquitectura/`, un ADR nuevo si hubo una decisión de arquitectura, y el README de la app.
 - [ ] Las subtareas están en **Finalizada** y la historia tiene un comentario con el enlace a la PR y cómo se verificó.
+- [ ] La evidencia de seguridad enlaza el commit y ejecución reales, los hallazgos atendidos y las decisiones sobre excepciones; para HU50 incluye los escenarios del plan asociados a RIKDP-243.
 
 ## Excepciones
 
