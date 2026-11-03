@@ -4,7 +4,7 @@ Next.js 16 (App Router) + TypeScript + Tailwind CSS 4. Creada en HU08-T04 (RIKDP
 
 ## Requisitos
 
-- Node.js 20.9 o superior
+- Node.js 22.12 o superior para desarrollo y pruebas (CI usa Node 22; axe requiere 22.12).
 
 ## Primera vez
 
@@ -35,6 +35,13 @@ npm run db:deploy    # aplica migraciones pendientes (CI y Vercel)
 npm run db:check     # falla si el esquema tiene cambios sin migración
 npm run db:seed      # datos de demostración
 ```
+
+Las pruebas `@smoke` incluyen las seis pantallas a 360/768/1280 px, axe,
+menú móvil y teclado. Para ejecutar sólo UI/UX: `npm run test:e2e -- --grep @ui`.
+Las pantallas privadas requieren PostgreSQL de pruebas. Los casos de inferencia
+real y cámara simulada también requieren los fixtures `E2E_MODEL_DIR`, descritos
+en `e2e/inspection.spec.ts`; no usan la cámara física.
+Auditoría, capturas y resultados de RIKDP-274: [docs/ui-ux](../../docs/ui-ux/RIKDP-274-resultados.md).
 
 ## Estructura
 

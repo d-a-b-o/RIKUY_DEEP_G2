@@ -30,7 +30,8 @@ const plans: Plan[] = [
   },
   {
     name: "Corporativo",
-    audience: "Para grupos con varias plantas y requisitos de seguridad propios.",
+    audience:
+      "Para grupos con varias plantas y requisitos de seguridad propios.",
     features: [
       "Todo lo del plan Planta",
       "Varias plantas con datos aislados",
@@ -42,29 +43,48 @@ const plans: Plan[] = [
 
 function Check() {
   return (
-    <svg viewBox="0 0 16 16" className="mt-1 h-4 w-4 flex-none text-ok" aria-hidden="true">
-      <path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <svg
+      viewBox="0 0 16 16"
+      className="mt-1 h-4 w-4 flex-none text-ok"
+      aria-hidden="true"
+    >
+      <path
+        d="M3 8.5l3 3 7-7"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
 
 export function Plans() {
   return (
-    <section id="planes" className="border-b border-border bg-surface">
-      <div className="mx-auto flex max-w-6xl flex-col gap-12 px-4 py-20 sm:px-6">
+    <section
+      id="planes"
+      className="border-b border-border bg-surface-raised/50"
+    >
+      <div className="mx-auto flex max-w-7xl flex-col gap-10 px-5 py-16 sm:px-8 sm:py-20">
         <div className="flex max-w-2xl flex-col gap-4">
-          <p className="font-mono text-xs uppercase tracking-[0.14em] text-accent">Planes</p>
-          <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">Empieza con una estación y crece a tu ritmo</h2>
+          <p className="ui-eyebrow">05 / Planes</p>
+          <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
+            Empieza con una estación y crece a tu ritmo
+          </h2>
           <p className="text-lg leading-8 text-muted-foreground">
-            El precio depende del número de estaciones y del volumen de piezas. Solicita una demo y te enviamos una propuesta.
+            El precio depende del número de estaciones y del volumen de piezas.
+            Solicita una demo y te enviamos una propuesta.
           </p>
         </div>
         <ul className="grid gap-6 lg:grid-cols-3">
           {plans.map((plan) => (
             <li
               key={plan.name}
-              className={`flex flex-col gap-6 rounded-2xl border bg-background p-7 ${
-                plan.featured ? "border-primary shadow-lg shadow-acero-900/10" : "border-border"
+              className={`flex flex-col gap-6 rounded-2xl border bg-background p-6 sm:p-7 ${
+                plan.featured
+                  ? "border-primary shadow-[0_0_40px_#22b8cf10]"
+                  : "border-border"
               }`}
             >
               <div className="flex flex-col gap-2">
@@ -76,7 +96,9 @@ export function Plans() {
                     </span>
                   ) : null}
                 </div>
-                <p className="leading-7 text-muted-foreground">{plan.audience}</p>
+                <p className="leading-7 text-muted-foreground">
+                  {plan.audience}
+                </p>
               </div>
               <ul className="flex flex-1 flex-col gap-3 text-sm leading-6">
                 {plan.features.map((feature) => (
@@ -88,11 +110,7 @@ export function Plans() {
               </ul>
               <a
                 href="#demo"
-                className={`inline-flex h-11 items-center justify-center rounded-lg px-5 text-sm font-semibold transition-opacity hover:opacity-90 ${
-                  plan.featured
-                    ? "bg-accent text-accent-foreground"
-                    : "border border-border bg-surface text-foreground hover:border-primary"
-                }`}
+                className={`ui-button ${plan.featured ? "" : "ui-button-secondary"}`}
               >
                 Pedir propuesta
               </a>

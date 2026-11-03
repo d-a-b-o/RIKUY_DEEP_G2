@@ -79,20 +79,25 @@ const features: Feature[] = [
 export function Solution() {
   return (
     <section id="solucion" className="border-b border-border">
-      <div className="mx-auto flex max-w-6xl flex-col gap-12 px-4 py-20 sm:px-6">
+      <div className="mx-auto flex max-w-7xl flex-col gap-10 px-5 py-16 sm:px-8 sm:py-20">
         <div className="flex max-w-2xl flex-col gap-4">
-          <p className="font-mono text-xs uppercase tracking-[0.14em] text-accent">La solución</p>
+          <p className="ui-eyebrow">02 / La solución</p>
           <h2 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl">
             Una estación que inspecciona cada pieza que pasa
           </h2>
           <p className="text-lg leading-8 text-muted-foreground">
-            Trabaja como un inspector que no se cansa: revisa cada pieza con el mismo criterio de principio a fin del turno, y libera a tu equipo para decidir qué hacer con los defectos.
+            Trabaja como un inspector que no se cansa: revisa cada pieza con el
+            mismo criterio de principio a fin del turno, y libera a tu equipo
+            para decidir qué hacer con los defectos.
           </p>
         </div>
-        <ul className="grid gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((feature) => (
-            <li key={feature.title} className="flex flex-col gap-3">
-              <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-acero-50 text-primary dark:bg-acero-900">
+            <li
+              key={feature.title}
+              className="ui-card flex flex-col gap-3 p-6 transition-colors hover:border-primary/60"
+            >
+              <span className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg border border-primary/25 bg-primary/10 text-primary">
                 {feature.icon}
               </span>
               <h3 className="text-lg font-semibold">{feature.title}</h3>

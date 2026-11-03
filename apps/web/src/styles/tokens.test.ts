@@ -2,7 +2,10 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
-const css = readFileSync(fileURLToPath(new URL("../app/globals.css", import.meta.url)), "utf8");
+const css = readFileSync(
+  fileURLToPath(new URL("../app/globals.css", import.meta.url)),
+  "utf8",
+);
 
 function parseVars(block: string): Record<string, string> {
   const vars: Record<string, string> = {};
@@ -25,16 +28,24 @@ function extractBlock(source: string, startIndex: number): string {
 
 const darkMediaIndex = css.indexOf("@media (prefers-color-scheme: dark)");
 const lightTheme = parseVars(extractBlock(css, css.indexOf(":root")));
-const darkTheme = parseVars(extractBlock(css, css.indexOf(":root", darkMediaIndex)));
+const darkTheme = {
+  ...lightTheme,
+  ...parseVars(extractBlock(css, css.indexOf(":root", darkMediaIndex))),
+};
 
 function relativeLuminance(hex: string): number {
-  const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
-  const linear = (c: number) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+  const [r, g, b] = [1, 3, 5].map(
+    (i) => parseInt(hex.slice(i, i + 2), 16) / 255,
+  );
+  const linear = (c: number) =>
+    c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
   return 0.2126 * linear(r) + 0.7152 * linear(g) + 0.0722 * linear(b);
 }
 
 function contrastRatio(a: string, b: string): number {
-  const [light, dark] = [relativeLuminance(a), relativeLuminance(b)].sort((x, y) => y - x);
+  const [light, dark] = [relativeLuminance(a), relativeLuminance(b)].sort(
+    (x, y) => y - x,
+  );
   return (light + 0.05) / (dark + 0.05);
 }
 
@@ -46,6 +57,8 @@ const pairs: Array<[string, string, number]> = [
   ["muted-foreground", "background", 4.5],
   ["muted-foreground", "surface", 4.5],
   ["primary", "background", 4.5],
+  ["primary", "surface", 4.5],
+  ["primary", "surface-raised", 4.5],
   ["primary-foreground", "primary", 4.5],
   ["accent", "background", 4.5],
   ["accent-foreground", "accent", 4.5],
@@ -56,10 +69,15 @@ const pairs: Array<[string, string, number]> = [
   ["warning", "background", 4.5],
   ["warning", "surface", 4.5],
   ["ring", "background", 3],
+  ["ring", "surface", 3],
+  ["input-border", "background", 3],
+  ["input-border", "surface", 3],
+  ["foreground", "surface-raised", 4.5],
+  ["muted-foreground", "surface-raised", 4.5],
 ];
 
 describe.each([
-  ["claro", lightTheme],
+  ["predeterminado", lightTheme],
   ["oscuro", darkTheme],
 ])("tokens de color · tema %s", (_name, theme) => {
   it("define todos los tokens semánticos", () => {
@@ -70,6 +88,8 @@ describe.each([
   });
 
   it.each(pairs)("%s sobre %s cumple %s:1", (text, background, minimum) => {
-    expect(contrastRatio(theme[text], theme[background])).toBeGreaterThanOrEqual(minimum);
+    expect(
+      contrastRatio(theme[text], theme[background]),
+    ).toBeGreaterThanOrEqual(minimum);
   });
 });

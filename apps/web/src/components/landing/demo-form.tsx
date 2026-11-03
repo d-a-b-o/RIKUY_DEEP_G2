@@ -14,15 +14,19 @@ const subscribeNoop = () => () => {};
 const getPageLoadedAt = () => pageLoadedAt;
 const getServerPageLoadedAt = () => "";
 
-const inputClass =
-  "w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-base text-foreground placeholder:text-muted-foreground/70 focus-visible:border-ring aria-[invalid=true]:border-defect";
+const inputClass = "ui-input";
 
 type FieldProps = {
   id: Exclude<DemoRequestField, "consent">;
   label: string;
   optional?: boolean;
   error?: string;
-  children: (props: { id: string; name: string; "aria-invalid": boolean; "aria-describedby"?: string }) => React.ReactNode;
+  children: (props: {
+    id: string;
+    name: string;
+    "aria-invalid": boolean;
+    "aria-describedby"?: string;
+  }) => React.ReactNode;
 };
 
 function Field({ id, label, optional, error, children }: FieldProps) {
@@ -31,9 +35,16 @@ function Field({ id, label, optional, error, children }: FieldProps) {
     <div className="flex flex-col gap-1.5">
       <label htmlFor={id} className="text-sm font-medium">
         {label}
-        {optional ? <span className="font-normal text-muted-foreground"> (opcional)</span> : null}
+        {optional ? (
+          <span className="font-normal text-muted-foreground"> (opcional)</span>
+        ) : null}
       </label>
-      {children({ id, name: id, "aria-invalid": Boolean(error), "aria-describedby": error ? errorId : undefined })}
+      {children({
+        id,
+        name: id,
+        "aria-invalid": Boolean(error),
+        "aria-describedby": error ? errorId : undefined,
+      })}
       {error ? (
         <p id={errorId} className="text-sm text-defect">
           {error}
@@ -44,19 +55,31 @@ function Field({ id, label, optional, error, children }: FieldProps) {
 }
 
 export function DemoForm() {
-  const [state, formAction, pending] = useActionState(requestDemo, initialState);
-  const startedAt = useSyncExternalStore(subscribeNoop, getPageLoadedAt, getServerPageLoadedAt);
+  const [state, formAction, pending] = useActionState(
+    requestDemo,
+    initialState,
+  );
+  const startedAt = useSyncExternalStore(
+    subscribeNoop,
+    getPageLoadedAt,
+    getServerPageLoadedAt,
+  );
 
   const errors = state.status === "invalid" ? state.errors : {};
   const values =
-    state.status === "invalid" || state.status === "unavailable" || state.status === "error" ? state.values : {};
+    state.status === "invalid" ||
+    state.status === "unavailable" ||
+    state.status === "error"
+      ? state.values
+      : {};
 
   if (state.status === "sent") {
     return (
       <div role="status" className="flex flex-col gap-3 py-6">
         <p className="text-xl font-semibold">Recibimos tu solicitud</p>
         <p className="leading-7 text-muted-foreground">
-          Gracias. Te escribiremos al correo que indicaste para coordinar la demo.
+          Gracias. Te escribiremos al correo que indicaste para coordinar la
+          demo.
         </p>
       </div>
     );
@@ -67,7 +90,14 @@ export function DemoForm() {
       <div className="grid gap-5 sm:grid-cols-2">
         <Field id="name" label="Nombre y apellido" error={errors.name}>
           {(props) => (
-            <input {...props} type="text" autoComplete="name" required defaultValue={values.name} className={inputClass} />
+            <input
+              {...props}
+              type="text"
+              autoComplete="name"
+              required
+              defaultValue={values.name}
+              className={inputClass}
+            />
           )}
         </Field>
         <Field id="email" label="Correo de trabajo" error={errors.email}>
@@ -123,7 +153,12 @@ export function DemoForm() {
         </Field>
       </div>
 
-      <Field id="message" label="¿Qué piezas inspeccionan?" optional error={errors.message}>
+      <Field
+        id="message"
+        label="¿Qué piezas inspeccionan?"
+        optional
+        error={errors.message}
+      >
         {(props) => (
           <textarea
             {...props}
@@ -145,7 +180,9 @@ export function DemoForm() {
             aria-describedby={errors.consent ? "consent-error" : undefined}
             className="mt-1 h-4 w-4 flex-none accent-[var(--color-primary)]"
           />
-          <span>Acepto que RikuyDeep use estos datos para contactarme sobre la demo.</span>
+          <span>
+            Acepto que RikuyDeep use estos datos para contactarme sobre la demo.
+          </span>
         </label>
         {errors.consent ? (
           <p id="consent-error" className="text-sm text-defect">
@@ -156,19 +193,24 @@ export function DemoForm() {
 
       <div aria-hidden="true" className="sr-only">
         <label htmlFor="website">Deja este campo vacío</label>
-        <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" defaultValue="" />
+        <input
+          id="website"
+          name="website"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          defaultValue=""
+        />
       </div>
       <input type="hidden" name="startedAt" value={startedAt} readOnly />
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-        <button
-          type="submit"
-          disabled={pending}
-          className="inline-flex h-12 items-center justify-center rounded-lg bg-accent px-6 font-semibold text-accent-foreground transition-opacity hover:opacity-90 disabled:cursor-wait disabled:opacity-70"
-        >
+        <button type="submit" disabled={pending} className="ui-button">
           {pending ? "Enviando…" : "Solicitar demo"}
         </button>
-        <p className="text-xs leading-5 text-muted-foreground">Los campos sin «(opcional)» son obligatorios.</p>
+        <p className="text-xs leading-5 text-muted-foreground">
+          Los campos sin «(opcional)» son obligatorios.
+        </p>
       </div>
 
       <div aria-live="polite" className="empty:hidden">
@@ -179,19 +221,21 @@ export function DemoForm() {
         ) : null}
         {state.status === "unavailable" ? (
           <p className="rounded-lg border border-warning/40 bg-warning/5 px-4 py-3 text-sm text-foreground">
-            Tus datos están completos, pero el envío de solicitudes todavía no está activo en este sitio, así que no
-            se ha guardado nada. Vuelve a intentarlo en unos días.
+            Tus datos están completos, pero el envío de solicitudes todavía no
+            está activo en este sitio, así que no se ha guardado nada. Vuelve a
+            intentarlo en unos días.
           </p>
         ) : null}
         {state.status === "error" ? (
           <p className="rounded-lg border border-defect/40 bg-defect/5 px-4 py-3 text-sm text-defect">
-            No pudimos guardar tu solicitud por un problema nuestro. Tus datos siguen en el formulario: vuelve a
-            enviarlo en unos minutos.
+            No pudimos guardar tu solicitud por un problema nuestro. Tus datos
+            siguen en el formulario: vuelve a enviarlo en unos minutos.
           </p>
         ) : null}
         {state.status === "rejected" ? (
           <p className="rounded-lg border border-defect/40 bg-defect/5 px-4 py-3 text-sm text-defect">
-            No pudimos procesar el envío. Recarga la página, espera unos segundos y vuelve a intentarlo.
+            No pudimos procesar el envío. Recarga la página, espera unos
+            segundos y vuelve a intentarlo.
           </p>
         ) : null}
       </div>
