@@ -1,0 +1,41 @@
+{
+  "task": "RIKDP-278",
+  "date": "2026-11-03",
+  "scope": "local reachable Git history; no remote fetch",
+  "gitleaks_version": "8.30.1",
+  "head": "b9834b5776f922cf326772c09d91f39595b9920a",
+  "reachable_commits": 96,
+  "shallow": false,
+  "log_options": "--all --full-history",
+  "initial_findings": 2,
+  "remaining_findings_with_proposed_exclusions": 0,
+  "exclusions_status": "proposed; awaiting human review",
+  "findings": [
+    {
+      "rule": "generic-api-key",
+      "file": ".github/workflows/ci.yml",
+      "line": 65,
+      "commit": "839187102256b7aea8383d3d750ffa057fe43fc0",
+      "fingerprint": "839187102256b7aea8383d3d750ffa057fe43fc0:.github/workflows/ci.yml:generic-api-key:65"
+    },
+    {
+      "rule": "generic-api-key",
+      "file": "apps/web/src/lib/auth/auth.test.ts",
+      "line": 236,
+      "commit": "839187102256b7aea8383d3d750ffa057fe43fc0",
+      "fingerprint": "839187102256b7aea8383d3d750ffa057fe43fc0:apps/web/src/lib/auth/auth.test.ts:generic-api-key:236"
+    }
+  ],
+  "report_sha256": {
+    "initial": "6d36da8257b76227c5b6ffe35b1e31b703a811ca5c2755e991cc25e6901ccb65",
+    "with_proposed_exclusions": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  "functional_checks": {
+    "deleted_synthetic_github_pat_exit": 1,
+    "synthetic_value_redacted_in_logs_and_report": true,
+    "empty_commit_range_exit": 0
+  },
+  "github_settings_changed": false,
+  "github_workflow_executed": false,
+  "rotation_performed": false
+}

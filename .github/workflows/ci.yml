@@ -14,6 +14,12 @@ permissions:
   contents: read
 
 jobs:
+  gitleaks:
+    name: Búsqueda de secretos
+    uses: ./.github/workflows/gitleaks.yml
+    permissions:
+      contents: read
+
   codeql:
     name: Seguridad estática
     uses: ./.github/workflows/codeql.yml
@@ -232,7 +238,8 @@ jobs:
   # canceló; los jobs omitidos (sin cambios o fuera de una PR) cuentan como éxito.
   ci:
     name: CI
-    needs: [changes, web, ml, convenciones, archivos, dependencias, codeql]
+    needs:
+      [changes, web, ml, convenciones, archivos, dependencias, codeql, gitleaks]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5
