@@ -58,7 +58,7 @@ jobs:
 
       - name: Conservar reporte con secretos ocultos
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: gitleaks-report
           path: ${{ runner.temp }}/gitleaks-results/findings.json
