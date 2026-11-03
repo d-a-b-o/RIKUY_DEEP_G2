@@ -27,7 +27,7 @@ jobs:
           git diff --exit-code -- golden/synthetic.dvc
           dvc checkout golden/synthetic.dvc
           python -c "from ml.regression import validate_golden; validate_golden('golden/synthetic')"
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: hu22-contract-evidence
@@ -51,7 +51,7 @@ jobs:
         run: python -m ml.regression_data
       - name: Compare baseline and candidate (0-2 pass; 3+ fail)
         run: python -m ml.regression
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: hu22-real-regression-evidence
