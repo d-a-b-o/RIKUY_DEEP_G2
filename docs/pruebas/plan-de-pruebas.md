@@ -359,7 +359,7 @@ o una ejecución manual debe comprobar las referencias disponibles en ese moment
 
 | Clave | PT | Nivel | Caso de prueba | Herramienta | Resp. | HU |
 | --- | --- | --- | --- | --- | --- | --- |
-| RIKDP-84 | PT1 | Componente | Forma y rango del preprocesamiento (400×400×3) | pytest | A. Chumbiraico | HU06 |
+| RIKDP-84 | PT1 | Componente | Forma y rango del preprocesamiento (400×400×3), PIL y TensorFlow real; [procedimiento](pt1-preprocesamiento.md) | pytest + TensorFlow CPU | A. Chumbiraico | HU06 |
 | RIKDP-85 | PT1 | Integración | Paridad del preprocesamiento Python ↔ TF.js (misma imagen, mismo tensor) | pytest + tfjs-node | D. Sánchez | HU06 |
 | RIKDP-96 | PT1 | Componente | Validación de datos con imágenes corruptas y duplicadas de muestra | pytest | D. Sánchez | HU10 |
 | RIKDP-101 | PT1 | Componente | Reproducibilidad: dos corridas con la misma semilla dan las mismas métricas | pytest | D. Bravo | HU10 |
