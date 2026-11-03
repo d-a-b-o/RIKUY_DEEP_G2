@@ -42,11 +42,11 @@ test(
     await expect(verdict).toHaveAttribute("data-verdict", "OK", {
       timeout: 30_000,
     });
-    // En Python la probabilidad de defecto de esta imagen es 0,22 %.
+    // En Python la probabilidad de defecto de esta imagen no es 0,22 %.
     const probability = Number(
       (await page.getByTestId("probabilidad").innerText())
-        .replace("%", "")
-        .replace(",", ".")
+        .replaceAll("%", "")
+        .replaceAll(",", ".")
         .trim(),
     );
     expect(probability).toBeLessThan(1);

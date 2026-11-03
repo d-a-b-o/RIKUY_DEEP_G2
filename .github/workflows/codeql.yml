@@ -1,0 +1,62 @@
+name: CodeQL
+
+# CI invokes this workflow on every PR, push to main and manual run.
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: CodeQL (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      security-events: write
+      packages: read
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [javascript-typescript, python]
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Probar la política de severidad
+        run: python -m unittest discover -s .github/scripts/tests -v
+
+      - name: Inicializar CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: none
+          queries: security-extended
+
+      - name: Analizar y publicar en Code scanning
+        id: analyze
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: /language:${{ matrix.language }}
+          output: ${{ runner.temp }}/codeql-results
+          wait-for-processing: true
+
+      # Runs even when SARIF upload fails, provided analysis produced results.
+      - name: Rechazar hallazgos altos y críticos
+        if: ${{ !cancelled() && steps.analyze.outcome != 'skipped' }}
+        run: python .github/scripts/check_codeql.py "${{ runner.temp }}/codeql-results"
+
+      - name: Conservar evidencia SARIF
+        if: ${{ !cancelled() && steps.analyze.outcome != 'skipped' }}
+        uses: actions/upload-artifact@v5
+        with:
+          name: codeql-${{ matrix.language }}
+          path: ${{ runner.temp }}/codeql-results/*.sarif
+          if-no-files-found: error
+          retention-days: 14
