@@ -47,6 +47,21 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install -r ml/requirements-regression.txt
+      - name: PT1 RIKDP-84 · Contrato real de entrada TensorFlow
+        env:
+          PT1_REQUIRE_TENSORFLOW: '1'
+        run: >-
+          python -m pytest -c ml/pytest.ini
+          ml/tests/test_preprocessing.py ml/tests/test_preprocessing_tensorflow.py
+          --junitxml=reports/preprocessing/RIKDP-84.xml
+      - name: PT1 RIKDP-84 · Evidencia del preprocesamiento
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: pt1-preprocessing-evidence
+          path: reports/preprocessing/
+          retention-days: 14
+          if-no-files-found: error
       - name: Retrieve public Drive objects, verify hashes and pull with DVC
         run: python -m ml.regression_data
       - name: Compare baseline and candidate (0-2 pass; 3+ fail)

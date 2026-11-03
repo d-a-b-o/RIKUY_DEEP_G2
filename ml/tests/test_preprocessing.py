@@ -9,10 +9,23 @@ def _sample_image(size=(640, 480), color=(200, 100, 50)):
 
 
 def _assert_model_input(array):
-    assert array.shape == (*TARGET_SIZE, 3)
+    assert array.shape == (400, 400, 3)
     assert array.dtype == np.float32
+    assert np.isfinite(array).all()
     assert array.min() >= 0.0
     assert array.max() <= 1.0
+
+
+def test_model_input_size_contract():
+    assert TARGET_SIZE == (400, 400)
+
+
+@pytest.mark.parametrize("size", [128, 400, 512])
+def test_square_images_preserve_rgb_and_normalization(size):
+    image = _sample_image(size=(size, size), color=(255, 0, 51))
+    result = preprocess_image(image)
+    _assert_model_input(result)
+    np.testing.assert_allclose(result, np.broadcast_to([1.0, 0.0, 0.2], result.shape), atol=1e-6)
 
 
 def test_preprocess_pil_image():
