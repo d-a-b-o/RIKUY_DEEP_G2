@@ -1,0 +1,291 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  gitleaks:
+    name: Búsqueda de secretos
+    uses: ./.github/workflows/gitleaks.yml
+    permissions:
+      contents: read
+
+  codeql:
+    name: Seguridad estática
+    uses: ./.github/workflows/codeql.yml
+    permissions:
+      contents: read
+      security-events: write
+      packages: read
+
+  changes:
+    name: Detectar cambios
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      web: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.web == 'true' }}
+      ml: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.ml == 'true' }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: |
+            web:
+              - "apps/web/**"
+              - ".github/workflows/ci.yml"
+            ml:
+              - "ml/**"
+              - "RIKUY_DEEP_G2.ipynb"
+              - ".github/workflows/ci.yml"
+              - ".github/requirements-audit.txt"
+              - ".github/scripts/audit_python.py"
+              - ".github/scripts/tests/test_audit_python.py"
+
+  web:
+    name: Web · lint, typecheck, test y build
+    needs: changes
+    if: needs.changes.outputs.web == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: rikuy
+          POSTGRES_PASSWORD: rikuy
+          POSTGRES_DB: rikuydeep
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U rikuy -d rikuydeep"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://rikuy:rikuy@localhost:5432/rikuydeep
+      DIRECT_URL: postgresql://rikuy:rikuy@localhost:5432/rikuydeep
+      # Solo para la base efímera de CI; producción usa su propio secreto en Vercel.
+      BETTER_AUTH_SECRET: ci-solo-pruebas-no-usar-en-produccion-0000
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Cache de Next.js
+        uses: actions/cache@v5
+        with:
+          path: apps/web/.next/cache
+          key: nextjs-${{ runner.os }}-${{ hashFiles('apps/web/package-lock.json') }}-${{ hashFiles('apps/web/src/**') }}
+          restore-keys: |
+            nextjs-${{ runner.os }}-${{ hashFiles('apps/web/package-lock.json') }}-
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Auditoría de dependencias de producción
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Migraciones
+        run: npm run db:deploy
+
+      - name: Esquema y migraciones sincronizados
+        run: npm run db:check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Navegador de Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Prueba de humo (Playwright @smoke)
+        env:
+          E2E_EXPECT_DATABASE: "1"
+        run: npm run test:smoke
+
+      - name: Reporte de Playwright
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: |
+            apps/web/playwright-report/
+            apps/web/test-results/
+          retention-days: 14
+
+  ml:
+    name: ML · pip-audit, ruff y pytest
+    needs: changes
+    if: needs.changes.outputs.ml == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: ml
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: ml/requirements-ci.txt
+
+      - name: Instalar herramientas de auditoría en entorno separado
+        run: |
+          python -m venv "$RUNNER_TEMP/pip-audit-venv"
+          "$RUNNER_TEMP/pip-audit-venv/bin/python" -m pip install -r ../.github/requirements-audit.txt
+
+      - name: Probar política de severidad de Python
+        run: python -m unittest discover -s ../.github/scripts/tests -p test_audit_python.py -v
+
+      - name: Auditar todos los requirements de ML (umbral alto)
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >-
+          "$RUNNER_TEMP/pip-audit-venv/bin/python" ../.github/scripts/audit_python.py
+          --requirements-dir . --output "$RUNNER_TEMP/pip-audit-reports"
+
+      - name: Conservar reportes de auditoría Python
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: pip-audit-reports
+          path: ${{ runner.temp }}/pip-audit-reports/*.json
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Instalar dependencias
+        run: pip install -r requirements-ci.txt
+
+      - name: Ruff (lint)
+        run: ruff check --output-format=github .
+
+      - name: Ruff (formato)
+        run: ruff format --check .
+
+      - name: Pytest
+        run: pytest
+
+  convenciones:
+    name: Convenciones de la PR
+    needs: changes
+    if: github.event_name == 'pull_request' && github.event.pull_request.user.type != 'Bot' && (needs.changes.outputs.web == 'true' || needs.changes.outputs.ml == 'true')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verificar convención en el título o la rama
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BRANCH: ${{ github.head_ref }}
+        run: |
+          if printf '%s\n%s\n' "$PR_TITLE" "$PR_BRANCH" | grep -Eq 'RIKDP-[0-9]+' \
+            || printf '%s\n' "$PR_BRANCH" | grep -Eq '^[[:alnum:]_.-]+-[[:alnum:]_.-]+-[0-9]+$'; then
+            echo "Convención de PR válida."
+          else
+            echo "::error::El título o la rama debe incluir la clave de Jira (por ejemplo RIKDP-123) o usar una rama descriptiva con sufijo numérico (por ejemplo usuario-cambio-1)."
+            exit 1
+          fi
+
+  archivos:
+    name: Archivos grandes
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      MAX_KB: 5120
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Rechazar archivos de más de 5 MB (usar DVC)
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          status=0
+          while IFS= read -r -d '' file; do
+            [ -f "$file" ] || continue
+            size_kb=$(( $(stat -c %s "$file") / 1024 ))
+            if [ "$size_kb" -gt "$MAX_KB" ]; then
+              echo "::error file=$file::$file pesa ${size_kb} KB (máximo ${MAX_KB} KB). Versiónalo con DVC."
+              status=1
+            fi
+          done < <(git diff -z --name-only --diff-filter=AM "$BASE_SHA" HEAD)
+          exit $status
+
+  dependencias:
+    name: Revisión de dependencias
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/dependency-review-action@v5
+        with:
+          fail-on-severity: high
+          comment-summary-in-pr: on-failure
+
+  # Job puerta: es el único check que debe marcarse como obligatorio en la
+  # protección de main. Siempre se ejecuta y falla si algún job falló o se
+  # canceló. Solo admite omisiones justificadas por rutas o por el tipo de evento;
+  # CodeQL y Gitleaks nunca pueden omitirse. pip-audit cuenta mediante el job ML.
+  ci:
+    name: CI
+    needs:
+      [changes, web, ml, convenciones, archivos, dependencias, codeql, gitleaks]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Probar el contrato del job puerta
+        run: python -m unittest discover -s .github/scripts/tests -p test_check_ci.py -v
+
+      - name: Verificar resultado de los jobs
+        env:
+          NEEDS_JSON: ${{ toJSON(needs) }}
+          EVENT_NAME: ${{ github.event_name }}
+          AUTHOR_TYPE: ${{ github.event.pull_request.user.type }}
+        run: python .github/scripts/check_ci.py

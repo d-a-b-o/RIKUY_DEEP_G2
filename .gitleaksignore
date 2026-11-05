@@ -1,0 +1,11 @@
+# RIKDP-278: excepciones PROPUESTAS, pendientes de revisión en la PR.
+# Nunca agregar secretos reales: revocar/rotar primero y documentar el incidente.
+# Cada huella limita la excepción a commit, archivo, regla y línea.
+
+# Credencial ficticia BETTER_AUTH_SECRET de la base efímera de CI.
+# Contexto: comentario explícito de uso exclusivo en pruebas; no es un token de proveedor.
+839187102256b7aea8383d3d750ffa057fe43fc0:.github/workflows/ci.yml:generic-api-key:65
+
+# Prueba de reutilización de token de recuperación: dato de entrada de /reset-password.
+# Contexto: contraseña ficticia para verificar INVALID_TOKEN, sin credencial externa.
+839187102256b7aea8383d3d750ffa057fe43fc0:apps/web/src/lib/auth/auth.test.ts:generic-api-key:236

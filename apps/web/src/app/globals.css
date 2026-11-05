@@ -1,26 +1,289 @@
 @import "tailwindcss";
 
+/*
+ * Tokens de diseño de RikuyDeep.
+ * Guía completa: docs/identidad-visual.md
+ *
+ * 1. Escalas de marca (fijas): acero (primario) y colada (acento).
+ * 2. Tokens semánticos Industrial Tech: úsalos en los componentes en lugar de
+ *    las escalas, p. ej. bg-surface, text-muted-foreground.
+ *
+ * Los pares de color semánticos se validan contra WCAG AA en
+ * src/styles/tokens.test.ts. Si cambias un valor, ejecuta `npm test`.
+ */
+
+@theme {
+  --color-acero-50: #eef4f8;
+  --color-acero-100: #d5e3ee;
+  --color-acero-200: #a9c6dc;
+  --color-acero-300: #74a2c3;
+  --color-acero-400: #4680a9;
+  --color-acero-500: #2a658f;
+  --color-acero-600: #1f5075;
+  --color-acero-700: #1a405e;
+  --color-acero-800: #16344c;
+  --color-acero-900: #122a3d;
+  --color-acero-950: #0b1b29;
+
+  --color-colada-50: #fff4ed;
+  --color-colada-100: #ffe6d4;
+  --color-colada-200: #ffc9a8;
+  --color-colada-300: #ffa370;
+  --color-colada-400: #ff8a4c;
+  --color-colada-500: #f55a16;
+  --color-colada-600: #e2550f;
+  --color-colada-700: #c2410c;
+  --color-colada-800: #952812;
+  --color-colada-900: #792412;
+  --color-colada-950: #410e07;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
+  --background: #f5f8fc;
+  --surface: #ffffff;
+  --foreground: #142238;
+  --muted-foreground: #495c73;
+  --border: #ced8e5;
+  --primary: #006779;
+  --primary-foreground: #ffffff;
+  --accent: #a33d08;
+  --accent-foreground: #ffffff;
+  --ok: #126b3c;
+  --defect: #b42332;
+  --warning: #704700;
+  --ring: #00758a;
+  --input-border: #74849a;
+  --surface-raised: #eaf0f7;
+  --primary-hover: #005465;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --primary-hover: #60d1e2;
+    --background: #101827;
+    --surface: #253349;
+    --foreground: #f1f5f9;
+    --muted-foreground: #b2c1d3;
+    --border: #3b4d65;
+    --primary: #22b8cf;
+    --primary-foreground: #101827;
+    --accent: #ffab72;
+    --accent-foreground: #101827;
+    --ok: #65dfa0;
+    --defect: #ff9393;
+    --warning: #f4ce77;
+    --ring: #45d9ed;
+    --input-border: #7b8da6;
+    --surface-raised: #1a273a;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --primary-hover: #60d1e2;
+  --background: #101827;
+  --surface: #253349;
+  --foreground: #f1f5f9;
+  --muted-foreground: #b2c1d3;
+  --border: #3b4d65;
+  --primary: #22b8cf;
+  --primary-foreground: #101827;
+  --accent: #ffab72;
+  --accent-foreground: #101827;
+  --ok: #65dfa0;
+  --defect: #ff9393;
+  --warning: #f4ce77;
+  --ring: #45d9ed;
+  --input-border: #7b8da6;
+  --surface-raised: #1a273a;
+}
+
+.theme-sun {
+  display: none;
+}
+:root[data-theme="dark"] .theme-sun {
+  display: block;
+}
+:root[data-theme="dark"] .theme-moon {
+  display: none;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-sun {
+    display: block;
+  }
+  :root:not([data-theme="light"]) .theme-moon {
+    display: none;
+  }
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-ok: var(--ok);
+  --color-defect: var(--defect);
+  --color-warning: var(--warning);
+  --color-ring: var(--ring);
+  --color-input-border: var(--input-border);
+  --color-surface-raised: var(--surface-raised);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    scroll-padding-top: 5rem;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+  }
+
+  ::selection {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+  button:not(:disabled),
+  summary,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+  a,
+  button,
+  input,
+  textarea,
+  summary {
+    transition-duration: 160ms;
+  }
+  button,
+  summary,
+  input[type="checkbox"] {
+    touch-action: manipulation;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .ui-button {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    border: 1px solid transparent;
+    border-radius: 0.625rem;
+    padding: 0.75rem 1.25rem;
+    background: var(--primary);
+    color: var(--primary-foreground);
+    font-weight: 650;
+    font-size: 0.875rem;
+    transition-property: background, box-shadow, border-color, transform;
+  }
+  .ui-button:hover {
+    background: var(--primary-hover);
+    box-shadow: 0 4px 24px #22b8cf15;
+  }
+  .ui-button:active {
+    transform: translateY(1px);
+  }
+  .ui-button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+  .ui-button-secondary {
+    background: transparent;
+    border-color: var(--input-border);
+    color: var(--foreground);
+  }
+  .ui-button-secondary:hover {
+    background: var(--surface);
+    border-color: var(--primary);
+  }
+  .ui-input {
+    width: 100%;
+    min-height: 3rem;
+    border-radius: 0.625rem;
+    border: 1px solid var(--input-border);
+    background: var(--background);
+    padding: 0.75rem 0.875rem;
+    color: var(--foreground);
+    font-size: 1rem;
+    transition-property: border-color, box-shadow;
+  }
+  .ui-input::placeholder {
+    color: var(--muted-foreground);
+    opacity: 0.8;
+  }
+  .ui-input:focus-visible {
+    border-color: var(--ring);
+    box-shadow: 0 0 0 3px #22b8cf15;
+  }
+  .ui-input[aria-invalid="true"] {
+    border-color: var(--defect);
+  }
+  .ui-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    color: var(--primary);
+    font: 500 0.7rem var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+  }
+  .ui-eyebrow::before {
+    content: "";
+    width: 1.5rem;
+    height: 1px;
+    background: currentColor;
+  }
+  .industrial-grid {
+    background-image:
+      linear-gradient(#b2c1d308 1px, transparent 1px),
+      linear-gradient(90deg, #b2c1d308 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+  .ui-card {
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    background: var(--surface-raised);
+  }
 }

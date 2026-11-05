@@ -1,0 +1,11 @@
+# Dependencias para lint y pruebas de ml/ en CI.
+# TensorFlow no se instala: make_tf_dataset lo importa de forma diferida
+# y las pruebas unitarias no lo usan.
+numpy>=2.0,<3
+pillow>=13,<14
+scikit-learn>=1.5,<2
+pytest>=8,<10
+ruff>=0.16,<0.17
+kagglehub
+dvc
+mlflow
