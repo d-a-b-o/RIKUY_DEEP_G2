@@ -44,8 +44,8 @@ async function AuthorizedInspector() {
         role="alert"
         className="rounded-lg border border-warning/40 bg-warning/5 px-4 py-3 text-sm"
       >
-        Falta configurar <code>NEXT_PUBLIC_MODEL_MANIFEST_URL</code>: la URL del
-        manifest de modelos en R2.
+        La inspección aún no está configurada. Contacta al responsable de tu
+        planta para habilitar el modelo.
       </p>
     );
   }
