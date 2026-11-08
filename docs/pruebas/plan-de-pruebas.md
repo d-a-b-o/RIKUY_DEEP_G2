@@ -7,7 +7,7 @@ Inspección de defectos en piezas de fundición con IA.
 | Proyecto | RikuyDeep (Jira: RIKDP) |
 | Documento | Plan de pruebas basado en el modelo en V (HU16 · Estrategia y plan de pruebas, RIKDP-27) |
 | Versión | 1.1, aplicada en Jira el 28/10/2026 en las tareas PT1 a PT5 |
-| Periodo | 30/09/2026 – 24/11/2026 · Semana 8 a Semana 15 |
+| Periodo | 30/09/2026 – 01/12/2026 · Semana 8 a Semana 15 |
 | Equipo | David Bravo (Product Owner, fullstack) · Daniel Sánchez (MLOps, inferencia y cámara) · Andre Chumbiraico (ML, datos y catálogos) |
 
 Este archivo es la versión del repositorio del *Plan de Pruebas v1.1*. Los casos de prueba viven en Jira; si algo cambia, se actualiza aquí y en Jira a la vez. La [sección 15](#15-aplicación-en-el-repositorio) recoge cómo se aplica el plan en el código y las diferencias con el documento original.
@@ -228,10 +228,12 @@ Cada defecto se registra en Jira como **Error**, con la etiqueta `defecto`, vinc
 
 | Sprint | Fechas | Pruebas |
 | --- | --- | --- |
-| Semanas 8–12 | 30/09–03/11 | Sin tareas de prueba formales. Verificación estática: code review en cada PR, revisiones de EDA, arquitectura, plan y selección del modelo; CI con lint, typecheck y humo. |
-| Semana 13 | 04/11–10/11 | **PT1 · Pruebas del modelo de IA** (9 casos). |
-| Semana 14 | 11/11–17/11 | **PT2 · Componente** (8 casos) y **PT3 · Integración** (19 casos). |
-| Semana 15 | 18/11–24/11 | **PT4 · Sistema con Playwright** (17 casos), **PT5 · No funcionales** (12 casos) y **UAT** (2 casos de aceptación + corrección de defectos críticos). |
+| Semanas 8–12 | 30/09–14/11 | Sin tareas de prueba formales. Verificación estática: code review en cada PR, revisiones de EDA, arquitectura, plan y selección del modelo; CI con lint, typecheck y humo. |
+| Semana 13 | 14/11–19/11 | **PT1 · Pruebas del modelo de IA** (9 casos). |
+| Semana 14 | 19/11–24/11 | **PT2 · Componente** (8 casos) y **PT3 · Integración** (19 casos). |
+| Semana 15 | 24/11–01/12 | **PT4 · Sistema con Playwright** (17 casos), **PT5 · No funcionales** (12 casos) y **UAT** (2 casos de aceptación + corrección de defectos críticos). |
+
+Recalendarizado el 08/11/2026: la Semana 11 se extendió hasta el 09/11, así que las Semanas 12 a 14 duran cinco días cada una y el cierre pasa al 01/12. Las fechas coinciden con los sprints de Jira.
 
 ## 11. Organización en Jira
 

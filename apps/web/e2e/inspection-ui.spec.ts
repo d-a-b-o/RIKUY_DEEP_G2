@@ -90,6 +90,15 @@ test.describe("Controles de inspección UI", { tag: "@ui" }, () => {
     await camera.click();
     await expect(camera).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByLabel("Vista de la cámara")).toBeVisible();
+    // The simulated device can be granted before its first frame is decoded.
+    await expect
+      .poll(() =>
+        page.getByLabel("Vista de la cámara").evaluate((video) => {
+          const source = video as HTMLVideoElement;
+          return source.videoWidth > 0 && source.videoHeight > 0;
+        }),
+      )
+      .toBe(true);
     const capture = page.getByRole("button", {
       name: "Inspeccionar",
       exact: true,
