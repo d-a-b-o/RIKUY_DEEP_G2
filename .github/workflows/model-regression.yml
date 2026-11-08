@@ -45,7 +45,8 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v6
         with:
-          python-version: '3.11'
+          # numpy 2.5 exige Python >= 3.12; 3.12 es también la versión de Colab.
+          python-version: '3.12'
       - run: pip install -r ml/requirements-regression.txt
       - name: PT1 RIKDP-84 · Contrato real de entrada TensorFlow
         env:
