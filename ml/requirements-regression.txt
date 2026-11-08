@@ -4,3 +4,5 @@ keras==3.15.1
 numpy==2.2.6
 pillow==13.0.0
 dvc==3.67.1
+# Pruebas del contrato de entrada con TensorFlow real (PT1).
+pytest>=8,<10
