@@ -140,7 +140,11 @@ export function Inspector({ manifestUrl }: { manifestUrl: string }) {
       </section>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
-        <section aria-labelledby="entrada" className="ui-card p-5 sm:p-6">
+        <section
+          aria-labelledby="entrada"
+          aria-busy={!ready}
+          className="ui-card p-5 sm:p-6"
+        >
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 id="entrada" className="text-lg font-semibold">
               Pieza a inspeccionar
@@ -272,7 +276,6 @@ function ModelStatus({
       <p
         role="status"
         aria-live="polite"
-        aria-busy="true"
         className="flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 px-4 py-4 text-sm text-muted-foreground"
       >
         <Icon

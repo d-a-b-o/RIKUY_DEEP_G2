@@ -82,6 +82,13 @@ test(
       (button as HTMLButtonElement).click();
     });
     await expect(region.getByRole("status")).toContainText("Reintentando");
+    await expect(region.getByRole("status")).not.toHaveAttribute(
+      "aria-busy",
+      "true",
+    );
+    await expect(
+      page.getByRole("region", { name: "Pieza a inspeccionar" }),
+    ).toHaveAttribute("aria-busy", "true");
     await expect(region).toBeFocused();
     await expect(retry).toHaveCount(0);
     await expect(page.locator('input[type="file"]')).toBeDisabled();
