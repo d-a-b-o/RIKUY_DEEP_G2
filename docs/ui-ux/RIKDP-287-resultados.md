@@ -134,3 +134,26 @@ se proporcionaron todos. Las 27 pruebas del cargador se ejecutan en CI con npm t
 
 El PR hacia main y el comentario de Jira registran los SHA y el estado final de CI.
 El PR debe permanecer abierto para revisión y Jira en En revisión, sin marcar Listo.
+
+## Entrega y bloqueo externo de CI
+
+PR [#45](https://github.com/d-a-b-o/RIKUY_DEEP_G2/pull/45), con el título exacto
+solicitado, base main, abierto y sin fusionar. Jira RIKDP-287 pasó de Por hacer
+a En curso y luego a En revisión; comentario 10045 con enlace y resultados.
+
+Commits de implementación y validación:
+
+- fc315eb: cargador, estados, recuperación y auditoría.
+- 5ed02ff: pruebas del cargador, E2E y sincronización del primer fotograma.
+- 9a82a85: anuncios accesibles e informe con siete capturas.
+- La actualización documental final registra este bloqueo externo, sin cambios de código.
+
+El 8 de noviembre de 2026 se consultaron las anotaciones de
+[CI](https://github.com/d-a-b-o/RIKUY_DEEP_G2/actions/runs/42506560903) y
+[HU22](https://github.com/d-a-b-o/RIKUY_DEEP_G2/actions/runs/42506560964) del commit
+9a82a85. GitHub informó: “The job was not started because your account is locked
+due to a billing issue.” Los jobs fallaron sin ejecutar pasos; Web quedó omitido.
+No se presentan esos checks como aprobados. La validación local detallada arriba
+sí se ejecutó. Pendiente externo: resolver la facturación de Actions y repetir los
+workflows; pendiente de entrega: revisión del PR. No se modificaron workflows ni
+configuración de facturación para eludir el bloqueo.
