@@ -4,19 +4,21 @@ Fuente única de permisos de RikuyDeep. Middleware, server actions, rutas de API
 
 ## Matriz de permisos
 
-| Permiso | Superadmin | Admin de planta | Inspector | Visualizador |
-|---|:-:|:-:|:-:|:-:|
-| empresas:gestionar | ✅ | | | |
-| modelos:gestionar | ✅ | | | |
-| usuarios:gestionar | ✅ | ✅ | | |
-| catalogos:gestionar | ✅ | ✅ | | |
-| auditoria:ver | ✅ | ✅ | | |
-| inspecciones:crear | ✅ | ✅ | ✅ | |
-| veredictos:corregir | ✅ | ✅ | ✅ | |
-| catalogos:ver | ✅ | ✅ | ✅ | ✅ |
-| inspecciones:ver | ✅ | ✅ | ✅ | ✅ |
-| dashboard:ver | ✅ | ✅ | ✅ | ✅ |
-| reportes:descargar | ✅ | ✅ | ✅ | ✅ |
+Los roles son los del enum `Role` de Prisma: `SUPERADMIN`, `ADMIN` (admin de planta), `INSPECTOR`, `VIEWER` (visualizador) y `STATION` (cuenta técnica de una estación, ADR 0007).
+
+| Permiso | SUPERADMIN | ADMIN | INSPECTOR | VIEWER | STATION |
+|---|:-:|:-:|:-:|:-:|:-:|
+| empresas:gestionar | ✅ | | | | |
+| modelos:gestionar | ✅ | | | | |
+| usuarios:gestionar | ✅ | ✅ | | | |
+| catalogos:gestionar | ✅ | ✅ | | | |
+| auditoria:ver | ✅ | ✅ | | | |
+| inspecciones:crear | ✅ | ✅ | ✅ | | ✅ |
+| veredictos:corregir | ✅ | ✅ | ✅ | | |
+| catalogos:ver | ✅ | ✅ | ✅ | ✅ | ✅ |
+| inspecciones:ver | ✅ | ✅ | ✅ | ✅ | |
+| dashboard:ver | ✅ | ✅ | ✅ | ✅ | |
+| reportes:descargar | ✅ | ✅ | ✅ | ✅ | |
 
 Salvo el Superadmin, nadie puede actuar sobre recursos de otra empresa (`OTRA_EMPRESA`).
 

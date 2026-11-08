@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { Role as PrismaRole } from "@/generated/prisma/enums";
 import {
   authorize,
   can,
@@ -15,13 +16,13 @@ import {
 } from "./index";
 
 const superadmin: AuthzUser = { id: "u0", role: "SUPERADMIN", empresaId: null };
-const admin: AuthzUser = { id: "u1", role: "ADMIN_PLANTA", empresaId: "emp-A" };
+const admin: AuthzUser = { id: "u1", role: "ADMIN", empresaId: "emp-A" };
 const inspector: AuthzUser = { id: "u2", role: "INSPECTOR", empresaId: "emp-A" };
-const visor: AuthzUser = { id: "u3", role: "VISUALIZADOR", empresaId: "emp-A" };
+const visor: AuthzUser = { id: "u3", role: "VIEWER", empresaId: "emp-A" };
 
 describe("matriz de permisos", () => {
-  it("define los cuatro roles de la HU32", () => {
-    expect(ROLES).toEqual(["SUPERADMIN", "ADMIN_PLANTA", "INSPECTOR", "VISUALIZADOR"]);
+  it("usa exactamente los roles del enum de Prisma", () => {
+    expect([...ROLES].sort()).toEqual(Object.values(PrismaRole).sort());
   });
 
   it("el Superadmin tiene todos los permisos", () => {
@@ -29,18 +30,22 @@ describe("matriz de permisos", () => {
   });
 
   it.each([
-    ["ADMIN_PLANTA", "usuarios:gestionar", true],
-    ["ADMIN_PLANTA", "catalogos:gestionar", true],
-    ["ADMIN_PLANTA", "empresas:gestionar", false],
-    ["ADMIN_PLANTA", "modelos:gestionar", false],
+    ["ADMIN", "usuarios:gestionar", true],
+    ["ADMIN", "catalogos:gestionar", true],
+    ["ADMIN", "empresas:gestionar", false],
+    ["ADMIN", "modelos:gestionar", false],
     ["INSPECTOR", "inspecciones:crear", true],
     ["INSPECTOR", "veredictos:corregir", true],
     ["INSPECTOR", "catalogos:gestionar", false],
     ["INSPECTOR", "usuarios:gestionar", false],
-    ["VISUALIZADOR", "dashboard:ver", true],
-    ["VISUALIZADOR", "inspecciones:ver", true],
-    ["VISUALIZADOR", "inspecciones:crear", false],
-    ["VISUALIZADOR", "veredictos:corregir", false],
+    ["VIEWER", "dashboard:ver", true],
+    ["VIEWER", "inspecciones:ver", true],
+    ["VIEWER", "inspecciones:crear", false],
+    ["VIEWER", "veredictos:corregir", false],
+    ["STATION", "inspecciones:crear", true],
+    ["STATION", "catalogos:ver", true],
+    ["STATION", "inspecciones:ver", false],
+    ["STATION", "veredictos:corregir", false],
   ] as const)("%s → %s = %s", (role, permission, expected) => {
     const user: AuthzUser = { id: "x", role, empresaId: "emp-A" };
     expect(can(user, permission)).toBe(expected);
@@ -48,9 +53,9 @@ describe("matriz de permisos", () => {
 
   it("los permisos crecen de Visualizador a Superadmin", () => {
     const n = (r: (typeof ROLES)[number]) => permissionsFor(r).length;
-    expect(n("VISUALIZADOR")).toBeLessThan(n("INSPECTOR"));
-    expect(n("INSPECTOR")).toBeLessThan(n("ADMIN_PLANTA"));
-    expect(n("ADMIN_PLANTA")).toBeLessThan(n("SUPERADMIN"));
+    expect(n("VIEWER")).toBeLessThan(n("INSPECTOR"));
+    expect(n("INSPECTOR")).toBeLessThan(n("ADMIN"));
+    expect(n("ADMIN")).toBeLessThan(n("SUPERADMIN"));
   });
 });
 
@@ -100,7 +105,7 @@ describe("authorize", () => {
     expect(registros).toHaveLength(1);
     expect(registros[0]).toMatchObject({
       userId: "u3",
-      role: "VISUALIZADOR",
+      role: "VIEWER",
       permission: "catalogos:gestionar",
       reason: "SIN_PERMISO",
       empresaId: "emp-A",

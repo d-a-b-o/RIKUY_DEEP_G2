@@ -6,14 +6,16 @@
  * decidir por su cuenta comparando nombres de rol.
  */
 
-export const ROLES = ["SUPERADMIN", "ADMIN_PLANTA", "INSPECTOR", "VISUALIZADOR"] as const;
+/** Mismos valores que el enum `Role` de Prisma (prisma/schema.prisma). */
+export const ROLES = ["SUPERADMIN", "ADMIN", "INSPECTOR", "VIEWER", "STATION"] as const;
 export type Role = (typeof ROLES)[number];
 
 export const ROLE_LABELS: Record<Role, string> = {
   SUPERADMIN: "Superadmin",
-  ADMIN_PLANTA: "Admin de planta",
+  ADMIN: "Admin de planta",
   INSPECTOR: "Inspector",
-  VISUALIZADOR: "Visualizador",
+  VIEWER: "Visualizador",
+  STATION: "Estación",
 };
 
 /** Permisos con formato `recurso:accion`. */
@@ -36,7 +38,7 @@ const LECTURA: Permission[] = ["catalogos:ver", "inspecciones:ver", "dashboard:v
 
 export const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
   SUPERADMIN: PERMISSIONS,
-  ADMIN_PLANTA: [
+  ADMIN: [
     ...LECTURA,
     "usuarios:gestionar",
     "catalogos:gestionar",
@@ -45,7 +47,9 @@ export const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     "auditoria:ver",
   ],
   INSPECTOR: [...LECTURA, "inspecciones:crear", "veredictos:corregir"],
-  VISUALIZADOR: LECTURA,
+  VIEWER: LECTURA,
+  // ADR 0007: cuenta técnica de una estación; registra inspecciones de línea y lee el lote y turno activos.
+  STATION: ["catalogos:ver", "inspecciones:crear"],
 };
 
 export function isRole(value: unknown): value is Role {
