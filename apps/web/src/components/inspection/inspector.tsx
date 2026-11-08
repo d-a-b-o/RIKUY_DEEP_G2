@@ -6,14 +6,17 @@ import {
   type LoadStage,
   type Prediction,
   loadInspectionModel,
+  modelLoadFailure,
 } from "@/lib/model/loader";
 import { type PixelSource, drawModelInput } from "@/lib/model/preprocess";
 import { Icon } from "@/components/ui/icon";
 
 type ModelState =
+  | { status: "idle" }
   | { status: "loading"; stage: LoadStage; progress?: number }
+  | { status: "retrying"; stage: LoadStage; progress?: number }
   | { status: "ready"; model: InspectionModel }
-  | { status: "error"; message: string };
+  | { status: "error"; message: string; retryable: boolean };
 
 type Mode = "upload" | "camera";
 
@@ -38,9 +41,11 @@ const percent = (value: number) =>
 
 export function Inspector({ manifestUrl }: { manifestUrl: string }) {
   const [modelState, setModelState] = useState<ModelState>({
-    status: "loading",
-    stage: "manifest",
+    status: "idle",
   });
+  const [attempt, setAttempt] = useState(0);
+  const initializing = useRef(false);
+  const statusRef = useRef<HTMLElement>(null);
   const [mode, setMode] = useState<Mode>("upload");
   const [result, setResult] = useState<Result | null>(null);
   const [busy, setBusy] = useState(false);
@@ -50,27 +55,55 @@ export function Inspector({ manifestUrl }: { manifestUrl: string }) {
 
   useEffect(() => {
     let cancelled = false;
+    let owned: InspectionModel | null = null;
+    initializing.current = true;
     loadInspectionModel(manifestUrl, (stage, progress) => {
-      if (!cancelled) setModelState({ status: "loading", stage, progress });
+      if (!cancelled)
+        setModelState({
+          status: attempt ? "retrying" : "loading",
+          stage,
+          progress,
+        });
     })
       .then((model) => {
         if (cancelled) return model.dispose();
+        owned = model;
         modelRef.current = model;
+        initializing.current = false;
         setModelState({ status: "ready", model });
       })
       .catch((error: unknown) => {
-        if (!cancelled)
+        if (!cancelled) {
+          initializing.current = false;
+          const failure = modelLoadFailure(error);
           setModelState({
             status: "error",
-            message: error instanceof Error ? error.message : String(error),
+            message: failure.message,
+            retryable: failure.retryable,
           });
+        }
       });
     return () => {
       cancelled = true;
-      modelRef.current?.dispose();
+      owned?.dispose();
       modelRef.current = null;
     };
-  }, [manifestUrl]);
+  }, [manifestUrl, attempt]);
+
+  function retry() {
+    if (
+      initializing.current ||
+      modelState.status !== "error" ||
+      !modelState.retryable
+    )
+      return;
+    initializing.current = true;
+    statusRef.current?.focus();
+    setResult(null);
+    setInputError(null);
+    setModelState({ status: "retrying", stage: "manifest" });
+    setAttempt((value) => value + 1);
+  }
 
   const inspect = useCallback(async (source: PixelSource, label: string) => {
     const model = modelRef.current;
@@ -97,10 +130,21 @@ export function Inspector({ manifestUrl }: { manifestUrl: string }) {
 
   return (
     <div className="flex flex-col gap-6">
-      <ModelStatus state={modelState} />
+      <section
+        ref={statusRef}
+        tabIndex={-1}
+        aria-label="Estado del modelo"
+        className="rounded-xl"
+      >
+        <ModelStatus state={modelState} onRetry={retry} />
+      </section>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
-        <section aria-labelledby="entrada" className="ui-card p-5 sm:p-6">
+        <section
+          aria-labelledby="entrada"
+          aria-busy={!ready}
+          className="ui-card p-5 sm:p-6"
+        >
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 id="entrada" className="text-lg font-semibold">
               Pieza a inspeccionar
@@ -193,18 +237,37 @@ export function Inspector({ manifestUrl }: { manifestUrl: string }) {
   );
 }
 
-function ModelStatus({ state }: { state: ModelState }) {
-  if (state.status === "error") {
+function ModelStatus({
+  state,
+  onRetry,
+}: {
+  state: ModelState;
+  onRetry: () => void;
+}) {
+  if (state.status === "idle")
     return (
-      <p
-        role="alert"
-        className="rounded-lg border border-defect/40 bg-defect/5 px-4 py-3 text-sm text-defect"
-      >
-        No se pudo cargar el modelo: {state.message}
+      <p role="status" className="ui-card p-4 text-sm text-muted-foreground">
+        El modelo aún no se ha inicializado. Preparando la inspección…
       </p>
     );
+  if (state.status === "error") {
+    return (
+      <div
+        role="alert"
+        aria-live="assertive"
+        className="rounded-lg border border-defect/40 bg-defect/5 px-4 py-3 text-sm text-defect"
+      >
+        <p className="font-semibold">No se pudo cargar el modelo</p>
+        <p className="mt-2 leading-6">{state.message}</p>
+        {state.retryable ? (
+          <button type="button" onClick={onRetry} className="ui-button mt-4">
+            Reintentar inicialización
+          </button>
+        ) : null}
+      </div>
+    );
   }
-  if (state.status === "loading") {
+  if (state.status === "loading" || state.status === "retrying") {
     const progress =
       state.stage === "download" && state.progress !== undefined
         ? ` ${Math.round(state.progress * 100)} %`
@@ -212,14 +275,22 @@ function ModelStatus({ state }: { state: ModelState }) {
     return (
       <p
         role="status"
+        aria-live="polite"
         className="flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 px-4 py-4 text-sm text-muted-foreground"
       >
         <Icon
           name="scan"
           className="h-5 w-5 shrink-0 text-primary motion-safe:animate-pulse"
         />
-        {stageText[state.stage]}
-        {progress}
+        <span>
+          {state.status === "retrying" ? (
+            <strong className="mb-1 block font-semibold text-foreground">
+              Reintentando la inicialización…
+            </strong>
+          ) : null}
+          {stageText[state.stage]}
+          {progress}
+        </span>
       </p>
     );
   }
