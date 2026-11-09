@@ -209,5 +209,35 @@ En una cuenta y ambiente de QA, escritorio con webcam y teléfono real:
 
 ## Entrega y revisión
 
-Pendiente de registrar URL del PR, commits, estado remoto de Actions y actualización
-final de Jira una vez publicada la rama. No se fusiona ni se aprueba el PR.
+PR [#57](https://github.com/d-a-b-o/RIKUY_DEEP_G2/pull/57), abierto hacia `main`,
+sin fusionar ni aprobar. Rama publicada y árbol limpio antes de esta actualización
+documental. Commits de implementación y validación:
+
+- `305a4d4`: correcciones de captura y recuperación de cámara.
+- `54a3d12`: pruebas, matriz, informe y 13 capturas revisadas.
+- El commit documental posterior registra la entrega, sin cambiar comportamiento.
+
+Jira RIKDP-288 pasó a **En revisión** después de publicar el PR. El comentario
+10055 enlaza PR, informe y capturas, y distingue validación simulada de hardware
+pendiente. No se marcó Listo ni se modificó RIKDP-46 o sus subtareas.
+
+El conector GitHub podía leer, pero crear PR devolvió 403 «Resource not accessible
+by integration». Se creó por la API oficial con la autenticación local de Git,
+que ya permitía publicar la rama. La credencial se mantuvo en memoria, sin
+imprimirla, guardarla en archivos ni modificar sus permisos.
+
+### GitHub Actions
+
+En el head `54a3d12`, [CI 42560590692](https://github.com/d-a-b-o/RIKUY_DEEP_G2/actions/runs/42560590692)
+y [HU22 42560590648](https://github.com/d-a-b-o/RIKUY_DEEP_G2/actions/runs/42560590648)
+**sí iniciaron pasos reales**: no se reprodujo el bloqueo de facturación observado
+anteriormente en PR #45. Durante esta consulta estaban en ejecución.
+Gitleaks, revisión de dependencias, archivos grandes y convenciones ya estaban
+aprobados; Web y CodeQL seguían ejecutándose. ML del workflow general quedó
+omitido por su filtro de rutas; el workflow específico HU22 sí inició sus dos jobs.
+No se presenta CI global como aprobado mientras no termine. La ejecución sobre
+el commit documental final se consulta separadamente en el PR.
+
+No se cambiaron workflows ni configuración de seguridad o facturación. Quedan
+pendientes revisión humana, hardware/checklist físico, funcionalidades HU35
+señaladas y conciliación con PR #45 antes de su integración conjunta.
