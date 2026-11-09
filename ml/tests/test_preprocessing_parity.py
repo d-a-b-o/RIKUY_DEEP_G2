@@ -43,11 +43,11 @@ def test_invalid_tensors_fail(fault):
 
 def test_fixtures_include_square_nonuniform_resize_cases(tmp_path):
     paths = square_fixtures(tmp_path)
-    assert len(paths) == 6
+    assert len(paths) == 16
     for path in paths:
         with Image.open(path) as image:
             assert image.width == image.height
-            assert image.width in (400, 512)
+            assert image.width in (128, 400, 512, 517)
             assert image.mode == "RGB"
             if "edges" in path.name:
                 assert np.asarray(image).min() == 0

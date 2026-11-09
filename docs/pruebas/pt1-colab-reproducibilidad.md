@@ -49,7 +49,7 @@ environment['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8'
 # Detectar errores de importación antes de iniciar ningún entrenamiento.
 probe = subprocess.run(
     [sys.executable, '-c',
-     'import ml.reproducibility as r; print("Módulo cargado:", r.__file__)'],
+     'import ml.reproducibility as r; print("Módulo cargado:", r.__spec__.origin)'],
     cwd=ROOT, env=environment, capture_output=True, text=True,
 )
 print(probe.stdout)
@@ -105,3 +105,10 @@ Si el proceso termina sin JSON, todavía no hay un resultado de comparación:
 puede haber fallado al importar un módulo, iniciarse Python o escribir el reporte.
 El traceback y `RIKDP-101.log` determinan la causa; no interpretar únicamente
 el código 1 como diferencia de métricas cuando el reporte no existe.
+
+## Ejecución recibida el 09/11/2026
+
+El usuario completó ambas réplicas: nueve épocas cada una, `passed=true` y
+`differences=[]`. El [reporte conservado](../evidencias/RIKDP-101-reproducibilidad.json)
+y su alcance están en [el cierre de PT1](pt1-cierre.md#reproducibilidad--rikdp-101).
+No es necesario volver a entrenarlas para continuar con las otras tareas.

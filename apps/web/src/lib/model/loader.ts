@@ -9,6 +9,7 @@
  * este módulo, para que no pese en el resto de páginas.
  */
 import { type ActiveModel, type Classification, classify, parseModelManifest, resolveActiveModel } from "./manifest";
+import { resizeModelPixels } from "./preprocess";
 
 export type Backend = "webgl" | "wasm" | "cpu";
 export type LoadStage = "manifest" | "cache" | "download" | "backend" | "warmup";
@@ -175,7 +176,8 @@ export async function loadInspectionModel(
       const begin = performance.now();
       const output = tf.tidy(() => {
         const pixels = tf.cast(tf.browser.fromPixels(canvas, 3), "float32");
-        const batch = tf.expandDims(tf.add(tf.mul(pixels, active.input.scale), active.input.offset), 0);
+        const resized = resizeModelPixels(tf, pixels, active.input);
+        const batch = tf.expandDims(tf.add(tf.mul(resized, active.input.scale), active.input.offset), 0);
         return model.predict(batch) as InstanceType<typeof tf.Tensor>;
       });
       try {

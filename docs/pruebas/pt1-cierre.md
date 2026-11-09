@@ -4,21 +4,63 @@ Revisión y ejecuciones locales del 08/11/2026 en la rama
 `RIKDP-250-pt1-pruebas-del-modelo-de-ia`. No se publica ni sustituye el modelo,
 no se modifica el notebook y no se cambian estados de Jira.
 
+Actualización del 09/11/2026: evidencia de RIKDP-101 recibida, RIKDP-96 aprobada
+y corrección de RIKDP-85 validada. El único cambio adicional del notebook es
+una consulta de ruta en la celda de diagnóstico, sin alterar el entrenamiento.
+
 ## Resultados y límites
 
 | Caso | Evidencia y estado técnico |
 | --- | --- |
 | RIKDP-84 | Aprobado: 19 pruebas reales en GitHub Actions. Se conserva el JUnit original y la referencia al run. |
+| RIKDP-85 | Corrección aprobada localmente: 16 patrones cuadrados en CPU, WebGL/SwiftShader y WASM, todos dentro de 1e-6 contra Python y TensorFlow real. Falta subir el cambio y conservar la ejecución remota. |
+| RIKDP-96 | Aprobado localmente el 09/11/2026: tres pruebas existentes de corrupción, duplicados recodificados y etiquetas contradictorias. JUnit conservado. |
 | RIKDP-166 | Aprobado localmente: 94,9 % rechaza y 95,0 % acepta; publicación bloqueada bajo el umbral. Se añadieron pruebas permanentes. |
 | RIKDP-154 | Aprobado para Keras ↔ TF.js CPU con tensores idénticos: nueva inferencia sobre 50 imágenes reales, cero discrepancias, diferencia máxima 2.9206275939941406e-06. |
 | RIKDP-131 | Métricas originales verificadas mediante un cálculo independiente: accuracy 98,4615 %, recall 100 %. Falta la firma de una persona distinta del autor para cerrar el requisito de revisión humana. |
 | RIKDP-145 | Rechazo real acreditado localmente: una copia degradada del checkpoint produce 25 discrepancias y salida 1. Falta ejecutar y enlazar el job rojo en GitHub después de subir estos cambios. |
-| RIKDP-101 | Comparador y ensayo de dos fits implementados. La ejecución de las dos réplicas sigue pendiente; las cuatro corridas existentes son HPO con parámetros diferentes. |
+| RIKDP-101 | Aprobado según la salida de Colab aportada el 09/11/2026: dos fits de nueve épocas, semilla 42, historiales y métricas iguales, diferencias vacías con tolerancia 1e-6. Reporte conservado. |
+| RIKDP-254 | Evaluador e inventario implementados y probados; faltan >=100 capturas físicas etiquetadas, su medición y revisión del origen. |
 
-Estos resultados no cierran por sí solos RIKDP-250: la discrepancia de resize de
-[RIKDP-85](pt1-paridad.md) sigue abierta y RIKDP-254 requiere las ≥100 capturas
-de hojas impresas con webcam/celular y su evaluación. RIKDP-96 ya dispone de
-tests de imágenes corruptas/duplicadas; se puede formalizar con su evidencia.
+Estos resultados no cierran por sí solos RIKDP-250: faltan el rechazo remoto del
+modelo degradado, la revisión humana independiente de métricas y las >=100
+capturas de hojas impresas con webcam/celular y su evaluación.
+
+## Corrección de inferencia · RIKDP-85
+
+La referencia es `make_tf_dataset`, que se utilizó al entrenar. La inferencia
+Python y la web ahora interpolan con coordenadas half-pixel float32, sin
+antialias ni redondeo intermedio a uint8. La matriz de 16 PNG incluye colores,
+gradientes, bordes y ruido a 128/400/512/517 píxeles. Los tres backends pasaron;
+error máximo contra TensorFlow 5.960464477539063e-08.
+
+WebGL se comprobó en Chromium con ANGLE/SwiftShader; no sustituye una medición
+de hardware físico ni la evaluación de las fotos JPEG de RIKDP-254.
+El [procedimiento](pt1-paridad.md) conserva los límites y el diagnóstico original.
+La regresión HU22 usa ahora una función explícita del resize PIL v1: las
+probabilidades reales de sus 50 imágenes son idénticas a las de antes de la
+corrección, conservando sus dos discrepancias. Ver
+[compatibilidad](../evidencias/RIKDP-85-regresion-compatible.json).
+
+Los informes anteriores de RIKDP-101/131/154 pertenecen a sus versiones y
+artefactos originales; no se reescriben para atribuirles el código nuevo.
+No es necesario repetir los dos entrenamientos de RIKDP-101.
+
+## Datos corruptos y duplicados · RIKDP-96
+
+El 09/11/2026 se ejecutaron tres pruebas existentes de `ml/tests/test_workflow.py`:
+`test_prepare_reuses_file_and_excludes_duplicates`, `test_corrupt_images_rejected`
+y `test_conflicting_labels_rejected`. Resultado: **3 passed**; evidencia en
+[RIKDP-96-datos.xml](../evidencias/RIKDP-96-datos.xml).
+
+El duplicado recodificado como BMP se excluye y las imágenes únicas conservan
+un solo hash de píxeles. Una imagen corrupta y la misma imagen con etiquetas
+contradictorias detienen la preparación. Son muestras sintéticas temporales:
+no se modifica el dataset real, no se crea otro split ni se entrena.
+
+```sh
+python -m pytest -c ml/pytest.ini ml/tests/test_workflow.py::WorkflowTests::test_prepare_reuses_file_and_excludes_duplicates ml/tests/test_workflow.py::WorkflowTests::test_corrupt_images_rejected ml/tests/test_workflow.py::WorkflowTests::test_conflicting_labels_rejected --junitxml=reports/RIKDP-96-datos.xml -q
+```
 
 ## Forma y rango · RIKDP-84
 
@@ -141,6 +183,29 @@ de salida durante 14 días. Registrar URL/SHA y conservar esos archivos antes
 de expirar. `degraded=false` conserva la comparación normal. No se ejecutó el
 workflow modificado remotamente durante esta entrega, porque aún es un cambio local.
 
+El 09/11/2026 se verificó que la rama remota ya contiene `degraded` en
+`model-regression.yml`. No se encontró un PR de esa rama ni se acreditó un run
+rojo nuevo. Para ejecutar deliberadamente el control con GitHub CLI:
+
+```sh
+gh workflow run model-regression.yml --repo d-a-b-o/RIKUY_DEEP_G2 --ref RIKDP-96-pt1-componente-validacion-de-datos-con-imagene -f degraded=true
+```
+
+Debe fallar el paso real con salida 1 y deben aprobar las comprobaciones
+posteriores de origen del fallo. Conservar URL, SHA, `regression.json`,
+`provenance.json`, `gate-exit-code.txt` y `verification.json`. Un job rojo por
+descarga o configuración no demuestra que el modelo degradado fue rechazado.
+
+## Pendientes con participación del equipo
+
+- RIKDP-131: [inferencia nueva del test reservado y acta de revisión](pt1-revision-independiente.md).
+  `ml.independent_metrics` evalúa las 195 imágenes sin usar la caché ni entrenar;
+  la aceptación debe proceder de otra persona, no de un campo rellenado por el script.
+- RIKDP-254: [protocolo de capturas y evaluación](pt1-capturas.md).
+  `ml.capture_evaluation` exige >=100 imágenes únicas, etiqueta humana y ambas
+  clases; mide la caída respecto al modelo original sin ajustar el umbral.
+  Su herramienta tiene tests sintéticos de contrato, aún no evidencia física.
+
 ## Reproducibilidad · RIKDP-101
 
 Las cuatro corridas MobileNetV2 encontradas comparten semilla 42, pero cambian
@@ -175,12 +240,40 @@ python -m ml.reproducibility --left RUN_A --right RUN_B
 ```
 
 Salidas de los comandos de evidencia: 0 aprobado, 1 criterio rechazado,
-2 ejecución/evidencia incompleta. La repetición de entrenamiento **no se ha
-ejecutado** en esta revisión: el equipo local no tiene el dataset completo y las
-corridas HPO recuperadas no son réplicas. El comparador tiene pruebas unitarias;
-sus fixtures sintéticos no se presentan como evidencia de entrenamiento real.
+2 ejecución/evidencia incompleta.
+
+### Resultado recibido el 09/11/2026
+
+El usuario ejecutó las dos réplicas en Colab después de restaurar y verificar
+la corrida de referencia y el manifiesto original de 1300 imágenes. La salida
+aportada incluye nueve épocas por réplica y el JSON del comparador:
+[RIKDP-101-reproducibilidad.json](../evidencias/RIKDP-101-reproducibilidad.json).
+`passed=true`, `differences=[]`, semilla 42 y tolerancia absoluta 1e-6.
+
+Las identidades comienzan en `62dcbd133928` y `4aaf55ab4165`; sus historiales y
+archivos de métricas tienen hashes iguales. Ambas réplicas obtienen accuracy y
+recall de validation 1.0, matriz [[78, 0], [0, 117]] y umbral
+0.3573272228240967. Estos resultados son de **validation** y no reemplazan las
+métricas del test reservado ni autorizan publicar otro modelo o umbral.
+
+Versiones declaradas: TensorFlow 2.21.0, NumPy 2.4.6, scikit-learn 1.6.1 y
+Pillow 11.3.0. Las fuentes locales coinciden con los hashes declarados al
+normalizar CRLF de Windows a LF de Colab. El estado y procedencia de la
+salida están en [RIKDP-101-estado.json](../evidencias/RIKDP-101-estado.json).
+No se recuperaron independientemente los bytes de ambas corridas desde Drive
+en esta revisión; la evidencia conservada proviene de la salida aportada por
+el usuario. Conservar los artefactos de ambas corridas en Drive y no repetir
+`--train-twice`: para volver a comprobarlas se usa `--left`/`--right`.
 
 ## Validación del cambio
+
+Actualización del 09/11/2026: **180 pruebas ML y cuatro subtests aprobados**,
+seis tests web de preprocesamiento, TypeScript y ESLint aprobados. Comparación
+real: 16 casos en cada backend CPU/WebGL-SwiftShader/WASM, todos aprobados.
+La comparación de AST confirma que `make_tf_dataset` no cambió respecto al
+commit `9764d5a`; las correcciones se aplican a la inferencia. Las herramientas
+de RIKDP-131/254 tienen pruebas de contrato, pero su existencia no acredita una
+revisión humana ni una evaluación de capturas físicas todavía no aportadas.
 
 Suite ML: **158 pruebas y cuatro subtests aprobados**, con TensorFlow obligatorio
 en las pruebas de entrada. Ruff y sintaxis del runner JavaScript aprobados.

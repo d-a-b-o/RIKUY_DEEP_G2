@@ -9,12 +9,14 @@ import platform
 from pathlib import Path
 
 import numpy as np
-from ml.preprocessing import preprocess_image
+from ml.preprocessing import preprocess_regression_image as preprocess_image
 from ml.quality_gate import probability
 from PIL import Image
 
 CLASSES = {"ok_front": 0, "def_front": 1}
 PREPROCESSING = "ml.preprocessing.preprocess_image:rgb-bilinear-400x400-float32-0-1:v1"
+# Identificador histórico inmutable de HU22: conserva los tensores PIL v1
+# aunque la inferencia actual use bilinear half-pixel sin cuantización.
 
 
 def sha256(path):

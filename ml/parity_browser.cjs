@@ -49,5 +49,7 @@ globalThis.pt1Tensor = (canvas, input) => {
 };`,
   core: fromWeb.resolve("@tensorflow/tfjs-core/dist/tf-core.min.js"),
   backend: fromWeb.resolve("@tensorflow/tfjs-backend-cpu/dist/tf-backend-cpu.min.js"),
+  webgl: fromWeb.resolve("@tensorflow/tfjs-backend-webgl/dist/tf-backend-webgl.min.js"),
+  wasm: fromWeb.resolve("@tensorflow/tfjs-backend-wasm/dist/tf-backend-wasm.min.js"),
   tfjs_version: fromWeb("@tensorflow/tfjs-core/package.json").version,
 }));

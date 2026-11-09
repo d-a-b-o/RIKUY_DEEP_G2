@@ -45,7 +45,7 @@ def compare_tensors(reference, actual):
 def square_fixtures(directory):
     """Non-uniform patterns exercise resizing, not only easy constant-color inputs."""
     cases = []
-    for size in (400, 512):
+    for size in (128, 400, 512, 517):
         y, x = np.indices((size, size))
         patterns = {
             "rgb": np.broadcast_to(np.array([255, 0, 51], dtype=np.uint8), (size, size, 3)),
@@ -53,6 +53,7 @@ def square_fixtures(directory):
                 [x * 255 // (size - 1), y * 255 // (size - 1), (x + y) * 255 // (2 * (size - 1))], axis=-1
             ).astype(np.uint8),
             "edges": np.repeat((((x // 3 + y // 3) % 2) * 255)[..., None], 3, axis=-1).astype(np.uint8),
+            "random": np.random.default_rng(85).integers(0, 256, (size, size, 3), dtype=np.uint8),
         }
         for name, pixels in patterns.items():
             path = directory / f"{name}-{size}.png"
@@ -86,7 +87,7 @@ def browser_tensor(page, path):
     return np.frombuffer(base64.b64decode(result["data"], validate=True), dtype="<f4").reshape(result["shape"])
 
 
-def measure(root):
+def measure(root, backend="cpu"):
     # Imports remain lazy: the lightweight ML test suite needs neither browser nor TensorFlow.
     import tensorflow as tf
     from playwright.sync_api import sync_playwright
@@ -102,28 +103,56 @@ def measure(root):
     scripts = json.loads(harness.stdout)
     results = []
     with tempfile.TemporaryDirectory(prefix="rikdp-85-") as temporary, sync_playwright() as playwright:
-        browser = playwright.chromium.launch(headless=True)
+        options = {"headless": True}
+        if backend == "webgl":
+            options["args"] = ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"]
+        browser = playwright.chromium.launch(**options)
         try:
             page = browser.new_page()
             page.add_script_tag(path=scripts["core"])
             page.add_script_tag(path=scripts["backend"])
+            if backend != "cpu":
+                page.add_script_tag(path=scripts[backend])
+            if backend == "wasm":
+                wasm_directory = Path(scripts["wasm"]).parent
+
+                def wasm_file(route):
+                    name = route.request.url.rsplit("/", 1)[-1]
+                    allowed = {
+                        "tfjs-backend-wasm.wasm",
+                        "tfjs-backend-wasm-simd.wasm",
+                        "tfjs-backend-wasm-threaded-simd.wasm",
+                    }
+                    if name not in allowed:
+                        route.abort()
+                        return
+                    route.fulfill(
+                        body=(wasm_directory / name).read_bytes(),
+                        headers={"Content-Type": "application/wasm", "Access-Control-Allow-Origin": "*"},
+                    )
+
+                page.route("https://pt1.invalid/wasm/**", wasm_file)
+                page.evaluate("tf.wasm.setWasmPaths('https://pt1.invalid/wasm/')")
             page.add_script_tag(type="module", content=scripts["source"])
             page.wait_for_function("typeof globalThis.pt1Tensor === 'function'")
-            ready = page.evaluate("async () => {const ok = await tf.setBackend('cpu'); await tf.ready(); return ok;}")
+            ready = page.evaluate(
+                "async name => {const ok = await tf.setBackend(name); await tf.ready(); return ok;}", backend
+            )
             if not ready:
-                raise RuntimeError("Backend CPU de TensorFlow.js no disponible")
+                raise RuntimeError(f"Backend {backend} de TensorFlow.js no disponible")
             for path in square_fixtures(Path(temporary)):
                 actual = browser_tensor(page, path)
                 training, _ = next(iter(make_tf_dataset([path], [0], training=False, batch_size=1)))
                 case = {
                     "id": path.stem,
                     "image_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
-                    "pil_vs_browser": compare_tensors(preprocess_image(path)[None, ...], actual),
+                    "python_vs_browser": compare_tensors(preprocess_image(path)[None, ...], actual),
                     "training_vs_browser": compare_tensors(training.numpy(), actual),
                 }
                 results.append(case)
                 print(
-                    f"{path.stem}: PIL={case['pil_vs_browser']['passed']}; TF={case['training_vs_browser']['passed']}"
+                    f"{path.stem}: Python={case['python_vs_browser']['passed']}; "
+                    f"TF={case['training_vs_browser']['passed']}"
                 )
             browser_version = browser.version
         finally:
@@ -138,7 +167,7 @@ def measure(root):
     return {
         "task": "RIKDP-85",
         "status": "completed",
-        "passed": all(c[key]["passed"] for c in results for key in ("pil_vs_browser", "training_vs_browser")),
+        "passed": all(c[key]["passed"] for c in results for key in ("python_vs_browser", "training_vs_browser")),
         "absolute_tolerance": ATOL,
         "relative_tolerance": 0,
         "input": INPUT,
@@ -147,7 +176,7 @@ def measure(root):
             "tensorflow": tf.__version__,
             "tfjs": scripts["tfjs_version"],
             "chromium": browser_version,
-            "backend": "cpu",
+            "backend": backend,
             "platform": platform.system(),
             "playwright": importlib.metadata.version("playwright"),
             "pillow": importlib.metadata.version("pillow"),
@@ -157,10 +186,10 @@ def measure(root):
     }
 
 
-def run(root, output):
+def run(root, output, backend="cpu"):
     output.mkdir(parents=True, exist_ok=True)
     try:
-        report = measure(root)
+        report = measure(root, backend=backend)
         exit_code = 0 if report["passed"] else 1
     except Exception as error:
         report = {
@@ -179,8 +208,9 @@ def run(root, output):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=Path("reports/preprocessing-parity"))
+    parser.add_argument("--backend", choices=("cpu", "webgl", "wasm"), default="cpu")
     args = parser.parse_args()
-    return run(Path(__file__).resolve().parents[1], args.output)
+    return run(Path(__file__).resolve().parents[1], args.output, args.backend)
 
 
 if __name__ == "__main__":
