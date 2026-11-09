@@ -51,7 +51,9 @@ test.describe("Usuarios de planta (HU30)", () => {
     // La persona invitada crea su cuenta en otro navegador.
     const guest = await browser.newContext();
     const guestPage = await guest.newPage();
-    await guestPage.goto(link);
+    // El enlace lleva el dominio público (NEXT_PUBLIC_SITE_URL); en las pruebas se abre en el servidor local.
+    const { pathname, search } = new URL(link);
+    await guestPage.goto(`${pathname}${search}`);
     await guestPage.getByLabel("Tu nombre").fill("Ana Mamani");
     await guestPage.getByLabel("Contraseña", { exact: true }).fill("Planta-Andina-2026");
     await guestPage.getByLabel("Repite la contraseña").fill("Planta-Andina-2026");
