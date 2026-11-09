@@ -61,7 +61,7 @@ async function History({ searchParams }: { searchParams: SearchParams }) {
       {page.rows.length === 0 ? (
         <p className="ui-card p-6 text-muted-foreground">No hay inspecciones con estos filtros.</p>
       ) : (
-        <div className="ui-card overflow-x-auto">
+        <div className="ui-card overflow-x-auto" tabIndex={0} role="region" aria-label="Inspecciones (se desplaza de lado)">
           <table className="w-full min-w-[760px] text-left text-sm">
             <caption className="sr-only">Inspecciones</caption>
             <thead className="border-b border-border text-muted-foreground">
