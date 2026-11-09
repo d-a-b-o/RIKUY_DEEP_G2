@@ -12,8 +12,8 @@ export type AcceptInvitationState =
   | { status: "accepted"; email: string };
 
 const MESSAGES: Record<InvitationError["code"], string> = {
-  INVALID: "El enlace no es válido. Pide al equipo de RikuyDeep que te envíe uno nuevo.",
-  EXPIRED: "La invitación venció. Pide al equipo de RikuyDeep que te envíe una nueva.",
+  INVALID: "El enlace no es válido. Pide a quien te invitó que te envíe uno nuevo.",
+  EXPIRED: "La invitación venció. Pide a quien te invitó que te envíe una nueva.",
   USED: "Esta invitación ya se usó. Si ya tienes cuenta, ingresa con tu correo.",
   COMPANY_INACTIVE: "La empresa de esta invitación está desactivada.",
   EMAIL_IN_USE: "Ya existe una cuenta con este correo. Ingresa o recupera tu contraseña.",

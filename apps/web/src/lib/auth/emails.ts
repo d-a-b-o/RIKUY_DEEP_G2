@@ -47,13 +47,21 @@ export async function sendPasswordResetEmail({ to, name, url }: PasswordResetEma
   if (error) console.error("No se pudo enviar el correo de recuperación", error.message);
 }
 
-type InvitationEmail = { to: string; name: string; companyName: string; url: string; days: number };
+type InvitationEmail = {
+  to: string;
+  name: string;
+  companyName: string;
+  url: string;
+  days: number;
+  /** Rol de la cuenta (HU30). Sin indicar, la invitación es para administrar la empresa (HU23). */
+  roleLabel?: string;
+};
 
 /**
  * Envía la invitación a crear la cuenta (HU23-T02). Devuelve false si no se
  * pudo enviar, para que la pantalla ofrezca copiar el enlace.
  */
-export async function sendInvitationEmail({ to, name, companyName, url, days }: InvitationEmail): Promise<boolean> {
+export async function sendInvitationEmail({ to, name, companyName, url, days, roleLabel }: InvitationEmail): Promise<boolean> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     if (process.env.NODE_ENV !== "production") {
@@ -66,7 +74,9 @@ export async function sendInvitationEmail({ to, name, companyName, url, days }: 
   const text = [
     `Hola, ${name}:`,
     "",
-    `Te invitamos a administrar ${companyName} en RikuyDeep, la plataforma de inspección de piezas de fundición.`,
+    roleLabel
+      ? `Te invitamos a usar RikuyDeep en ${companyName} como ${roleLabel}. RikuyDeep es la plataforma de inspección de piezas de fundición.`
+      : `Te invitamos a administrar ${companyName} en RikuyDeep, la plataforma de inspección de piezas de fundición.`,
     "Abre este enlace para crear tu cuenta y elegir tu contraseña:",
     "",
     url,
@@ -78,7 +88,7 @@ export async function sendInvitationEmail({ to, name, companyName, url, days }: 
   const { error } = await new Resend(apiKey).emails.send({
     from,
     to,
-    subject: `Invitación para administrar ${companyName} en RikuyDeep`,
+    subject: roleLabel ? `Invitación a RikuyDeep en ${companyName}` : `Invitación para administrar ${companyName} en RikuyDeep`,
     text,
   });
   if (error) {
