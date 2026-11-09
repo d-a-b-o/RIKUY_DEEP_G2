@@ -25,6 +25,8 @@ export const PERMISSIONS = [
   "catalogos:ver", // HU31
   "catalogos:gestionar", // HU31 · piezas, moldes, lotes y turnos
   "inspecciones:crear", // inspección con webcam
+  "estaciones:gestionar", // HU44 · alta, calibración y lote de las estaciones automáticas
+  "estacion:operar", // HU44 · pantalla de la estación automática (solo la cuenta técnica)
   "inspecciones:ver", // HU24 · trazabilidad
   "veredictos:corregir", // HU40
   "dashboard:ver", // HU37
@@ -46,6 +48,7 @@ export const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     ...LECTURA,
     "usuarios:gestionar",
     "catalogos:gestionar",
+    "estaciones:gestionar",
     "inspecciones:crear",
     "veredictos:corregir",
     "auditoria:ver",
@@ -54,7 +57,7 @@ export const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
   INSPECTOR: [...LECTURA.filter((p) => p !== "reportes:descargar"), "inspecciones:crear", "veredictos:corregir"],
   VIEWER: LECTURA,
   // ADR 0007: cuenta técnica de una estación; registra inspecciones de línea y lee el lote y turno activos.
-  STATION: ["catalogos:ver", "inspecciones:crear"],
+  STATION: ["catalogos:ver", "inspecciones:crear", "estacion:operar"],
 };
 
 export function isRole(value: unknown): value is Role {

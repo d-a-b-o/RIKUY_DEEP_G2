@@ -9,7 +9,7 @@ const initialState: CatalogFormState = { status: "idle" };
 export type FieldSpec = {
   name: string;
   label: string;
-  type?: "text" | "time" | "number" | "select";
+  type?: "text" | "time" | "number" | "select" | "email" | "password";
   options?: { value: string; label: string }[];
   defaultValue?: string;
   required?: boolean;
@@ -17,6 +17,9 @@ export type FieldSpec = {
   maxLength?: number;
   min?: number;
   max?: number;
+  /** Para números con decimales («any»). */
+  step?: string;
+  autoComplete?: string;
 };
 
 /**
@@ -103,7 +106,15 @@ export function CatalogForm({
                     ))}
                   </select>
                 ) : (
-                  <input {...common} type={f.type ?? "text"} maxLength={f.maxLength} min={f.min} max={f.max} />
+                  <input
+                    {...common}
+                    type={f.type ?? "text"}
+                    maxLength={f.maxLength}
+                    min={f.min}
+                    max={f.max}
+                    step={f.step}
+                    autoComplete={f.autoComplete}
+                  />
                 )}
                 {f.hint ? (
                   <p id={`${fieldId}-hint`} className="text-sm text-muted-foreground">

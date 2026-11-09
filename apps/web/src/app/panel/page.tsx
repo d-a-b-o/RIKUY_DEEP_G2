@@ -63,7 +63,15 @@ async function Welcome() {
           <dd className="break-all font-medium">{user.email}</dd>
         </div>
       </dl>
-      {can(toAuthzUser(user), "inspecciones:crear") ? (
+      {can(toAuthzUser(user), "estacion:operar") ? (
+        <NextStep
+          icon="camera"
+          title="Abre la estación automática"
+          text="Inspecciona sola cada pieza de la línea. Pulsa «Iniciar» al empezar el turno."
+          href="/panel/estacion"
+          action="Abrir la estación"
+        />
+      ) : can(toAuthzUser(user), "inspecciones:crear") ? (
         <NextStep
           icon="scan"
           title="Empieza una inspección"
@@ -92,7 +100,7 @@ function NextStep({
   href,
   action,
 }: {
-  icon: "scan" | "building";
+  icon: "scan" | "building" | "camera";
   title: string;
   text: string;
   href: string;

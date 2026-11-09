@@ -257,6 +257,25 @@ Queda margen hasta 1 pieza por segundo. Por encima, la estación avisa de que la
 
 Contadores del turno siempre visibles: piezas inspeccionadas, OK, defectuosas, porcentaje de defectos y ritmo actual (piezas por minuto), junto con el lote, el turno y la versión del modelo.
 
+### Implementación
+
+| Pieza | Archivo | Qué hace |
+| --- | --- | --- |
+| Detector | `src/lib/station/detector.ts` | Máquina de estados *Vacía → Llegando → Inspeccionada → Saliendo*, diferencias de fotogramas, fondo y umbrales sugeridos. Puro, sin cámara. |
+| Ciclo | `src/lib/station/engine.ts` | Una inferencia por pieza, numeración del lote, foto de las defectuosas y de 1 de cada N OK, registro en la cola. |
+| Cola | `src/lib/station/queue.ts` | IndexedDB (`rikuydeep-station`) con las pendientes y las rechazadas; envío por lotes de 50 o cada 5 s. |
+| Configuración | `src/lib/station/config.ts` | Lee `station.config` campo por campo, con los valores por defecto de la tabla anterior. |
+| Servidor | `src/lib/station/service.ts` | Contexto de la estación (lote, turno por el reloj, contadores), envío por lotes con `recordInspection` y administración. |
+| Pantalla | `/panel/estacion` | Solo la cuenta técnica (`estacion:operar`). Botón «Iniciar»: pantalla completa, sonido, cámara y calibración con la cinta vacía. |
+| Administración | `/panel/admin/estaciones` | Admin de planta (`estaciones:gestionar`): crea la estación con su cuenta técnica, asigna el lote, ajusta los parámetros y la desactiva. |
+
+- **Una pieza, una inferencia.** Tras inspeccionar, la estación no vuelve a inferir hasta que la escena queda vacía durante `stableFrames` fotogramas. Si la escena cambia mucho respecto de la pieza inspeccionada sin vaciarse (piezas pegadas), se inspecciona con el aviso de conteo dudoso; si apenas cambia (alguien tocó la pieza), no se repite.
+- **Rechazos.** Lo que el servidor rechaza por una causa que no se arregla reintentando (lote cerrado, fuera de turno, foto obligatoria sin almacenamiento) pasa a la lista de rechazadas para no bloquear la cola. La pantalla muestra cuántas hay.
+- **Recuperación.** Si la cámara deja de enviar imagen, se reintenta cada 5 s; tras 6 intentos, o si falla el modelo (contexto WebGL perdido), la página se recarga sola y vuelve a arrancar con el fondo calibrado guardado en `sessionStorage`. La cola sigue en IndexedDB.
+- **Lote y turno.** La estación consulta su contexto cada minuto: un lote reasignado o un turno nuevo se aplican sin intervención. Sin lote abierto o fuera de turno, la estación espera y lo indica.
+- **Fugas de memoria.** La pantalla muestra `tf.memory().numTensors` tras cada pieza; debe mantenerse constante. La prueba de 8 horas se hace en planta con la cámara real (RIKDP-226).
+- **Pruebas.** Unitarias del detector, el ciclo y la cola (`src/lib/station/*.test.ts`), integración con Postgres (`service.test.ts`) y Playwright: `e2e/stations.spec.ts` (alta y pantalla) y `e2e/station-kiosk.spec.ts` (ciclo real con el modelo y una cámara simulada; necesita `E2E_MODEL_DIR`).
+
 ## Telemetría (HU43)
 
 Por cada inferencia se mide la duración (sin el calentamiento) y el backend. Se envían en lotes a `model_telemetry`. Los errores de carga del manifest o del modelo se registran con su mensaje.
