@@ -6,9 +6,12 @@ Tarea: RIKDP-86 (HU07-T01 · diagrama de arquitectura y ADR de stack), dentro de
 
 Documentos relacionados:
 
+- [HU35: integración manual auditada y límites actuales](inspeccion-manual-hu35.md) (RIKDP-289)
+- [HU35: contratos de datos](inspeccion-manual-contratos.md) y [reproducción](../pruebas/hu35-reproduccion.md)
 - [Modelo de datos](modelo-datos.md) (RIKDP-87)
 - [Inferencia en el navegador y manifest de modelos](inferencia-navegador.md) (RIKDP-88)
 - [Autenticación](autenticacion.md) (HU19)
+- [Empresas e invitaciones](empresas-e-invitaciones.md) (HU23)
 - [Acta de la revisión de arquitectura](revisiones/2026-11-01-hu08.md) (RIKDP-89)
 - [Decisiones de arquitectura (ADR)](../adr/README.md)
 - [Identidad visual](../identidad-visual.md)
@@ -87,7 +90,9 @@ flowchart LR
 
 ## Flujo de registro de una inspección
 
-Este flujo es el mismo para una inspección manual y para una estación automática. La estación lo hace sin intervención humana y en lotes; la detección de cada pieza está en [inferencia en el navegador](inferencia-navegador.md#estación-de-inspección-automática-hu44).
+**Estado auditado (2026-11-09, `98bbd55`):** el diagrama siguiente describe el contrato de registro disponible en HU24. La pantalla manual `/panel/inspeccion` todavía no conecta JPG, selección de lote/turno, subida ni registro. La estación HU44 sí tiene su propia integración. Consulte la [auditoría de HU35](inspeccion-manual-hu35.md) para distinguir código existente de conexiones pendientes. La cola IndexedDB de capturas pertenece actualmente a HU44, no al inspector manual.
+
+El contrato está previsto para una inspección manual y para una estación automática. La estación ya lo aplica sin intervención humana y en lotes; la detección de cada pieza está en [inferencia en el navegador](inferencia-navegador.md#estación-de-inspección-automática-hu44).
 
 ```mermaid
 sequenceDiagram

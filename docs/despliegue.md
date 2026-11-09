@@ -45,6 +45,16 @@ El repositorio no contiene ningún secreto: las variables se configuran en Verce
 
    Con `SEED_DEMO_PASSWORD="<contraseña>"` crea además un usuario por rol para probar el login: `superadmin@`, `admin@`, `inspector@` y `consulta@demo.rikuydeep.test`, todos con esa contraseña.
 
+7. Crea el **superadministrador de producción** con tu correo real (HU23). Desde `apps/web`:
+
+   ```bash
+   DIRECT_URL="<cadena directa de main>" npm run create:superadmin
+   ```
+
+   Al entrar por primera vez, la app te pedirá activar la **verificación en dos pasos** (HU29): ten a mano una app autenticadora y guarda los códigos de respaldo. Si un día pierdes el móvil y los códigos, `DIRECT_URL="<cadena directa de main>" npm run reset:two-factor` le quita la 2FA a una cuenta para que la vuelva a activar.
+
+   El script muestra a qué base se va a conectar y pide escribir `SI` antes de escribir nada. Luego pide el nombre, el correo y la contraseña (de 10 a 128 caracteres), que no se muestra en pantalla ni queda en el historial. Usa `DIRECT_URL` antes que `DATABASE_URL`, y lo pasado en la línea de comandos tiene prioridad sobre `.env.local`. Si el correo ya tiene cuenta, no cambia nada. Para cambiar la contraseña después, usa «¿Olvidaste tu contraseña?» en `/ingresar`.
+
 ## 2. Vercel (RIKDP-118)
 
 1. En [vercel.com/new](https://vercel.com/new), importa el repositorio `d-a-b-o/RIKUY_DEEP_G2`.
@@ -146,10 +156,14 @@ Las fotos de las inspecciones van en un bucket **distinto y privado** ([ADR 0005
 
 Sin estas variables la app funciona, pero no puede registrar inspecciones que guardan foto: responde `STORAGE_NOT_CONFIGURED`.
 
-## 4. Correo con Resend (aviso de solicitudes de demo)
+## 4. Correo con Resend (avisos de demo, recuperación e invitaciones)
 
 1. Crea una cuenta en [resend.com](https://resend.com) y una API key con permiso de envío.
-2. Para enviar desde un dominio propio, verifícalo en *Domains* y usa ese remitente en `LEAD_NOTIFICATION_FROM`. Sin dominio, `onboarding@resend.dev` solo puede enviar al correo de la cuenta de Resend.
+2. Para enviar desde un dominio propio, verifícalo en *Domains* y usa ese remitente en `AUTH_EMAIL_FROM` y `LEAD_NOTIFICATION_FROM`. Sin dominio, `onboarding@resend.dev` solo puede enviar al correo de la cuenta de Resend, así que la recuperación de contraseña y las invitaciones a otras personas fallan (en los logs: *«domain is not verified»*).
+
+   En producción el dominio es **`d-a-b-o.dev`** (DNS en Cloudflare, región de Resend São Paulo). Resend usa los registros MX y SPF del subdominio `send` y el DKIM `resend._domainkey`; el remitente es `RikuyDeep <cuentas@d-a-b-o.dev>`. La parte antes de `@` puede ser cualquiera y no necesita buzón.
+
+   Para recibir correo en `@d-a-b-o.dev`, Cloudflare **Email Routing** reenvía las direcciones del dominio a la cuenta compartida del equipo (con delegación de Gmail para cada integrante). Sus MX están en la raíz del dominio y no chocan con los de Resend. Para responder como `@d-a-b-o.dev` desde Gmail se usa «Enviar como» con el SMTP de Resend (`smtp.resend.com`, puerto 465, usuario `resend`, contraseña = una API key con acceso solo de envío).
 3. Sin `RESEND_API_KEY`, las solicitudes de demo **se guardan igual** en la tabla `lead`; solo se omite el aviso por correo.
 
 ## 5. Variables de entorno
@@ -161,7 +175,7 @@ Referencia completa con valores de ejemplo en [`apps/web/.env.example`](../apps/
 | `DATABASE_URL` | Sí | Conexión de la aplicación (con pooler en Neon) |
 | `DIRECT_URL` | Para migraciones y seed | Conexión directa para Prisma Migrate. Si falta, se usa `DATABASE_URL_UNPOOLED` o `DATABASE_URL` |
 | `BETTER_AUTH_SECRET` | Sí, en producción | Firma de sesiones y tokens de Better Auth (HU19) |
-| `AUTH_EMAIL_FROM` | No | Remitente del correo de recuperación de contraseña. Si falta, se usa `LEAD_NOTIFICATION_FROM` |
+| `AUTH_EMAIL_FROM` | No | Remitente de la recuperación de contraseña y de las invitaciones (HU23). Si falta, se usa `LEAD_NOTIFICATION_FROM` |
 | `SEED_DEMO_PASSWORD` | No | Contraseña de los usuarios de demostración del seed |
 | `RESEND_API_KEY` | No | Envío del aviso de nuevos leads y del correo de recuperación de contraseña. Sin ella, en desarrollo el enlace de recuperación se escribe en la consola |
 | `LEAD_NOTIFICATION_TO` | Con Resend | Destinatarios del aviso, separados por comas |

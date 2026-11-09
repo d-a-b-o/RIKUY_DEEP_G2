@@ -280,7 +280,7 @@ erDiagram
 4. **Corrección.** Un evento `CORRECTED` exige `reason`, y `new_verdict` distinto del vigente. Toda corrección genera también `FLAGGED_FOR_RETRAINING` (HU40).
 5. **Turno activo.** Para una hora local `h` de la empresa, un turno está activo si `start_time <= h < end_time`, o, cuando cruza la medianoche (`end_time < start_time`), si `h >= start_time` o `h < end_time`.
 6. **Lote.** Solo se registran inspecciones en lotes `OPEN`. Al cerrarse, el resumen compara el porcentaje de defectuosas con `company.batch_reject_threshold` para recomendar liberar o rechazar (HU39).
-7. **Superadministrador.** `role = SUPERADMIN` si y solo si `company_id` es nulo. Siempre con 2FA (HU29).
+7. **Superadministrador.** `role = SUPERADMIN` si y solo si `company_id` es nulo. Siempre con 2FA (HU29): la app no le deja usar el panel hasta activarla ni desactivarla después.
 8. **Autor de la inspección.** Exactamente uno de `inspector_id` y `station_id` tiene valor. Con `source = LINE`, es `station_id`.
 9. **Fotos.** `image_key` es obligatorio si `predicted_verdict = DEFECTIVE`. En las OK de una estación, solo 1 de cada `config.okPhotoEvery`. Las inspecciones manuales (HU35, HU39) siempre guardan foto.
 10. **Cuenta de estación.** Un usuario con rol `STATION` solo puede registrar inspecciones de su estación; no accede al dashboard ni a la administración.
@@ -306,11 +306,11 @@ Con estaciones automáticas, cada una registra unas 28 800 inspecciones por turn
 
 ## Roles
 
-Resumen de la matriz de permisos de HU32. El detalle por acción se implementa en RIKDP-179.
+Resumen de la matriz de permisos de HU32. El detalle por acción está en [`apps/web/src/lib/authz`](../../apps/web/src/lib/authz/README.md).
 
 | Rol | Alcance |
 | --- | --- |
-| `SUPERADMIN` | Plataforma: empresas, leads, monitoreo y versiones del modelo |
+| `SUPERADMIN` | Plataforma: empresas, leads, monitoreo y versiones del modelo. No inspecciona, no corrige y no ve datos de las empresas |
 | `ADMIN` | Su empresa: usuarios, catálogos, lotes, turnos, dashboard y reportes |
 | `INSPECTOR` | Su empresa: inspeccionar, corregir veredictos y ver el historial |
 | `VIEWER` | Su empresa: solo lectura de dashboard, historial y reportes |

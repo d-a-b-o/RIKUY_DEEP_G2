@@ -15,6 +15,8 @@ npm install                  # también genera el cliente de Prisma
 npm run db:migrate           # aplica las migraciones a tu base de datos
 npm run db:seed              # datos de demostración (idempotente)
                              # con SEED_DEMO_PASSWORD crea un usuario por rol para probar /ingresar
+npm run create:superadmin    # crea un superadministrador (pide los datos por consola)
+npm run reset:two-factor     # quita la 2FA de una cuenta que perdió el móvil y los códigos
 ```
 
 La base de datos puede ser la rama `dev` de Neon o un PostgreSQL 16 local. Detalle en [docs/despliegue.md](../../docs/despliegue.md).
@@ -28,6 +30,7 @@ npm run lint         # ESLint
 npm run typecheck    # tipos (next typegen + tsc)
 npm test             # pruebas (Vitest); las de base de datos se ejecutan si hay DATABASE_URL
 npm run test:e2e     # pruebas de sistema (Playwright); requiere npm run build antes
+npm run test:camera  # exploración aislada de cámara simulada; requiere build, no DB/modelo
 npm run test:smoke   # solo la prueba de humo (@smoke), la misma que corre en CI
                      # la prueba del modelo real necesita E2E_MODEL_DIR con una copia del bucket
 npm run db:migrate   # crea y aplica una migración tras cambiar prisma/schema.prisma
@@ -42,6 +45,10 @@ Las pantallas privadas requieren PostgreSQL de pruebas. Los casos de inferencia
 real y cámara simulada también requieren los fixtures `E2E_MODEL_DIR`, descritos
 en `e2e/inspection.spec.ts`; no usan la cámara física.
 Auditoría, capturas y resultados de RIKDP-274: [docs/ui-ux](../../docs/ui-ux/RIKDP-274-resultados.md).
+Validación exploratoria de cámara, límites del flujo HU35 y reproducción de
+RIKDP-288: [informe y evidencias](../../docs/ui-ux/RIKDP-288-resultados.md).
+`test:camera` usa el Inspector real con dobles de cámara/modelo; las pruebas de
+`camera-flow.spec.ts` usan la ruta autenticada y TF.js real con dispositivo ficticio.
 
 ## Estructura
 
@@ -54,7 +61,7 @@ apps/web/
 │   └── seed.ts           # datos de demostración
 ├── src/app/              # rutas (App Router)
 ├── src/components/       # componentes (landing, marca)
-├── src/lib/              # lógica compartida: db.ts, auth/, leads/, model/
+├── src/lib/              # lógica compartida: db.ts, auth/, authz/, companies/, invitations/, leads/, model/
 ├── src/generated/        # cliente de Prisma generado (no se versiona)
 ├── public/               # archivos estáticos
 ├── playwright.config.ts
@@ -79,10 +86,13 @@ Al importar el repositorio en Vercel, configurar **Root Directory = `apps/web`**
 | `/recuperar`, `/restablecer` | Recuperación de contraseña (HU19) |
 | `/panel` | Área privada; requiere sesión |
 | `/panel/inspeccion` | Inspección con el modelo TF.js en el navegador: foto o cámara (HU26) |
+| `/panel/cuenta/seguridad` | Verificación en dos pasos: activar, códigos de respaldo y política de la planta (HU29) |
+| `/panel/admin/empresas` | Gestión de empresas del superadministrador: alta, edición, invitación del administrador y desactivación (HU23) |
+| `/invitacion?token=…` | Aceptar una invitación y crear la cuenta (HU23) |
 | `/api/auth/*` | API de Better Auth |
 
 Detalle de la autenticación en [docs/arquitectura/autenticacion.md](../../docs/arquitectura/autenticacion.md).
 
 ## Nota sobre Next.js 16
 
-El antiguo `middleware.ts` ahora se llama **`proxy.ts`** (`src/proxy.ts`). Hoy hace la comprobación optimista de sesión en `/panel`. Las protecciones por rol de HU32 también van ahí.
+El antiguo `middleware.ts` ahora se llama **`proxy.ts`** (`src/proxy.ts`). Hoy hace la comprobación optimista de sesión en `/panel`. Los permisos por rol (HU32) los comprueba cada página con `getPageAccess()` y cada Server Action con `authorize()` (`src/lib/authz`).

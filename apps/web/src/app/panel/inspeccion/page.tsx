@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Inspector } from "@/components/inspection/inspector";
 import { PanelShell } from "@/components/panel/panel-shell";
-import { getCurrentUser } from "@/lib/auth/session";
+import { Forbidden } from "@/components/panel/forbidden";
+import { getPageAccess } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
   title: "Inspeccionar una pieza",
@@ -36,7 +37,8 @@ export default function InspectionPage() {
 }
 
 async function AuthorizedInspector() {
-  await getCurrentUser("/panel/inspeccion");
+  const { allowed } = await getPageAccess("/panel/inspeccion", "inspecciones:crear");
+  if (!allowed) return <Forbidden />;
   const manifestUrl = process.env.NEXT_PUBLIC_MODEL_MANIFEST_URL;
   if (!manifestUrl) {
     return (
@@ -44,8 +46,8 @@ async function AuthorizedInspector() {
         role="alert"
         className="rounded-lg border border-warning/40 bg-warning/5 px-4 py-3 text-sm"
       >
-        Falta configurar <code>NEXT_PUBLIC_MODEL_MANIFEST_URL</code>: la URL del
-        manifest de modelos en R2.
+        La inspección aún no está configurada. Contacta al responsable de tu
+        planta para habilitar el modelo.
       </p>
     );
   }

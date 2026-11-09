@@ -3,7 +3,9 @@ import Link from "next/link";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { Logo } from "@/components/brand/logo";
 import { Icon } from "@/components/ui/icon";
-import { PanelNav } from "./panel-nav";
+import { Suspense } from "react";
+import { PanelLinks } from "./panel-links";
+import { BASE_LINKS, RoleNav } from "./role-nav";
 
 export function PanelShell({ children }: { children: React.ReactNode }) {
   return (
@@ -34,7 +36,9 @@ export function PanelShell({ children }: { children: React.ReactNode }) {
           <p className="mb-4 hidden px-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground lg:block">
             Espacio de trabajo
           </p>
-          <PanelNav />
+          <Suspense fallback={<PanelLinks links={BASE_LINKS} pathname={null} />}>
+            <RoleNav />
+          </Suspense>
         </div>
         <div className="mt-auto hidden p-5 lg:block">
           <div className="rounded-xl border border-border p-4">

@@ -1,6 +1,6 @@
 # Autenticación
 
-Inicio de sesión, bloqueo por intentos y recuperación de contraseña con [Better Auth](https://www.better-auth.com) 1.7. HU19 · RIKDP-30: RIKDP-132, RIKDP-133, RIKDP-134, RIKDP-137 y RIKDP-138.
+Inicio de sesión, bloqueo por intentos, recuperación de contraseña y verificación en dos pasos con [Better Auth](https://www.better-auth.com) 1.7. HU19 · RIKDP-30: RIKDP-132, RIKDP-133, RIKDP-134, RIKDP-137 y RIKDP-138. HU29 · RIKDP-40: RIKDP-167, RIKDP-168 y RIKDP-169.
 
 ## Piezas
 
@@ -17,10 +17,10 @@ Inicio de sesión, bloqueo por intentos y recuperación de contraseña con [Bett
 
 ## Decisiones
 
-- **Sin registro público.** `disableSignUp: true`. Las cuentas las crea un administrador (HU23, HU30). Mientras tanto, el seed y las pruebas crean usuarios con `createCredentialUser()`, que usa el mismo hash scrypt que Better Auth.
+- **Sin registro público.** `disableSignUp: true`. Las cuentas se crean al aceptar una invitación ([empresas e invitaciones](empresas-e-invitaciones.md), HU23; HU30 para los usuarios de planta). El seed y las pruebas usan `createCredentialUser()`, que usa el mismo hash scrypt que Better Auth.
 - **Sesión en base de datos**, cookie `HttpOnly`. Dura 8 horas (un turno) y se renueva cada hora de uso.
 - **Las pantallas llaman a `/api/auth` desde el navegador** y no desde una Server Action. Así el rate limit de Better Auth, que solo actúa sobre peticiones HTTP, protege también el formulario.
-- **Doble comprobación.** `proxy.ts` solo mira si existe la cookie, sin ir a la base, para redirigir rápido. La comprobación que cuenta la hace `getCurrentUser()` en cada página: valida la sesión y que la cuenta siga activa. Los permisos por rol se añaden en HU32.
+- **Doble comprobación.** `proxy.ts` solo mira si existe la cookie, sin ir a la base, para redirigir rápido. La comprobación que cuenta la hace `getCurrentUser()` en cada página: valida la sesión, que la cuenta siga activa y que su empresa no esté desactivada. Los permisos por rol los comprueba `getPageAccess()` (HU32).
 - **Instancia perezosa.** `getAuth()` crea Better Auth en la primera petición, así `next build` no necesita la base ni `BETTER_AUTH_SECRET`.
 
 ## Inicio de sesión y bloqueo (criterio 1)
@@ -74,10 +74,35 @@ La IP sale de `x-forwarded-for`, que en Vercel pone la propia plataforma. El lí
 
 Sin `RESEND_API_KEY`, en desarrollo el enlace se escribe en la consola del servidor y en producción solo queda un aviso.
 
+## Verificación en dos pasos (HU29)
+
+Plugin `twoFactor` de Better Auth con TOTP (app autenticadora) y códigos de respaldo. Piezas propias:
+
+| Pieza | Archivo | Qué hace |
+| --- | --- | --- |
+| Política | `apps/web/src/lib/auth/two-factor-policy.ts` | `isTwoFactorRequired()`: superadmin siempre; el resto si su empresa la exige (`company.require_two_factor`); las estaciones (`STATION`) nunca |
+| Segundo paso del login | `apps/web/src/components/auth/two-factor-step.tsx` | Código de 6 dígitos o código de respaldo, y «Confiar en este equipo 30 días» |
+| Configuración | `/panel/cuenta/seguridad` | Activar (QR + primer código), regenerar códigos y desactivar. El admin de planta exige la 2FA a su empresa |
+
+**Activación (criterio 1).** Con la contraseña, `/two-factor/enable` genera el secreto y los códigos, pero la cuenta solo queda con 2FA cuando `/two-factor/verify-totp` acepta el primer código (`two_factor.verified`). Al terminar se cierran las demás sesiones.
+
+**Códigos de respaldo (criterio 2).** Diez códigos `xxxxx-xxxxx` que se muestran una vez (copiar o descargar). Cada uno se borra al usarlo. Regenerarlos invalida los anteriores.
+
+**Obligatoriedad (criterio 3).** Quien la tiene obligatoria y no la activó solo puede entrar a `/panel/cuenta/seguridad`: `getCurrentUser()` lo redirige ahí, `getActionUser()` no le deja usar Server Actions y `loadActor()` (HU24) no le deja registrar inspecciones. No puede desactivarla: un hook `before` de `/two-factor/disable` responde 403 `TWO_FACTOR_REQUIRED`.
+
+**Seguridad.**
+- El secreto TOTP y los códigos de respaldo se guardan **cifrados** con `BETTER_AUTH_SECRET`. Cambiar esa variable deja inservibles los 2FA activos.
+- Tras la contraseña correcta no hay sesión hasta el código: Better Auth deja una cookie firmada de desafío que admite 5 intentos.
+- 5 códigos incorrectos seguidos bloquean el segundo paso 15 minutos (`two_factor.locked_until`). El rate limit de `/two-factor/*` es de 15 peticiones por minuto e IP.
+- Si alguien pierde el móvil y los códigos, `npm run reset:two-factor` (desde `apps/web`, con `DIRECT_URL`) le quita la 2FA y cierra sus sesiones. Si su cuenta la tiene obligatoria, deberá activarla otra vez al entrar.
+
 ## Pruebas
 
 - `src/lib/auth/auth.test.ts` (integración con Postgres, a través del handler HTTP): login, conteo y bloqueo, desbloqueo al vencer, usuario desactivado, rate limit, mensaje neutro, vencimiento a 30 minutos, revocación de sesiones, token reutilizado y token vencido.
 - `src/lib/auth/config.test.ts`: destino seguro tras el login y mensajes de error.
+- `src/lib/auth/two-factor.test.ts` (integración, handler HTTP): activación con verificación del primer código y secretos cifrados, login en dos pasos, código de respaldo de un solo uso, regeneración, desactivación y 2FA obligatoria (superadmin y empresa).
+- `src/lib/auth/two-factor-policy.test.ts`: política por rol y empresa.
+- `e2e/two-factor.spec.ts` (Playwright): `@smoke` activación con el QR → login con código → código de respaldo reutilizado; `@regression` superadmin sin 2FA bloqueado hasta activarla (responsive y axe) y admin que la exige a su planta.
 - `e2e/auth.spec.ts` (Playwright):
   - `@smoke`: entrar al panel, cerrar sesión y contraseña incorrecta.
   - `@regression`: bloqueo en pantalla, `?next=` externo, recuperación con mensaje neutro y enlace inválido.

@@ -1,4 +1,5 @@
 import "server-only";
+import { mustSetUpTwoFactor } from "@/lib/auth/two-factor-policy";
 import { Prisma, type PrismaClient } from "@/generated/prisma/client";
 import { createImageReadUrl, imageExists, isImageKeyOfCompany, isStorageConfigured } from "@/lib/storage/r2";
 import { canCorrect, canReadTrace, canRecord, findActiveShift, isImageRequired, type Role, type Verdict } from "./rules";
@@ -58,13 +59,24 @@ export type ServiceDeps = {
   now?: () => Date;
 };
 
-/** Carga el actor de la sesión. Devuelve null si el usuario no existe o está desactivado. */
+/** Carga el actor de la sesión. Devuelve null si el usuario no existe o él o su empresa están desactivados. */
 export async function loadActor(db: PrismaClient, userId: string): Promise<Actor | null> {
   const user = await db.user.findUnique({
     where: { id: userId },
-    select: { id: true, role: true, companyId: true, active: true, station: { select: { id: true, active: true } } },
+    select: {
+      id: true,
+      role: true,
+      companyId: true,
+      active: true,
+      twoFactorEnabled: true,
+      company: { select: { status: true, requireTwoFactor: true } },
+      station: { select: { id: true, active: true } },
+    },
   });
-  if (!user?.active) return null;
+  // Una empresa desactivada no registra ni consulta inspecciones (HU23, criterio 3).
+  if (!user?.active || user.company?.status === "INACTIVE") return null;
+  // Obligada a usar 2FA y sin activarla todavía (HU29, criterio 3).
+  if (mustSetUpTwoFactor(user)) return null;
   return {
     userId: user.id,
     role: user.role,
