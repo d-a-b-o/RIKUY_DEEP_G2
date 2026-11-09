@@ -47,6 +47,10 @@ export function Inspector({ manifestUrl }: { manifestUrl: string }) {
   const [inputError, setInputError] = useState<string | null>(null);
   const modelRef = useRef<InspectionModel | null>(null);
   const previewRef = useRef<HTMLCanvasElement>(null);
+  const reportInputError = useCallback((message: string | null) => {
+    setInputError(message);
+    if (message) setResult(null);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -78,15 +82,14 @@ export function Inspector({ manifestUrl }: { manifestUrl: string }) {
     if (!model || !canvas) return;
     setBusy(true);
     setInputError(null);
+    setResult(null);
     try {
       drawModelInput(source, canvas, model.info.input);
       const prediction = await model.predict(canvas);
       setResult({ ...prediction, label });
-    } catch (error) {
+    } catch {
       setInputError(
-        error instanceof Error
-          ? error.message
-          : "No se pudo inspeccionar la imagen.",
+        "No se pudo inspeccionar la imagen. Comprueba el encuadre y vuelve a intentarlo.",
       );
     } finally {
       setBusy(false);
@@ -115,7 +118,10 @@ export function Inspector({ manifestUrl }: { manifestUrl: string }) {
                   key={value}
                   type="button"
                   aria-pressed={mode === value}
-                  onClick={() => setMode(value)}
+                  onClick={() => {
+                    setInputError(null);
+                    setMode(value);
+                  }}
                   className="flex min-h-11 items-center gap-2 rounded-md px-3 py-2 font-medium text-muted-foreground aria-pressed:bg-primary aria-pressed:text-primary-foreground"
                 >
                   <Icon
@@ -132,13 +138,13 @@ export function Inspector({ manifestUrl }: { manifestUrl: string }) {
               <UploadInput
                 disabled={!ready || busy}
                 onImage={inspect}
-                onError={setInputError}
+                onError={reportInputError}
               />
             ) : (
               <CameraInput
                 disabled={!ready || busy}
                 onFrame={inspect}
-                onError={setInputError}
+                onError={reportInputError}
               />
             )}
           </div>
@@ -314,7 +320,7 @@ function Verdict({ result }: { result: Result }) {
 
 type InputProps = {
   disabled: boolean;
-  onError: (message: string) => void;
+  onError: (message: string | null) => void;
 };
 
 function UploadInput({
@@ -388,45 +394,95 @@ function CameraInput({
 }: InputProps & { onFrame: (source: PixelSource, label: string) => void }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [live, setLive] = useState(false);
+  const [active, setActive] = useState(true);
+  const [attempt, setAttempt] = useState(0);
+  const [cameraStatus, setCameraStatus] = useState(
+    "Esperando permiso y el primer fotograma de la cámara…",
+  );
 
   useEffect(() => {
+    if (!active) return;
+    const video = videoRef.current;
     let stream: MediaStream | null = null;
     let cancelled = false;
-    navigator.mediaDevices
-      ?.getUserMedia({
-        video: {
-          facingMode: "environment",
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-        },
-        audio: false,
-      })
-      .then((media) => {
+    let failed = false;
+    let frameTimer: ReturnType<typeof setTimeout> | undefined;
+    const release = () => {
+      clearTimeout(frameTimer);
+      stream?.getTracks().forEach((track) => {
+        track.removeEventListener("ended", disconnected);
+        track.stop();
+      });
+      if (video) video.srcObject = null;
+    };
+    const fail = (message: string) => {
+      if (cancelled || failed) return;
+      failed = true;
+      release();
+      setLive(false);
+      setCameraStatus("Cámara no disponible. Puedes volver a intentarlo.");
+      onError(message);
+    };
+    const disconnected = () => fail(
+      "La cámara se desconectó o se revocó el permiso. Comprueba la conexión y vuelve a intentarlo.",
+    );
+    const firstFrame = () => {
+      if (
+        cancelled || failed || !video || video.readyState < 2 ||
+        !video.videoWidth || !video.videoHeight
+      ) return;
+      clearTimeout(frameTimer);
+      setLive(true);
+      setCameraStatus("Cámara lista para capturar.");
+    };
+    video?.addEventListener("loadeddata", firstFrame);
+    video?.addEventListener("playing", firstFrame);
+    async function start() {
+      try {
+        if (!navigator.mediaDevices?.getUserMedia) {
+          fail("Este navegador no permite usar la cámara. Abre la aplicación mediante HTTPS en un navegador compatible.");
+          return;
+        }
+        const media = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: "environment",
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+          },
+          audio: false,
+        });
         if (cancelled)
           return media.getTracks().forEach((track) => track.stop());
         stream = media;
-        if (videoRef.current) {
-          videoRef.current.srcObject = media;
-          void videoRef.current.play();
+        if (!video || !media.getVideoTracks().length || media.getVideoTracks().some((track) => track.readyState === "ended")) {
+          disconnected();
+          return;
         }
-        setLive(true);
-      })
-      .catch((error: unknown) => {
+        media.getVideoTracks().forEach((track) => track.addEventListener("ended", disconnected));
+        video.srcObject = media;
+        frameTimer = setTimeout(() => fail(
+          "La cámara no envía imágenes. Comprueba que no esté ocupada y vuelve a intentarlo.",
+        ), 15_000);
+        await video.play();
+        firstFrame();
+      } catch (error: unknown) {
         const denied =
           error instanceof DOMException && error.name === "NotAllowedError";
-        onError(
+        fail(
           denied
             ? "El navegador no tiene permiso para usar la cámara. Actívalo en la barra de direcciones y vuelve a intentarlo."
-            : "No se encontró una cámara disponible.",
+            : "No se pudo iniciar una cámara disponible. Comprueba la conexión y que no esté ocupada por otra aplicación.",
         );
-      });
-    if (!navigator.mediaDevices)
-      onError("Este navegador no permite usar la cámara (se necesita HTTPS).");
+      }
+    }
+    void start();
     return () => {
       cancelled = true;
-      stream?.getTracks().forEach((track) => track.stop());
+      video?.removeEventListener("loadeddata", firstFrame);
+      video?.removeEventListener("playing", firstFrame);
+      release();
     };
-  }, [onError]);
+  }, [onError, active, attempt]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -446,20 +502,59 @@ function CameraInput({
           <div className="aspect-square h-full rounded-lg border-2 border-white/80 shadow-[0_0_0_9999px_rgba(11,27,41,0.45)]" />
         </div>
       </div>
+      <p role="status" className="text-sm text-muted-foreground">
+        {cameraStatus}
+      </p>
       <button
         type="button"
         disabled={disabled || !live}
-        onClick={() =>
-          videoRef.current &&
+        onClick={() => {
+          const video = videoRef.current;
+          const stream = video?.srcObject as MediaStream | null;
+          if (
+            !video || video.readyState < 2 || !video.videoWidth || !video.videoHeight ||
+            !stream?.getVideoTracks().some((track) => track.readyState === "live" && !track.muted)
+          ) {
+            onError("La cámara no tiene un fotograma disponible. Comprueba la conexión y vuelve a intentarlo.");
+            return;
+          }
           onFrame(
-            videoRef.current,
+            video,
             `Cámara · ${new Date().toLocaleTimeString("es-PE")}`,
-          )
-        }
+          );
+        }}
         className="ui-button"
       >
         Inspeccionar
       </button>
+      <div className="flex flex-wrap gap-3">
+        <button
+          type="button"
+          className="ui-button"
+          onClick={() => {
+            setLive(false);
+            onError(null);
+            setCameraStatus("Esperando permiso y el primer fotograma de la cámara…");
+            setActive(true);
+            setAttempt((value) => value + 1);
+          }}
+        >
+          Reintentar cámara
+        </button>
+        <button
+          type="button"
+          className="ui-button"
+          disabled={!active}
+          onClick={() => {
+            setLive(false);
+            setActive(false);
+            onError(null);
+            setCameraStatus("Cámara detenida.");
+          }}
+        >
+          Detener cámara
+        </button>
+      </div>
       <p className="text-sm text-muted-foreground">
         Centra la pieza dentro del cuadro, con buena luz y sin movimiento.
       </p>
