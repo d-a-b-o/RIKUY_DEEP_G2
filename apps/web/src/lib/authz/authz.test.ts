@@ -170,6 +170,8 @@ describe("requiredPermission", () => {
     ["/panel/admin/empresas/123", "empresas:gestionar"],
     ["/panel/inspeccion", "inspecciones:crear"],
     ["/panel/admin/auditoria", "auditoria:ver"],
+    ["/panel/inspecciones", "inspecciones:ver"],
+    ["/panel/inspecciones/123", "inspecciones:ver"],
   ])("%s exige %s", (path, permission) => {
     expect(requiredPermission(path)).toBe(permission);
   });
