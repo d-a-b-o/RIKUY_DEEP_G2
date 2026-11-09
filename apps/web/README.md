@@ -14,8 +14,8 @@ cp .env.example .env.local   # completa DATABASE_URL y DIRECT_URL
 npm install                  # también genera el cliente de Prisma
 npm run db:migrate           # aplica las migraciones a tu base de datos
 npm run db:seed              # datos de demostración (idempotente)
-npm run create:superadmin    # crea un superadministrador (pide los datos por consola)
                              # con SEED_DEMO_PASSWORD crea un usuario por rol para probar /ingresar
+npm run create:superadmin    # crea un superadministrador (pide los datos por consola)
 ```
 
 La base de datos puede ser la rama `dev` de Neon o un PostgreSQL 16 local. Detalle en [docs/despliegue.md](../../docs/despliegue.md).
