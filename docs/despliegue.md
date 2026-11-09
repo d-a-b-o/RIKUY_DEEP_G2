@@ -45,6 +45,14 @@ El repositorio no contiene ningún secreto: las variables se configuran en Verce
 
    Con `SEED_DEMO_PASSWORD="<contraseña>"` crea además un usuario por rol para probar el login: `superadmin@`, `admin@`, `inspector@` y `consulta@demo.rikuydeep.test`, todos con esa contraseña.
 
+7. Crea el **superadministrador de producción** con tu correo real (HU23). Desde `apps/web`:
+
+   ```bash
+   DIRECT_URL="<cadena directa de main>" npm run create:superadmin
+   ```
+
+   El script muestra a qué base se va a conectar y pide escribir `SI` antes de escribir nada. Luego pide el nombre, el correo y la contraseña (de 10 a 128 caracteres), que no se muestra en pantalla ni queda en el historial. Usa `DIRECT_URL` antes que `DATABASE_URL`, y lo pasado en la línea de comandos tiene prioridad sobre `.env.local`. Si el correo ya tiene cuenta, no cambia nada. Para cambiar la contraseña después, usa «¿Olvidaste tu contraseña?» en `/ingresar`.
+
 ## 2. Vercel (RIKDP-118)
 
 1. En [vercel.com/new](https://vercel.com/new), importa el repositorio `d-a-b-o/RIKUY_DEEP_G2`.
