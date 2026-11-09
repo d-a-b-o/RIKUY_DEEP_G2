@@ -1,4 +1,5 @@
 import "server-only";
+import { mustSetUpTwoFactor } from "@/lib/auth/two-factor-policy";
 import { Prisma, type PrismaClient } from "@/generated/prisma/client";
 import { createImageReadUrl, imageExists, isImageKeyOfCompany, isStorageConfigured } from "@/lib/storage/r2";
 import { canCorrect, canReadTrace, canRecord, findActiveShift, isImageRequired, type Role, type Verdict } from "./rules";
@@ -67,12 +68,15 @@ export async function loadActor(db: PrismaClient, userId: string): Promise<Actor
       role: true,
       companyId: true,
       active: true,
-      company: { select: { status: true } },
+      twoFactorEnabled: true,
+      company: { select: { status: true, requireTwoFactor: true } },
       station: { select: { id: true, active: true } },
     },
   });
   // Una empresa desactivada no registra ni consulta inspecciones (HU23, criterio 3).
   if (!user?.active || user.company?.status === "INACTIVE") return null;
+  // Obligada a usar 2FA y sin activarla todavía (HU29, criterio 3).
+  if (mustSetUpTwoFactor(user)) return null;
   return {
     userId: user.id,
     role: user.role,
