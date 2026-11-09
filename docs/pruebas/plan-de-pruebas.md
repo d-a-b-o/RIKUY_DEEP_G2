@@ -160,6 +160,11 @@ Playwright (`@playwright/test` con TypeScript) es la herramienta de las pruebas 
 
 ## 5. Pruebas del modelo de IA (PT1, Semana 13)
 
+Evidencias y estado técnico verificados el 08/11/2026:
+[PT1 · Evidencia de modelo y estado de cierre](pt1-cierre.md). Incluye resultados
+reales de paridad, métricas recalculadas, límites del gate y los ensayos aún
+pendientes; las pruebas unitarias aprobadas no sustituyen los experimentos.
+
 Métricas objetivo: **recall de piezas defectuosas ≥ 95 %** y **accuracy ≥ 97 %** sobre el test reservado. Como el modelo corre en el navegador, además se prueba que la versión TensorFlow.js decide igual que la versión Keras.
 
 | Caso | Nivel | Criterio de aprobación |
@@ -360,12 +365,12 @@ o una ejecución manual debe comprobar las referencias disponibles en ese moment
 | Clave | PT | Nivel | Caso de prueba | Herramienta | Resp. | HU |
 | --- | --- | --- | --- | --- | --- | --- |
 | RIKDP-84 | PT1 | Componente | Forma y rango del preprocesamiento (400×400×3), PIL y TensorFlow real; [procedimiento](pt1-preprocesamiento.md) | pytest + TensorFlow CPU | A. Chumbiraico | HU06 |
-| RIKDP-85 | PT1 | Integración | Paridad del preprocesamiento Python ↔ TF.js (misma imagen, mismo tensor) | pytest + tfjs-node | D. Sánchez | HU06 |
+| RIKDP-85 | PT1 | Integración | Paridad del preprocesamiento Python ↔ TF.js (misma imagen cuadrada, mismo tensor); [procedimiento y defecto detectado](pt1-paridad.md) | pytest + Chromium + TF.js CPU | D. Sánchez | HU06 |
 | RIKDP-96 | PT1 | Componente | Validación de datos con imágenes corruptas y duplicadas de muestra | pytest | D. Sánchez | HU10 |
-| RIKDP-101 | PT1 | Componente | Reproducibilidad: dos corridas con la misma semilla dan las mismas métricas | pytest | D. Bravo | HU10 |
+| RIKDP-101 | PT1 | Componente | Reproducibilidad: dos corridas con la misma semilla dan las mismas métricas; [ensayo y ejecución pendiente](pt1-cierre.md#reproducibilidad--rikdp-101) | pytest + TensorFlow | D. Bravo | HU10 |
 | RIKDP-131 | PT1 | Sistema | Verificación independiente de métricas en test (recall ≥ 95 %, accuracy ≥ 97 %) | pytest + scikit-learn | D. Sánchez | HU17 |
 | RIKDP-145 | PT1 | Integración | Un modelo degradado hace fallar el job de regresión en CI | GitHub Actions + pytest | D. Bravo | HU22 |
-| RIKDP-154 | PT1 | Integración | Paridad Keras ↔ TF.js en el conjunto dorado (≤ 2 discrepancias) | tfjs-node + pytest | D. Bravo | HU25 |
+| RIKDP-154 | PT1 | Integración | Paridad Keras ↔ TF.js en el conjunto dorado (≤ 2 discrepancias); [evidencia real CPU](pt1-cierre.md) | TF.js CPU + pytest | D. Bravo | HU25 |
 | RIKDP-166 | PT1 | Integración | El quality gate bloquea un modelo bajo la métrica (94,9 % falla, 95,0 % pasa) | GitHub Actions | A. Chumbiraico | HU25 |
 | RIKDP-254 ★ | PT1 | Sistema | Evaluación con ≥ 100 imágenes de webcam: caída de métricas documentada | pytest + set webcam | A. Chumbiraico | HU17 |
 | RIKDP-135 | PT2 | Componente | Unitarias de validación de login, sesión y token de recuperación | Vitest | D. Bravo | HU19 |

@@ -1,0 +1,676 @@
+{
+  "export_sha256": {
+    "group1-shard1of3.bin": "efe0f181998787d5134cacbaa6c614f34c1434b2345e8f19dfc33293b9580e5c",
+    "group1-shard2of3.bin": "c160760e063e568fdeee0cf75f2fdd2134d0c7589df448da341bf17f35d79d91",
+    "group1-shard3of3.bin": "a29c2703bd5b839b6f65cb5901ef755921c240ab083d59ef4e94470294edfa3e",
+    "model.json": "febcf5fb66db867452f95093df18f2f8da2a0db85d12b35d317a58f566b2fba5",
+    "preprocessing.json": "cb6743029d9bcadf877dc6f316d78a0e4de48f5ede7c3c1613569561f93d9180"
+  },
+  "golden_manifest_sha256": "9a1fe3ac38fdfb363df5f665ffdb423951552f2b822b4eb7916b462a87e60678",
+  "measurement": {
+    "classification_discrepancies": 0,
+    "discrepancy_ids": [],
+    "failures": [
+      "python: accuracy inferior a 97%.",
+      "tensorflowjs: accuracy inferior a 97%."
+    ],
+    "golden_rows": [
+      {
+        "id": "hu22-000",
+        "label": 0,
+        "path": "hu22-000.jpeg",
+        "sha256": "ddfb5c64b13f7b5d77683dc916508c75ca959bfd43c6c40e3b9bd9d0a8852100",
+        "source": "data/casting_data/ok_front/cast_ok_0_1082.jpeg"
+      },
+      {
+        "id": "hu22-001",
+        "label": 0,
+        "path": "hu22-001.jpeg",
+        "sha256": "8905f53c5ff4bb00d2e68c4a28e6fd8dbb19790fdb037d144ea02d1bedfca578",
+        "source": "data/casting_data/ok_front/cast_ok_0_1092.jpeg"
+      },
+      {
+        "id": "hu22-002",
+        "label": 0,
+        "path": "hu22-002.jpeg",
+        "sha256": "9c7517b28f1e47c09d0f158120939f95a3b64d224d15e9b2af835d0732f5d3c7",
+        "source": "data/casting_data/ok_front/cast_ok_0_1102.jpeg"
+      },
+      {
+        "id": "hu22-003",
+        "label": 0,
+        "path": "hu22-003.jpeg",
+        "sha256": "af4addbd622375ae694d5763005ef941b8e6c69dd3d74cbe0fb2c14029cd3b43",
+        "source": "data/casting_data/ok_front/cast_ok_0_1392.jpeg"
+      },
+      {
+        "id": "hu22-004",
+        "label": 0,
+        "path": "hu22-004.jpeg",
+        "sha256": "6b228f1ea9394f19ba49cef918748c0296db56e397e12f7fe3b2811bbe14bdae",
+        "source": "data/casting_data/ok_front/cast_ok_0_1589.jpeg"
+      },
+      {
+        "id": "hu22-005",
+        "label": 0,
+        "path": "hu22-005.jpeg",
+        "sha256": "5ad3fc32e985ebc0721c91ae1626f7d99771c0425510256438488a34785a2eb9",
+        "source": "data/casting_data/ok_front/cast_ok_0_1682.jpeg"
+      },
+      {
+        "id": "hu22-006",
+        "label": 0,
+        "path": "hu22-006.jpeg",
+        "sha256": "11e8f896ec175e4e85b051197bc9cc32d30f10a01d0119418b7a04fbbba7468e",
+        "source": "data/casting_data/ok_front/cast_ok_0_1755.jpeg"
+      },
+      {
+        "id": "hu22-007",
+        "label": 0,
+        "path": "hu22-007.jpeg",
+        "sha256": "25a9510d0acb0a85241b3f4cba497cd1903f39d8e726ecfde5c281beef28d14b",
+        "source": "data/casting_data/ok_front/cast_ok_0_1780.jpeg"
+      },
+      {
+        "id": "hu22-008",
+        "label": 0,
+        "path": "hu22-008.jpeg",
+        "sha256": "9c3f3cf8f7c139ff6e3ae6994b997bb792e861a56050932ff9ccaccea4980593",
+        "source": "data/casting_data/ok_front/cast_ok_0_1817.jpeg"
+      },
+      {
+        "id": "hu22-009",
+        "label": 0,
+        "path": "hu22-009.jpeg",
+        "sha256": "a96b524e42308ae7785bc0cf885e51104c75ac7d9b7fcff7445e17489775e9b6",
+        "source": "data/casting_data/ok_front/cast_ok_0_1933.jpeg"
+      },
+      {
+        "id": "hu22-010",
+        "label": 0,
+        "path": "hu22-010.jpeg",
+        "sha256": "555628e42187ce9bed29fbab9962c655b7c5aa134f356b6a1c96d4bb3ee52d2d",
+        "source": "data/casting_data/ok_front/cast_ok_0_196.jpeg"
+      },
+      {
+        "id": "hu22-011",
+        "label": 0,
+        "path": "hu22-011.jpeg",
+        "sha256": "c61f5f1be5bb1b182ce532e433078401d0634e23552e23d00b16ac4268ef43f3",
+        "source": "data/casting_data/ok_front/cast_ok_0_2060.jpeg"
+      },
+      {
+        "id": "hu22-012",
+        "label": 0,
+        "path": "hu22-012.jpeg",
+        "sha256": "6ef436798c5cccda7b3e71cb4328e8df4ffd25840e133fb6160ffd9225c12b1e",
+        "source": "data/casting_data/ok_front/cast_ok_0_2208.jpeg"
+      },
+      {
+        "id": "hu22-013",
+        "label": 0,
+        "path": "hu22-013.jpeg",
+        "sha256": "3ca695fcdc361a8f8666aafde99b6359fcf130a2cb91860694634d88ec92fb2b",
+        "source": "data/casting_data/ok_front/cast_ok_0_2271.jpeg"
+      },
+      {
+        "id": "hu22-014",
+        "label": 0,
+        "path": "hu22-014.jpeg",
+        "sha256": "c586d5b8a0ddf5ce6febc5130103334e438d03c71c2a292c3f68980b84bc5998",
+        "source": "data/casting_data/ok_front/cast_ok_0_2544.jpeg"
+      },
+      {
+        "id": "hu22-015",
+        "label": 0,
+        "path": "hu22-015.jpeg",
+        "sha256": "7013a6184ac42b2b3e66d668aeaae22016bd374f0cf0677da789e21cc958798d",
+        "source": "data/casting_data/ok_front/cast_ok_0_2588.jpeg"
+      },
+      {
+        "id": "hu22-016",
+        "label": 0,
+        "path": "hu22-016.jpeg",
+        "sha256": "ba6b15ee0d23d170e4b034e865f835c468df6533b6f3cd49483ff2f9ffa4e819",
+        "source": "data/casting_data/ok_front/cast_ok_0_2622.jpeg"
+      },
+      {
+        "id": "hu22-017",
+        "label": 0,
+        "path": "hu22-017.jpeg",
+        "sha256": "a9d4c9bfe2d131329e328b20d92af19284ebd062eb74ba9f55d30e95b6acf8ce",
+        "source": "data/casting_data/ok_front/cast_ok_0_2746.jpeg"
+      },
+      {
+        "id": "hu22-018",
+        "label": 0,
+        "path": "hu22-018.jpeg",
+        "sha256": "41bd59b4dff0f54355102247b22b725ae23d3cc4b4d0dc4fa214d03b620ec348",
+        "source": "data/casting_data/ok_front/cast_ok_0_2997.jpeg"
+      },
+      {
+        "id": "hu22-019",
+        "label": 0,
+        "path": "hu22-019.jpeg",
+        "sha256": "74bdbfb70063756cfe1435742ddb9e8d033edf04f60e7b16d11e550d8d4c19e9",
+        "source": "data/casting_data/ok_front/cast_ok_0_3102.jpeg"
+      },
+      {
+        "id": "hu22-020",
+        "label": 0,
+        "path": "hu22-020.jpeg",
+        "sha256": "47ba0f9c637c36ab2c4fb8daf9744b497e2b507083da8c363973dad5a539df01",
+        "source": "data/casting_data/ok_front/cast_ok_0_3181.jpeg"
+      },
+      {
+        "id": "hu22-021",
+        "label": 0,
+        "path": "hu22-021.jpeg",
+        "sha256": "52c396178634956bd712180ac32a144542c9eef983c513b3d4435569e75677ad",
+        "source": "data/casting_data/ok_front/cast_ok_0_3304.jpeg"
+      },
+      {
+        "id": "hu22-022",
+        "label": 0,
+        "path": "hu22-022.jpeg",
+        "sha256": "3eb246cc65129bbda6bad34e7dbd7759937bfda3e4a560dc665f406bff30fde6",
+        "source": "data/casting_data/ok_front/cast_ok_0_3337.jpeg"
+      },
+      {
+        "id": "hu22-023",
+        "label": 0,
+        "path": "hu22-023.jpeg",
+        "sha256": "57e73d03513b80cd9e54b990eddf0a75c76d143cb5597188960eba1f46c01cbe",
+        "source": "data/casting_data/ok_front/cast_ok_0_3371.jpeg"
+      },
+      {
+        "id": "hu22-024",
+        "label": 0,
+        "path": "hu22-024.jpeg",
+        "sha256": "bee3959428e270da4997848a360146d023684cca23b3ab19a72f1f316a720f3d",
+        "source": "data/casting_data/ok_front/cast_ok_0_3440.jpeg"
+      },
+      {
+        "id": "hu22-025",
+        "label": 1,
+        "path": "hu22-025.jpeg",
+        "sha256": "5f487998b15c7561410bae41c12b0fab58fab96adc2b23a7f87cf6bf9b27b386",
+        "source": "data/casting_data/def_front/cast_def_0_1015.jpeg"
+      },
+      {
+        "id": "hu22-026",
+        "label": 1,
+        "path": "hu22-026.jpeg",
+        "sha256": "bfe77e1c17208e3100d7d267db9c14e1fd3dba17a563fd1eb6124e3d0c509c32",
+        "source": "data/casting_data/def_front/cast_def_0_1046.jpeg"
+      },
+      {
+        "id": "hu22-027",
+        "label": 1,
+        "path": "hu22-027.jpeg",
+        "sha256": "5a58735f2269b58868e25d14c015e292edeb470bc223c1438b2ff7ce2df01abf",
+        "source": "data/casting_data/def_front/cast_def_0_1137.jpeg"
+      },
+      {
+        "id": "hu22-028",
+        "label": 1,
+        "path": "hu22-028.jpeg",
+        "sha256": "2c5692db372730ce9a36501b0e0b9a1d9ebae82d1c66c50620016b7de089f043",
+        "source": "data/casting_data/def_front/cast_def_0_1157.jpeg"
+      },
+      {
+        "id": "hu22-029",
+        "label": 1,
+        "path": "hu22-029.jpeg",
+        "sha256": "32abf2ec52cb8e5e377ad6ca20fd4caf319ed724d678e2a5d4daf069c45dacba",
+        "source": "data/casting_data/def_front/cast_def_0_1188.jpeg"
+      },
+      {
+        "id": "hu22-030",
+        "label": 1,
+        "path": "hu22-030.jpeg",
+        "sha256": "3dd76716020ab82c7c26aaf918d74634e4238c599a1f5887315e85da2d526751",
+        "source": "data/casting_data/def_front/cast_def_0_1226.jpeg"
+      },
+      {
+        "id": "hu22-031",
+        "label": 1,
+        "path": "hu22-031.jpeg",
+        "sha256": "342508f58a680461b72626c5089ca2a2a8d613d1055f133f57e196cdd85c7b7a",
+        "source": "data/casting_data/def_front/cast_def_0_1350.jpeg"
+      },
+      {
+        "id": "hu22-032",
+        "label": 1,
+        "path": "hu22-032.jpeg",
+        "sha256": "eea10e6134d9281c2238298c43b13b0ba5b8efb5fdd98f0fe25462156daa769e",
+        "source": "data/casting_data/def_front/cast_def_0_1533.jpeg"
+      },
+      {
+        "id": "hu22-033",
+        "label": 1,
+        "path": "hu22-033.jpeg",
+        "sha256": "3dd23c520774e450b74565d0a8d8ed6e24e595dd8c4686d2ff06b91c061eb58b",
+        "source": "data/casting_data/def_front/cast_def_0_159.jpeg"
+      },
+      {
+        "id": "hu22-034",
+        "label": 1,
+        "path": "hu22-034.jpeg",
+        "sha256": "8f3e1b72c757b727395067bf6c816cb2c4ea308e77d8864b4e36cfb2876cc99a",
+        "source": "data/casting_data/def_front/cast_def_0_1596.jpeg"
+      },
+      {
+        "id": "hu22-035",
+        "label": 1,
+        "path": "hu22-035.jpeg",
+        "sha256": "820c600c4e4af281d700417b304253cdc797bf25a6f20408611c051306550145",
+        "source": "data/casting_data/def_front/cast_def_0_1609.jpeg"
+      },
+      {
+        "id": "hu22-036",
+        "label": 1,
+        "path": "hu22-036.jpeg",
+        "sha256": "d3e800098f9862c8c1e84b5c3137b1289beccc2ba65eff23e109081561da4fd1",
+        "source": "data/casting_data/def_front/cast_def_0_1721.jpeg"
+      },
+      {
+        "id": "hu22-037",
+        "label": 1,
+        "path": "hu22-037.jpeg",
+        "sha256": "c596800c36bbdab47a4a6f11cac5ebae1da1b7e9a28a7174be60160bc238e535",
+        "source": "data/casting_data/def_front/cast_def_0_1729.jpeg"
+      },
+      {
+        "id": "hu22-038",
+        "label": 1,
+        "path": "hu22-038.jpeg",
+        "sha256": "ae80561a23d0301015e01b0769a09e356f79113278884f47661d792344405a7a",
+        "source": "data/casting_data/def_front/cast_def_0_1815.jpeg"
+      },
+      {
+        "id": "hu22-039",
+        "label": 1,
+        "path": "hu22-039.jpeg",
+        "sha256": "cc1463e16169749829d4f76e6fb16a84cb3210b89b12aab4556b52c326e12e5a",
+        "source": "data/casting_data/def_front/cast_def_0_1831.jpeg"
+      },
+      {
+        "id": "hu22-040",
+        "label": 1,
+        "path": "hu22-040.jpeg",
+        "sha256": "451b8e7bb0b84d70e89139a0d7d5f876efb9d6c99385cd758373420c9fdb59e8",
+        "source": "data/casting_data/def_front/cast_def_0_2003.jpeg"
+      },
+      {
+        "id": "hu22-041",
+        "label": 1,
+        "path": "hu22-041.jpeg",
+        "sha256": "5fbb88329c71e93a7c85a36cfa997e0c5530ab484fa35fa8dba836ab2ea59bcc",
+        "source": "data/casting_data/def_front/cast_def_0_2220.jpeg"
+      },
+      {
+        "id": "hu22-042",
+        "label": 1,
+        "path": "hu22-042.jpeg",
+        "sha256": "bfb7d7e4647381362aafa0d0428aac3f0f5b1181cd334a372d80eaf7208509d1",
+        "source": "data/casting_data/def_front/cast_def_0_2485.jpeg"
+      },
+      {
+        "id": "hu22-043",
+        "label": 1,
+        "path": "hu22-043.jpeg",
+        "sha256": "6dbe1c287418e868b163407f049aea5a89e42f269ecd2fb08a707b5d7d5caba7",
+        "source": "data/casting_data/def_front/cast_def_0_2663.jpeg"
+      },
+      {
+        "id": "hu22-044",
+        "label": 1,
+        "path": "hu22-044.jpeg",
+        "sha256": "074d8d5f500d0313dedb88cfc151dd0c859c84970cd3f8c142281b1c2f1854da",
+        "source": "data/casting_data/def_front/cast_def_0_2820.jpeg"
+      },
+      {
+        "id": "hu22-045",
+        "label": 1,
+        "path": "hu22-045.jpeg",
+        "sha256": "0185a2d12a4b14207590e51061ffd4e3a64541b015956417a79e6fc26bf1f6f3",
+        "source": "data/casting_data/def_front/cast_def_0_2887.jpeg"
+      },
+      {
+        "id": "hu22-046",
+        "label": 1,
+        "path": "hu22-046.jpeg",
+        "sha256": "0e129a83c13281fa563f1bafd1bf0efff8d2577249139e36ae21d34cc336569a",
+        "source": "data/casting_data/def_front/cast_def_0_3056.jpeg"
+      },
+      {
+        "id": "hu22-047",
+        "label": 1,
+        "path": "hu22-047.jpeg",
+        "sha256": "31cca44d40f1e8299e2cb8d25ceb4c49cb5b1889a5cf31d68ad02f409a4917ba",
+        "source": "data/casting_data/def_front/cast_def_0_3104.jpeg"
+      },
+      {
+        "id": "hu22-048",
+        "label": 1,
+        "path": "hu22-048.jpeg",
+        "sha256": "1e5665395ac982c76c7733b46885bab2fe98c5337dc7f460c239ce8701220d28",
+        "source": "data/casting_data/def_front/cast_def_0_3114.jpeg"
+      },
+      {
+        "id": "hu22-049",
+        "label": 1,
+        "path": "hu22-049.jpeg",
+        "sha256": "9dbea1b67a8c9304ccd929953e195f1f69fd7ddcdfd9eb875ad94f84461d0185",
+        "source": "data/casting_data/def_front/cast_def_0_3179.jpeg"
+      }
+    ],
+    "max_absolute_difference": 2.9206275939941406e-06,
+    "mean_absolute_difference": 1.664506271481514e-07,
+    "passed": false,
+    "policy": {
+      "expected_count": 50,
+      "max_classification_discrepancies": 2,
+      "max_probability_difference": 0.0001,
+      "min_accuracy": 0.97,
+      "min_defect_recall": 0.95
+    },
+    "predictions": [
+      {
+        "id": "hu22-000",
+        "python": 0.0458267517387867,
+        "tfjs": 0.045826852321624756
+      },
+      {
+        "id": "hu22-001",
+        "python": 0.022409942001104355,
+        "tfjs": 0.022409776225686073
+      },
+      {
+        "id": "hu22-002",
+        "python": 0.05213019251823425,
+        "tfjs": 0.05212938040494919
+      },
+      {
+        "id": "hu22-003",
+        "python": 0.059041887521743774,
+        "tfjs": 0.05904196575284004
+      },
+      {
+        "id": "hu22-004",
+        "python": 0.03348696231842041,
+        "tfjs": 0.033487118780612946
+      },
+      {
+        "id": "hu22-005",
+        "python": 0.004565197043120861,
+        "tfjs": 0.004565225448459387
+      },
+      {
+        "id": "hu22-006",
+        "python": 0.00489254854619503,
+        "tfjs": 0.004892557859420776
+      },
+      {
+        "id": "hu22-007",
+        "python": 0.028405919671058655,
+        "tfjs": 0.028405888006091118
+      },
+      {
+        "id": "hu22-008",
+        "python": 0.0011847977293655276,
+        "tfjs": 0.0011847938876599073
+      },
+      {
+        "id": "hu22-009",
+        "python": 0.00818659644573927,
+        "tfjs": 0.008186581544578075
+      },
+      {
+        "id": "hu22-010",
+        "python": 0.30092647671699524,
+        "tfjs": 0.3009262681007385
+      },
+      {
+        "id": "hu22-011",
+        "python": 0.3237786889076233,
+        "tfjs": 0.32377889752388
+      },
+      {
+        "id": "hu22-012",
+        "python": 0.0013758856803178787,
+        "tfjs": 0.0013758778804913163
+      },
+      {
+        "id": "hu22-013",
+        "python": 0.05409625545144081,
+        "tfjs": 0.05409630760550499
+      },
+      {
+        "id": "hu22-014",
+        "python": 0.002982551231980324,
+        "tfjs": 0.0029825367964804173
+      },
+      {
+        "id": "hu22-015",
+        "python": 0.02130228281021118,
+        "tfjs": 0.021302297711372375
+      },
+      {
+        "id": "hu22-016",
+        "python": 0.030767856165766716,
+        "tfjs": 0.030767790973186493
+      },
+      {
+        "id": "hu22-017",
+        "python": 0.007956817746162415,
+        "tfjs": 0.007956882007420063
+      },
+      {
+        "id": "hu22-018",
+        "python": 0.37305936217308044,
+        "tfjs": 0.3730597496032715
+      },
+      {
+        "id": "hu22-019",
+        "python": 0.012323222123086452,
+        "tfjs": 0.012323133647441864
+      },
+      {
+        "id": "hu22-020",
+        "python": 0.1498989760875702,
+        "tfjs": 0.14989863336086273
+      },
+      {
+        "id": "hu22-021",
+        "python": 0.003081316826865077,
+        "tfjs": 0.003081302158534527
+      },
+      {
+        "id": "hu22-022",
+        "python": 0.0028801318258047104,
+        "tfjs": 0.0028801262378692627
+      },
+      {
+        "id": "hu22-023",
+        "python": 0.10732493549585342,
+        "tfjs": 0.10732430964708328
+      },
+      {
+        "id": "hu22-024",
+        "python": 0.03383698686957359,
+        "tfjs": 0.03383709862828255
+      },
+      {
+        "id": "hu22-025",
+        "python": 0.9998981952667236,
+        "tfjs": 0.9998981952667236
+      },
+      {
+        "id": "hu22-026",
+        "python": 1.0,
+        "tfjs": 1
+      },
+      {
+        "id": "hu22-027",
+        "python": 0.4710887372493744,
+        "tfjs": 0.4710886776447296
+      },
+      {
+        "id": "hu22-028",
+        "python": 0.9896607995033264,
+        "tfjs": 0.9896607995033264
+      },
+      {
+        "id": "hu22-029",
+        "python": 1.0,
+        "tfjs": 1
+      },
+      {
+        "id": "hu22-030",
+        "python": 1.0,
+        "tfjs": 1
+      },
+      {
+        "id": "hu22-031",
+        "python": 0.9992024898529053,
+        "tfjs": 0.9992024898529053
+      },
+      {
+        "id": "hu22-032",
+        "python": 0.3428502678871155,
+        "tfjs": 0.3428473472595215
+      },
+      {
+        "id": "hu22-033",
+        "python": 0.9999998807907104,
+        "tfjs": 0.9999998807907104
+      },
+      {
+        "id": "hu22-034",
+        "python": 0.9936173558235168,
+        "tfjs": 0.9936172962188721
+      },
+      {
+        "id": "hu22-035",
+        "python": 0.874754011631012,
+        "tfjs": 0.874752938747406
+      },
+      {
+        "id": "hu22-036",
+        "python": 1.0,
+        "tfjs": 1
+      },
+      {
+        "id": "hu22-037",
+        "python": 0.9992981553077698,
+        "tfjs": 0.9992981553077698
+      },
+      {
+        "id": "hu22-038",
+        "python": 0.9968303442001343,
+        "tfjs": 0.9968303442001343
+      },
+      {
+        "id": "hu22-039",
+        "python": 0.9999998807907104,
+        "tfjs": 0.9999998807907104
+      },
+      {
+        "id": "hu22-040",
+        "python": 0.9915262460708618,
+        "tfjs": 0.991526186466217
+      },
+      {
+        "id": "hu22-041",
+        "python": 0.9999351501464844,
+        "tfjs": 0.9999351501464844
+      },
+      {
+        "id": "hu22-042",
+        "python": 0.9995914697647095,
+        "tfjs": 0.9995914697647095
+      },
+      {
+        "id": "hu22-043",
+        "python": 0.9948081970214844,
+        "tfjs": 0.9948082566261292
+      },
+      {
+        "id": "hu22-044",
+        "python": 0.9881207942962646,
+        "tfjs": 0.9881207942962646
+      },
+      {
+        "id": "hu22-045",
+        "python": 0.853670597076416,
+        "tfjs": 0.8536701798439026
+      },
+      {
+        "id": "hu22-046",
+        "python": 0.971197783946991,
+        "tfjs": 0.971197783946991
+      },
+      {
+        "id": "hu22-047",
+        "python": 0.9998120069503784,
+        "tfjs": 0.9998120069503784
+      },
+      {
+        "id": "hu22-048",
+        "python": 0.9938138127326965,
+        "tfjs": 0.9938137531280518
+      },
+      {
+        "id": "hu22-049",
+        "python": 1.0,
+        "tfjs": 1
+      }
+    ],
+    "python": {
+      "accuracy": 0.94,
+      "confusion_matrix_0_ok_1_defect": [
+        [
+          22,
+          3
+        ],
+        [
+          0,
+          25
+        ]
+      ],
+      "precision": 0.8928571428571429,
+      "recall": 1.0
+    },
+    "sample_count": 50,
+    "scope": "python_vs_tfjs_cpu_preprocessed_tensors",
+    "tensorflowjs": {
+      "accuracy": 0.94,
+      "confusion_matrix_0_ok_1_defect": [
+        [
+          22,
+          3
+        ],
+        [
+          0,
+          25
+        ]
+      ],
+      "precision": 0.8928571428571429,
+      "recall": 1.0
+    },
+    "threshold": 0.24371959269046783
+  },
+  "model_sha256": "28f54a232e3dbdf2498cba8a5d8aa2002d9a312c560ce3acd818023b77ba949e",
+  "parity_failures": [],
+  "passed": true,
+  "runtime": {
+    "backend": "cpu",
+    "node": "v26.3.0",
+    "tfjs_version": "4.22.0"
+  },
+  "scope": "fresh_keras_vs_tfjs_cpu_identical_tensors_50",
+  "source_report_sha256": "70d1a08ef656f35b62a7802a69f12610b012671feaeb6efe9b43222818fd59c7",
+  "tensorflow": "2.20.0"
+}

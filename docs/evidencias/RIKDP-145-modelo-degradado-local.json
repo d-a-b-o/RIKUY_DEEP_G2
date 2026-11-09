@@ -1,0 +1,438 @@
+{
+  "gate_exit_code": 1,
+  "passed": true,
+  "provenance": {
+    "degraded_sha256": "df1154cb67bc9143c246fe5d4c00a05741175866514a9e4e1f5e61c256855835",
+    "mutation": "zero sigmoid kernel, bias=-12",
+    "scope": "deliberately_degraded_copy",
+    "source_sha256": "28f54a232e3dbdf2498cba8a5d8aa2002d9a312c560ce3acd818023b77ba949e",
+    "source_unchanged": true
+  },
+  "regression": {
+    "config_sha256": "28192de73e840541a16a6d20f06d653125eded69d4424a530f436644d3a77177",
+    "contract": {
+      "classes": {
+        "def_front": 1,
+        "ok_front": 0
+      },
+      "preprocessing": "ml.preprocessing.preprocess_image:rgb-bilinear-400x400-float32-0-1:v1",
+      "threshold": 0.26489877700805664
+    },
+    "discrepancies": 25,
+    "golden_manifest_sha256": "9a1fe3ac38fdfb363df5f665ffdb423951552f2b822b4eb7916b462a87e60678",
+    "max_discrepancies": 2,
+    "model_sha256": {
+      "baseline": "9664b2497f6b578e2f68a6b147cf991e1cbb8d2987d09c41222502346bfa05a1",
+      "candidate": "df1154cb67bc9143c246fe5d4c00a05741175866514a9e4e1f5e61c256855835"
+    },
+    "passed": false,
+    "rows": [
+      {
+        "changed": false,
+        "id": "hu22-000",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 0,
+        "original_probability": 0.0013369540683925152
+      },
+      {
+        "changed": false,
+        "id": "hu22-001",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 0,
+        "original_probability": 0.0005453356425277889
+      },
+      {
+        "changed": false,
+        "id": "hu22-002",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 0,
+        "original_probability": 0.002075785305351019
+      },
+      {
+        "changed": false,
+        "id": "hu22-003",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 0,
+        "original_probability": 0.0026767090894281864
+      },
+      {
+        "changed": false,
+        "id": "hu22-004",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 0,
+        "original_probability": 0.001108730211853981
+      },
+      {
+        "changed": false,
+        "id": "hu22-005",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 0,
+        "original_probability": 0.007834814488887787
+      },
+      {
+        "changed": false,
+        "id": "hu22-006",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 0,
+        "original_probability": 0.0074892244301736355
+      },
+      {
+        "changed": false,
+        "id": "hu22-007",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 0,
+        "original_probability": 0.000665373750962317
+      },
+      {
+        "changed": false,
+        "id": "hu22-008",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 0,
+        "original_probability": 0.00011760656343540177
+      },
+      {
+        "changed": false,
+        "id": "hu22-009",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 0,
+        "original_probability": 0.0006674216710962355
+      },
+      {
+        "changed": false,
+        "id": "hu22-010",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 0,
+        "original_probability": 0.06867551803588867
+      },
+      {
+        "changed": false,
+        "id": "hu22-011",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 0,
+        "original_probability": 0.027538638561964035
+      },
+      {
+        "changed": false,
+        "id": "hu22-012",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 0,
+        "original_probability": 0.001948872464708984
+      },
+      {
+        "changed": false,
+        "id": "hu22-013",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 0,
+        "original_probability": 0.0015677573392167687
+      },
+      {
+        "changed": false,
+        "id": "hu22-014",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 0,
+        "original_probability": 0.0008948573376983404
+      },
+      {
+        "changed": false,
+        "id": "hu22-015",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 0,
+        "original_probability": 0.0065061310306191444
+      },
+      {
+        "changed": false,
+        "id": "hu22-016",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 0,
+        "original_probability": 0.003786256071180105
+      },
+      {
+        "changed": false,
+        "id": "hu22-017",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 0,
+        "original_probability": 0.00015927386994007975
+      },
+      {
+        "changed": false,
+        "id": "hu22-018",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 0,
+        "original_probability": 0.07682127505540848
+      },
+      {
+        "changed": false,
+        "id": "hu22-019",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 0,
+        "original_probability": 0.002937715733423829
+      },
+      {
+        "changed": false,
+        "id": "hu22-020",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 0,
+        "original_probability": 0.009578796103596687
+      },
+      {
+        "changed": false,
+        "id": "hu22-021",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 0,
+        "original_probability": 0.00021343608386814594
+      },
+      {
+        "changed": false,
+        "id": "hu22-022",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 0,
+        "original_probability": 0.001569219515658915
+      },
+      {
+        "changed": false,
+        "id": "hu22-023",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 0,
+        "original_probability": 0.011621366254985332
+      },
+      {
+        "changed": false,
+        "id": "hu22-024",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 0,
+        "original_probability": 0.001949794590473175
+      },
+      {
+        "changed": true,
+        "id": "hu22-025",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 1,
+        "original_probability": 1.0
+      },
+      {
+        "changed": true,
+        "id": "hu22-026",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 1,
+        "original_probability": 1.0
+      },
+      {
+        "changed": true,
+        "id": "hu22-027",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 1,
+        "original_probability": 0.9993003606796265
+      },
+      {
+        "changed": true,
+        "id": "hu22-028",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 1,
+        "original_probability": 0.9999025464057922
+      },
+      {
+        "changed": true,
+        "id": "hu22-029",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 1,
+        "original_probability": 1.0
+      },
+      {
+        "changed": true,
+        "id": "hu22-030",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 1,
+        "original_probability": 1.0
+      },
+      {
+        "changed": true,
+        "id": "hu22-031",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 1,
+        "original_probability": 0.9999992251396179
+      },
+      {
+        "changed": true,
+        "id": "hu22-032",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 1,
+        "original_probability": 0.9968302845954895
+      },
+      {
+        "changed": true,
+        "id": "hu22-033",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 1,
+        "original_probability": 1.0
+      },
+      {
+        "changed": true,
+        "id": "hu22-034",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 1,
+        "original_probability": 0.9999963641166687
+      },
+      {
+        "changed": true,
+        "id": "hu22-035",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 1,
+        "original_probability": 0.9973462224006653
+      },
+      {
+        "changed": true,
+        "id": "hu22-036",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 1,
+        "original_probability": 1.0
+      },
+      {
+        "changed": true,
+        "id": "hu22-037",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 1,
+        "original_probability": 0.9999995231628418
+      },
+      {
+        "changed": true,
+        "id": "hu22-038",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 1,
+        "original_probability": 0.9999948740005493
+      },
+      {
+        "changed": true,
+        "id": "hu22-039",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 1,
+        "original_probability": 1.0
+      },
+      {
+        "changed": true,
+        "id": "hu22-040",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 1,
+        "original_probability": 0.9998644590377808
+      },
+      {
+        "changed": true,
+        "id": "hu22-041",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 1,
+        "original_probability": 1.0
+      },
+      {
+        "changed": true,
+        "id": "hu22-042",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 1,
+        "original_probability": 0.9999995231628418
+      },
+      {
+        "changed": true,
+        "id": "hu22-043",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 1,
+        "original_probability": 0.9992778897285461
+      },
+      {
+        "changed": true,
+        "id": "hu22-044",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 1,
+        "original_probability": 0.9999803304672241
+      },
+      {
+        "changed": true,
+        "id": "hu22-045",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 1,
+        "original_probability": 0.996255099773407
+      },
+      {
+        "changed": true,
+        "id": "hu22-046",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 1,
+        "original_probability": 0.9999231696128845
+      },
+      {
+        "changed": true,
+        "id": "hu22-047",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 1,
+        "original_probability": 0.9999997615814209
+      },
+      {
+        "changed": true,
+        "id": "hu22-048",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 1,
+        "original_probability": 0.9999960660934448
+      },
+      {
+        "changed": true,
+        "id": "hu22-049",
+        "new_prediction": 0,
+        "new_probability": 6.144174221844878e-06,
+        "original_prediction": 1,
+        "original_probability": 1.0
+      }
+    ],
+    "runtime": {
+      "python": "3.13.1",
+      "tensorflow": "2.20.0"
+    },
+    "scope": "real_keras_baseline_vs_candidate"
+  },
+  "scope": "local_negative_control_not_remote_ci"
+}

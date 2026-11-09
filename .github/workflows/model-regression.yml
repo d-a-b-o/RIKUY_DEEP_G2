@@ -4,6 +4,11 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
+    inputs:
+      degraded:
+        description: 'RIKDP-145: usar copia degradada; el job real debe FALLAR'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -64,12 +69,39 @@ jobs:
           if-no-files-found: error
       - name: Retrieve public Drive objects, verify hashes and pull with DVC
         run: python -m ml.regression_data
+      - name: Prepare deliberately degraded copy (manual negative control)
+        if: github.event_name == 'workflow_dispatch' && inputs.degraded
+        run: python -m ml.regression_negative --prepare-only --output reports/pt1-negative
       - name: Compare baseline and candidate (0-2 pass; 3+ fail)
+        if: github.event_name != 'workflow_dispatch' || !inputs.degraded
         run: python -m ml.regression
+      - name: RIKDP-145 real degraded model must fail this job
+        if: github.event_name == 'workflow_dispatch' && inputs.degraded
+        shell: bash
+        run: |
+          set +e
+          python -m ml.regression --config reports/pt1-negative/config.json
+          result=$?
+          echo "$result" > reports/pt1-negative/gate-exit-code.txt
+          exit "$result"
+      - name: Verify that failure was caused by real prediction differences
+        if: always() && github.event_name == 'workflow_dispatch' && inputs.degraded
+        run: >-
+          python -c "from pathlib import Path; from ml.workflow import read_json;
+          from ml.regression import write_json; from ml.regression_negative import verify_rejection;
+          code=int(Path('reports/pt1-negative/gate-exit-code.txt').read_text());
+          report=read_json('reports/regression/regression.json');
+          valid=verify_rejection(code,report);
+          write_json('reports/pt1-negative/verification.json',dict(passed=valid,gate_exit_code=code));
+          assert valid, 'No se acredito el rechazo del modelo degradado'"
       - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: hu22-real-regression-evidence
-          path: reports/regression/
+          path: |
+            reports/regression/
+            reports/pt1-negative/provenance.json
+            reports/pt1-negative/gate-exit-code.txt
+            reports/pt1-negative/verification.json
           retention-days: 14
           if-no-files-found: error
