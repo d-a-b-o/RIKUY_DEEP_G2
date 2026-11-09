@@ -180,6 +180,7 @@ describe("requiredPermission", () => {
     ["/panel/reportes/turno", "reportes:descargar"],
     ["/panel/catalogos", "catalogos:ver"],
     ["/panel/admin/usuarios", "usuarios:gestionar"],
+    ["/panel/dashboard", "dashboard:ver"],
   ])("%s exige %s", (path, permission) => {
     expect(requiredPermission(path)).toBe(permission);
   });

@@ -8,6 +8,7 @@ import { PanelNav } from "./panel-nav";
 const LINKS: readonly (PanelLink & { permission?: Permission })[] = [
   { href: "/panel", label: "Inicio", icon: "grid" },
   { href: "/panel/inspeccion", label: "Inspeccionar", icon: "scan", permission: "inspecciones:crear" },
+  { href: "/panel/dashboard", label: "Dashboard", icon: "alert", permission: "dashboard:ver" },
   { href: "/panel/inspecciones", label: "Historial", icon: "check", permission: "inspecciones:ver" },
   { href: "/panel/reportes", label: "Reportes", icon: "upload", permission: "reportes:descargar" },
   { href: "/panel/catalogos", label: "Catálogos", icon: "grid", permission: "catalogos:ver" },

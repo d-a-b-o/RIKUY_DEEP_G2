@@ -56,6 +56,9 @@
   --input-border: #74849a;
   --surface-raised: #eaf0f7;
   --primary-hover: #005465;
+  /* Gráficos del dashboard (HU37): validados para daltonismo; las defectuosas además van rayadas. */
+  --chart-ok: #0f84a6;
+  --chart-defect: #b42332;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -77,6 +80,8 @@
     --ring: #45d9ed;
     --input-border: #7b8da6;
     --surface-raised: #1a273a;
+    --chart-ok: #1a9fbd;
+    --chart-defect: #e85d63;
   }
 }
 
@@ -98,6 +103,8 @@
   --ring: #45d9ed;
   --input-border: #7b8da6;
   --surface-raised: #1a273a;
+  --chart-ok: #1a9fbd;
+  --chart-defect: #e85d63;
 }
 
 .theme-sun {
