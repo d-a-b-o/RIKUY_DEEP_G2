@@ -30,6 +30,9 @@ export async function loadInspectionModel(): Promise<InspectionModel> {
       if (window.cameraQA.predictionFails) throw new Error("Detalle interno que no debe mostrarse");
       return { verdict: "OK", confidence: 0.9, defectProbability: 0.1, thresholdApplied: 0.5, inferenceMs: 1 };
     },
+    tensorCount() {
+      return 0;
+    },
     dispose() {},
   };
 }
