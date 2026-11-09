@@ -19,7 +19,23 @@ export const AUTH_RATE_LIMITS = {
   "/sign-in/email": { window: 60, max: 10 },
   "/request-password-reset": { window: 15 * 60, max: 5 },
   "/reset-password": { window: 15 * 60, max: 10 },
+  // El límite real del código lo ponen los intentos por desafío y el bloqueo de la cuenta (HU29).
+  "/two-factor/*": { window: 60, max: 15 },
 } as const;
+
+/** Verificación en dos pasos (HU29). */
+export const TWO_FACTOR_ISSUER = "RikuyDeep";
+export const BACKUP_CODES_AMOUNT = 10;
+/** Días que un equipo marcado como de confianza no vuelve a pedir el código. */
+export const TRUST_DEVICE_DAYS = 30;
+/** Fallos seguidos del código que bloquean el segundo paso, y minutos de bloqueo. */
+export const TWO_FACTOR_MAX_FAILED_ATTEMPTS = 5;
+export const TWO_FACTOR_LOCK_MINUTES = 15;
+/** Página para configurar la verificación en dos pasos. */
+export const SECURITY_PATH = "/panel/cuenta/seguridad";
+
+/** Código de error propio: no se puede desactivar una 2FA obligatoria (HU29). */
+export const TWO_FACTOR_REQUIRED = "TWO_FACTOR_REQUIRED";
 
 /** Código de error propio para una cuenta bloqueada por intentos fallidos. */
 export const ACCOUNT_LOCKED = "ACCOUNT_LOCKED";
@@ -42,7 +58,7 @@ export function safeNextPath(next: string | null | undefined): string {
 type AuthError = { code?: string; status?: number } | null | undefined;
 
 /** Traduce los errores de Better Auth a mensajes para el usuario. */
-export function authErrorMessage(error: AuthError, flow: "sign-in" | "reset"): string {
+export function authErrorMessage(error: AuthError, flow: "sign-in" | "reset" | "two-factor"): string {
   if (error?.status === 429) {
     return "Hiciste demasiados intentos seguidos desde este equipo. Espera unos minutos y vuelve a intentarlo.";
   }
@@ -57,7 +73,21 @@ export function authErrorMessage(error: AuthError, flow: "sign-in" | "reset"): s
       return `La contraseña debe tener al menos ${MIN_PASSWORD_LENGTH} caracteres.`;
     case "PASSWORD_TOO_LONG":
       return `La contraseña no puede tener más de ${MAX_PASSWORD_LENGTH} caracteres.`;
+    case "INVALID_CODE":
+      return "El código no es correcto. Revisa la hora del móvil y escribe el código que aparece ahora.";
+    case "INVALID_BACKUP_CODE":
+      return "El código de respaldo no es válido o ya se usó.";
+    case "TOO_MANY_ATTEMPTS_REQUEST_NEW_CODE":
+    case "INVALID_TWO_FACTOR_COOKIE":
+      return "La verificación venció o tuvo demasiados intentos. Vuelve a ingresar con tu correo y contraseña.";
+    case "ACCOUNT_TEMPORARILY_LOCKED":
+      return `Demasiados códigos incorrectos. Espera ${TWO_FACTOR_LOCK_MINUTES} minutos o usa un código de respaldo.`;
+    case TWO_FACTOR_REQUIRED:
+      return "Tu cuenta debe tener la verificación en dos pasos activada; no puedes desactivarla.";
+    case "INVALID_PASSWORD":
+      return "La contraseña no es correcta.";
     default:
+      if (flow === "two-factor") return "No pudimos verificar el código. Vuelve a intentarlo en unos minutos.";
       return flow === "sign-in"
         ? "No pudimos iniciar sesión. Vuelve a intentarlo en unos minutos."
         : "No pudimos cambiar la contraseña. Vuelve a intentarlo en unos minutos.";

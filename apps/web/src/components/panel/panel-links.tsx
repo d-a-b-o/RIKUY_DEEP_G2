@@ -12,9 +12,9 @@ function isCurrent(pathname: string | null, href: string): boolean {
 export function PanelLinks({ links, pathname }: { links: readonly PanelLink[]; pathname: string | null }) {
   return (
     <nav aria-label="Panel">
-      <ul className="flex gap-2 lg:flex-col">
+      <ul className="flex flex-wrap gap-2 lg:flex-col lg:flex-nowrap">
         {links.map((link) => (
-          <li key={link.href} className="flex-1">
+          <li key={link.href} className="min-w-[8.5rem] flex-1 lg:min-w-0">
             <Link
               href={link.href}
               aria-current={isCurrent(pathname, link.href) ? "page" : undefined}

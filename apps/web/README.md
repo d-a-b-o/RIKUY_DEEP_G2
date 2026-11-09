@@ -16,6 +16,7 @@ npm run db:migrate           # aplica las migraciones a tu base de datos
 npm run db:seed              # datos de demostración (idempotente)
                              # con SEED_DEMO_PASSWORD crea un usuario por rol para probar /ingresar
 npm run create:superadmin    # crea un superadministrador (pide los datos por consola)
+npm run reset:two-factor     # quita la 2FA de una cuenta que perdió el móvil y los códigos
 ```
 
 La base de datos puede ser la rama `dev` de Neon o un PostgreSQL 16 local. Detalle en [docs/despliegue.md](../../docs/despliegue.md).
@@ -80,6 +81,7 @@ Al importar el repositorio en Vercel, configurar **Root Directory = `apps/web`**
 | `/recuperar`, `/restablecer` | Recuperación de contraseña (HU19) |
 | `/panel` | Área privada; requiere sesión |
 | `/panel/inspeccion` | Inspección con el modelo TF.js en el navegador: foto o cámara (HU26) |
+| `/panel/cuenta/seguridad` | Verificación en dos pasos: activar, códigos de respaldo y política de la planta (HU29) |
 | `/panel/admin/empresas` | Gestión de empresas del superadministrador: alta, edición, invitación del administrador y desactivación (HU23) |
 | `/invitacion?token=…` | Aceptar una invitación y crear la cuenta (HU23) |
 | `/api/auth/*` | API de Better Auth |
