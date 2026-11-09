@@ -51,6 +51,8 @@ El repositorio no contiene ningún secreto: las variables se configuran en Verce
    DIRECT_URL="<cadena directa de main>" npm run create:superadmin
    ```
 
+   Al entrar por primera vez, la app te pedirá activar la **verificación en dos pasos** (HU29): ten a mano una app autenticadora y guarda los códigos de respaldo. Si un día pierdes el móvil y los códigos, `DIRECT_URL="<cadena directa de main>" npm run reset:two-factor` le quita la 2FA a una cuenta para que la vuelva a activar.
+
    El script muestra a qué base se va a conectar y pide escribir `SI` antes de escribir nada. Luego pide el nombre, el correo y la contraseña (de 10 a 128 caracteres), que no se muestra en pantalla ni queda en el historial. Usa `DIRECT_URL` antes que `DATABASE_URL`, y lo pasado en la línea de comandos tiene prioridad sobre `.env.local`. Si el correo ya tiene cuenta, no cambia nada. Para cambiar la contraseña después, usa «¿Olvidaste tu contraseña?» en `/ingresar`.
 
 ## 2. Vercel (RIKDP-118)
