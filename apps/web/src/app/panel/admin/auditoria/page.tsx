@@ -59,7 +59,7 @@ async function DeniedAccessList() {
   }
 
   return (
-    <div className="ui-card overflow-x-auto">
+    <div className="ui-card overflow-x-auto" tabIndex={0} role="region" aria-label="Accesos denegados (se desplaza de lado)">
       <table className="w-full min-w-[640px] text-left text-sm">
         <caption className="sr-only">Accesos denegados más recientes</caption>
         <thead className="border-b border-border text-muted-foreground">
