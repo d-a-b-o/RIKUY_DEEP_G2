@@ -1,0 +1,34 @@
+{
+  "issue": "RIKDP-289",
+  "date": "2026-11-09",
+  "base": "98bbd550e2e694b418a02f93d61cffa764dee41b",
+  "scope": "documentation only; local validation",
+  "newMarkdownFiles": 4,
+  "relativeLinksChecked": 58,
+  "missingTargetsOrAnchors": [],
+  "mermaid": {
+    "version": "10.9.5",
+    "engine": "Chromium via Playwright",
+    "parsedAndRendered": 2,
+    "visualReview": "both reviewed",
+    "failures": []
+  },
+  "vitest": {
+    "version": "4.1.12",
+    "filesPassed": 6,
+    "testsPassed": 101,
+    "testsSkipped": 0,
+    "testsFailed": 0,
+    "durationSeconds": 3.90,
+    "databaseUrl": "empty to prevent database access",
+    "command": "vitest run src/lib/model/manifest.test.ts src/lib/model/preprocess.test.ts src/lib/model/loader.test.ts src/lib/storage/r2.test.ts src/lib/storage/sigv4.test.ts src/lib/inspections/rules.test.ts"
+  },
+  "secretScan": {
+    "scope": "four new Markdown documents plus manual review of diff",
+    "method": "heuristic patterns: private key, GitHub token, AWS access key, Postgres credential URI",
+    "matches": 0,
+    "limitation": "not a full repository security certification"
+  },
+  "diffCheck": "passed",
+  "notExecuted": ["physical webcam", "browser E2E", "database integration", "remote R2", "production", "model accuracy or latency certification"]
+}
