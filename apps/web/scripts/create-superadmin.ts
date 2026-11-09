@@ -49,7 +49,8 @@ function createPrompter() {
       const take = (line: string) => {
         muted = false;
         if (hidden && !stdin.isTTY) stdout.write("\n");
-        resolve(line.trim());
+        // La contraseña se guarda tal cual: el login no recorta espacios.
+        resolve(hidden ? line : line.trim());
       };
       const ready = queued.shift();
       if (ready !== undefined) take(ready);

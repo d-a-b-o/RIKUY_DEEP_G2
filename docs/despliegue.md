@@ -154,10 +154,14 @@ Las fotos de las inspecciones van en un bucket **distinto y privado** ([ADR 0005
 
 Sin estas variables la app funciona, pero no puede registrar inspecciones que guardan foto: responde `STORAGE_NOT_CONFIGURED`.
 
-## 4. Correo con Resend (aviso de solicitudes de demo)
+## 4. Correo con Resend (avisos de demo, recuperación e invitaciones)
 
 1. Crea una cuenta en [resend.com](https://resend.com) y una API key con permiso de envío.
-2. Para enviar desde un dominio propio, verifícalo en *Domains* y usa ese remitente en `LEAD_NOTIFICATION_FROM`. Sin dominio, `onboarding@resend.dev` solo puede enviar al correo de la cuenta de Resend.
+2. Para enviar desde un dominio propio, verifícalo en *Domains* y usa ese remitente en `AUTH_EMAIL_FROM` y `LEAD_NOTIFICATION_FROM`. Sin dominio, `onboarding@resend.dev` solo puede enviar al correo de la cuenta de Resend, así que la recuperación de contraseña y las invitaciones a otras personas fallan (en los logs: *«domain is not verified»*).
+
+   En producción el dominio es **`d-a-b-o.dev`** (DNS en Cloudflare, región de Resend São Paulo). Resend usa los registros MX y SPF del subdominio `send` y el DKIM `resend._domainkey`; el remitente es `RikuyDeep <cuentas@d-a-b-o.dev>`. La parte antes de `@` puede ser cualquiera y no necesita buzón.
+
+   Para recibir correo en `@d-a-b-o.dev`, Cloudflare **Email Routing** reenvía las direcciones del dominio a la cuenta compartida del equipo (con delegación de Gmail para cada integrante). Sus MX están en la raíz del dominio y no chocan con los de Resend. Para responder como `@d-a-b-o.dev` desde Gmail se usa «Enviar como» con el SMTP de Resend (`smtp.resend.com`, puerto 465, usuario `resend`, contraseña = una API key con acceso solo de envío).
 3. Sin `RESEND_API_KEY`, las solicitudes de demo **se guardan igual** en la tabla `lead`; solo se omite el aviso por correo.
 
 ## 5. Variables de entorno
@@ -169,7 +173,7 @@ Referencia completa con valores de ejemplo en [`apps/web/.env.example`](../apps/
 | `DATABASE_URL` | Sí | Conexión de la aplicación (con pooler en Neon) |
 | `DIRECT_URL` | Para migraciones y seed | Conexión directa para Prisma Migrate. Si falta, se usa `DATABASE_URL_UNPOOLED` o `DATABASE_URL` |
 | `BETTER_AUTH_SECRET` | Sí, en producción | Firma de sesiones y tokens de Better Auth (HU19) |
-| `AUTH_EMAIL_FROM` | No | Remitente del correo de recuperación de contraseña. Si falta, se usa `LEAD_NOTIFICATION_FROM` |
+| `AUTH_EMAIL_FROM` | No | Remitente de la recuperación de contraseña y de las invitaciones (HU23). Si falta, se usa `LEAD_NOTIFICATION_FROM` |
 | `SEED_DEMO_PASSWORD` | No | Contraseña de los usuarios de demostración del seed |
 | `RESEND_API_KEY` | No | Envío del aviso de nuevos leads y del correo de recuperación de contraseña. Sin ella, en desarrollo el enlace de recuperación se escribe en la consola |
 | `LEAD_NOTIFICATION_TO` | Con Resend | Destinatarios del aviso, separados por comas |
