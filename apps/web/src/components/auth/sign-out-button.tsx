@@ -1,11 +1,9 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { authClient } from "@/lib/auth/client";
 
 export function SignOutButton() {
-  const router = useRouter();
   const [pending, startTransition] = useTransition();
 
   return (
@@ -15,8 +13,9 @@ export function SignOutButton() {
       onClick={() =>
         startTransition(async () => {
           await authClient.signOut();
-          router.replace("/ingresar");
-          router.refresh();
+          // Navegación completa: descarta la caché del router con las páginas de la sesión.
+          // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- se busca justo una carga completa
+          window.location.assign("/ingresar");
         })
       }
       className="ui-button ui-button-secondary"
