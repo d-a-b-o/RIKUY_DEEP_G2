@@ -14,7 +14,7 @@ export function PanelLinks({ links, pathname }: { links: readonly PanelLink[]; p
     <nav aria-label="Panel">
       <ul className="flex flex-wrap gap-2 lg:flex-col lg:flex-nowrap">
         {links.map((link) => (
-          <li key={link.href} className="flex-auto">
+          <li key={link.href} className="min-w-[8.5rem] flex-1 lg:min-w-0">
             <Link
               href={link.href}
               aria-current={isCurrent(pathname, link.href) ? "page" : undefined}

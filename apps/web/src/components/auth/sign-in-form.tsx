@@ -6,6 +6,7 @@ import { useState, useTransition } from "react";
 import { authClient } from "@/lib/auth/client";
 import { authErrorMessage, safeNextPath } from "@/lib/auth/config";
 import { Field, FormAlert, inputClass, submitClass } from "./fields";
+import { TwoFactorStep } from "./two-factor-step";
 
 type Errors = { email?: string; password?: string };
 
@@ -15,6 +16,15 @@ export function SignInForm() {
   const [errors, setErrors] = useState<Errors>({});
   const [alert, setAlert] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [secondStep, setSecondStep] = useState(false);
+
+  function finish() {
+    // Next conserva el estado de las páginas visitadas: sin esto, tras cerrar
+    // sesión /ingresar volvería a mostrar el paso del código.
+    setSecondStep(false);
+    router.replace(next);
+    router.refresh();
+  }
 
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -30,14 +40,22 @@ export function SignInForm() {
     if (found.email || found.password) return;
 
     startTransition(async () => {
-      const { error } = await authClient.signIn.email({ email, password });
+      const { data: result, error } = await authClient.signIn.email({ email, password });
       if (error) {
         setAlert(authErrorMessage(error, "sign-in"));
         return;
       }
-      router.replace(next);
-      router.refresh();
+      // Con 2FA (HU29) la contraseña es correcta, pero la sesión llega tras el código.
+      if (result && "twoFactorRedirect" in result && result.twoFactorRedirect) {
+        setSecondStep(true);
+        return;
+      }
+      finish();
     });
+  }
+
+  if (secondStep) {
+    return <TwoFactorStep onVerified={finish} onCancel={() => setSecondStep(false)} />;
   }
 
   return (
