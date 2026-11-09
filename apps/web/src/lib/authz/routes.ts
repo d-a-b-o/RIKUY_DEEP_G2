@@ -14,6 +14,10 @@ export interface RouteRule {
 
 // Orden: de lo más específico a lo más general.
 export const ROUTE_RULES: readonly RouteRule[] = [
+  // Pantallas ya construidas, dentro de /panel (protegido por src/proxy.ts).
+  { prefix: "/panel/admin/empresas", permission: "empresas:gestionar" },
+  { prefix: "/panel/inspeccion", permission: "inspecciones:crear" },
+  // Previstas por las historias.
   { prefix: "/admin/empresas", permission: "empresas:gestionar" },
   { prefix: "/admin/modelos", permission: "modelos:gestionar" },
   { prefix: "/admin/usuarios", permission: "usuarios:gestionar" },

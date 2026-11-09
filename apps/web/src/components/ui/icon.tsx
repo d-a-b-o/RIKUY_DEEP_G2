@@ -1,5 +1,6 @@
-type IconName =
+export type IconName =
   | "grid"
+  | "building"
   | "scan"
   | "arrow"
   | "shield"
@@ -10,6 +11,7 @@ type IconName =
 
 const paths: Record<IconName, string> = {
   grid: "M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z",
+  building: "M4 21V5l8-3v19M12 9h8v12M4 21h17M8 7v.1M8 11v.1M8 15v.1M16 13v.1M16 17v.1",
   scan: "M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5M7 12h10M12 7v10",
   arrow: "M5 12h14m-6-6 6 6-6 6",
   shield: "M12 3 3 7v5c0 5 9 9 9 9s9-4 9-9V7l-9-4Zm-4 9 3 3 5-6",

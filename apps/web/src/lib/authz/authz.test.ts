@@ -25,8 +25,15 @@ describe("matriz de permisos", () => {
     expect([...ROLES].sort()).toEqual(Object.values(PrismaRole).sort());
   });
 
-  it("el Superadmin tiene todos los permisos", () => {
-    for (const p of PERMISSIONS) expect(can(superadmin, p)).toBe(true);
+  it("el Superadmin opera la plataforma y no la planta", () => {
+    const plataforma = ["empresas:gestionar", "modelos:gestionar", "leads:gestionar", "monitoreo:ver", "auditoria:ver"];
+    for (const p of PERMISSIONS) expect(can(superadmin, p)).toBe(plataforma.includes(p));
+  });
+
+  it("coincide con las reglas de trazabilidad de HU24: el Superadmin no inspecciona ni corrige", () => {
+    expect(can(superadmin, "inspecciones:crear")).toBe(false);
+    expect(can(superadmin, "veredictos:corregir")).toBe(false);
+    expect(can(superadmin, "inspecciones:ver")).toBe(false);
   });
 
   it.each([
@@ -51,11 +58,10 @@ describe("matriz de permisos", () => {
     expect(can(user, permission)).toBe(expected);
   });
 
-  it("los permisos crecen de Visualizador a Superadmin", () => {
+  it("los permisos de planta crecen de Visualizador a Admin", () => {
     const n = (r: (typeof ROLES)[number]) => permissionsFor(r).length;
     expect(n("VIEWER")).toBeLessThan(n("INSPECTOR"));
     expect(n("INSPECTOR")).toBeLessThan(n("ADMIN"));
-    expect(n("ADMIN")).toBeLessThan(n("SUPERADMIN"));
   });
 });
 
@@ -77,8 +83,8 @@ describe("check", () => {
     expect(can(admin, "catalogos:gestionar", { empresaId: "emp-A" })).toBe(true);
   });
 
-  it("el Superadmin puede actuar sobre cualquier empresa", () => {
-    expect(can(superadmin, "usuarios:gestionar", { empresaId: "emp-B" })).toBe(true);
+  it("el Superadmin gestiona cualquier empresa", () => {
+    expect(can(superadmin, "empresas:gestionar", { empresaId: "emp-B" })).toBe(true);
   });
 });
 
@@ -144,6 +150,9 @@ describe("requiredPermission", () => {
     ["/inspecciones/42", "inspecciones:ver"],
     ["/api/catalogos/piezas", "catalogos:gestionar"],
     ["/dashboard", "dashboard:ver"],
+    ["/panel/admin/empresas", "empresas:gestionar"],
+    ["/panel/admin/empresas/123", "empresas:gestionar"],
+    ["/panel/inspeccion", "inspecciones:crear"],
   ])("%s exige %s", (path, permission) => {
     expect(requiredPermission(path)).toBe(permission);
   });

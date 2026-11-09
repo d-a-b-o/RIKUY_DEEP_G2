@@ -1,7 +1,7 @@
 import "server-only";
 import { randomUUID } from "node:crypto";
 import { hashPassword } from "better-auth/crypto";
-import type { PrismaClient, Role } from "@/generated/prisma/client";
+import type { Prisma, PrismaClient, Role } from "@/generated/prisma/client";
 import { getDb } from "@/lib/db";
 
 export type NewCredentialUser = {
@@ -19,7 +19,10 @@ export type NewCredentialUser = {
  * El registro público está desactivado; lo usan el seed, las pruebas y, más
  * adelante, la aceptación de invitaciones (HU23, HU30).
  */
-export async function createCredentialUser(input: NewCredentialUser, db: PrismaClient = getDb()) {
+export async function createCredentialUser(
+  input: NewCredentialUser,
+  db: PrismaClient | Prisma.TransactionClient = getDb(),
+) {
   const userId = randomUUID();
   const password = await hashPassword(input.password);
   return db.user.create({

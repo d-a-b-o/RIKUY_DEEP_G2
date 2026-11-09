@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
 import { PanelShell } from "@/components/panel/panel-shell";
-import { getCurrentUser } from "@/lib/auth/session";
+import { can } from "@/lib/authz";
+import { getCurrentUser, toAuthzUser } from "@/lib/auth/session";
 import { Icon } from "@/components/ui/icon";
 
 export const metadata: Metadata = {
@@ -54,7 +55,7 @@ async function Welcome() {
         <div>
           <dt className="text-sm text-muted-foreground">Empresa</dt>
           <dd className="font-medium">
-            {user.companyName ?? "Todas (superadministrador)"}
+            {user.companyName ?? "Plataforma (superadministrador)"}
           </dd>
         </div>
         <div>
@@ -62,23 +63,56 @@ async function Welcome() {
           <dd className="break-all font-medium">{user.email}</dd>
         </div>
       </dl>
-      <div className="mx-6 mb-6 flex flex-col gap-6 rounded-xl border border-primary/30 bg-primary/5 p-6 sm:mx-9 sm:mb-9 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-start gap-4">
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <Icon name="scan" className="h-6 w-6" />
-          </span>
-          <div>
-            <h2 className="font-semibold">Empieza una inspección</h2>
-            <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-              Sube una imagen o utiliza la cámara para analizar una pieza.
-            </p>
-          </div>
-        </div>
-        <Link href="/panel/inspeccion" className="ui-button shrink-0">
-          Inspeccionar una pieza
-          <Icon name="arrow" />
-        </Link>
-      </div>
+      {can(toAuthzUser(user), "inspecciones:crear") ? (
+        <NextStep
+          icon="scan"
+          title="Empieza una inspección"
+          text="Sube una imagen o utiliza la cámara para analizar una pieza."
+          href="/panel/inspeccion"
+          action="Inspeccionar una pieza"
+        />
+      ) : null}
+      {can(toAuthzUser(user), "empresas:gestionar") ? (
+        <NextStep
+          icon="building"
+          title="Gestiona las empresas"
+          text="Da de alta una planta, invita a su administrador o desactiva su acceso."
+          href="/panel/admin/empresas"
+          action="Ver empresas"
+        />
+      ) : null}
     </section>
+  );
+}
+
+function NextStep({
+  icon,
+  title,
+  text,
+  href,
+  action,
+}: {
+  icon: "scan" | "building";
+  title: string;
+  text: string;
+  href: string;
+  action: string;
+}) {
+  return (
+    <div className="mx-6 mb-6 flex flex-col gap-6 rounded-xl border border-primary/30 bg-primary/5 p-6 sm:mx-9 sm:mb-9 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex items-start gap-4">
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <Icon name={icon} className="h-6 w-6" />
+        </span>
+        <div>
+          <h2 className="font-semibold">{title}</h2>
+          <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">{text}</p>
+        </div>
+      </div>
+      <Link href={href} className="ui-button shrink-0">
+        {action}
+        <Icon name="arrow" />
+      </Link>
+    </div>
   );
 }

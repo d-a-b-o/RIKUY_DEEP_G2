@@ -64,3 +64,39 @@ export async function deleteAccount(account: TestAccount): Promise<void> {
     await client.query(`DELETE FROM company WHERE name = $1`, [account.companyName]);
   });
 }
+
+/** Superadministrador de plataforma (sin empresa) para las pruebas de HU23. */
+export async function createSuperadmin(): Promise<TestAccount> {
+  const suffix = randomUUID().slice(0, 8);
+  const account: TestAccount = {
+    email: `e2e-sa-${suffix}@rikuydeep.test`,
+    name: `Superadmin E2E ${suffix}`,
+    password: TEST_PASSWORD,
+    companyName: "",
+  };
+  const password = await hashPassword(account.password);
+  await withClient(async (client) => {
+    const userId = randomUUID();
+    await client.query("BEGIN");
+    await client.query(
+      `INSERT INTO "user" (id, company_id, name, email, email_verified, role, updated_at)
+       VALUES ($1, NULL, $2, $3, true, 'SUPERADMIN', now())`,
+      [userId, account.name, account.email],
+    );
+    await client.query(
+      `INSERT INTO account (id, user_id, account_id, provider_id, password, updated_at)
+       VALUES ($1, $2, $2, 'credential', $3, now())`,
+      [randomUUID(), userId, password],
+    );
+    await client.query("COMMIT");
+  });
+  return account;
+}
+
+/** Borra una empresa creada desde la interfaz, con sus usuarios e invitaciones. */
+export async function deleteCompanyByName(name: string): Promise<void> {
+  await withClient(async (client) => {
+    await client.query(`DELETE FROM "user" WHERE company_id IN (SELECT id FROM company WHERE name = $1)`, [name]);
+    await client.query(`DELETE FROM company WHERE name = $1`, [name]);
+  });
+}
