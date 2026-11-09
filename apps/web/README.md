@@ -54,7 +54,7 @@ apps/web/
 │   └── seed.ts           # datos de demostración
 ├── src/app/              # rutas (App Router)
 ├── src/components/       # componentes (landing, marca)
-├── src/lib/              # lógica compartida: db.ts, auth/, leads/, model/
+├── src/lib/              # lógica compartida: db.ts, auth/, authz/, companies/, invitations/, leads/, model/
 ├── src/generated/        # cliente de Prisma generado (no se versiona)
 ├── public/               # archivos estáticos
 ├── playwright.config.ts
@@ -79,10 +79,12 @@ Al importar el repositorio en Vercel, configurar **Root Directory = `apps/web`**
 | `/recuperar`, `/restablecer` | Recuperación de contraseña (HU19) |
 | `/panel` | Área privada; requiere sesión |
 | `/panel/inspeccion` | Inspección con el modelo TF.js en el navegador: foto o cámara (HU26) |
+| `/panel/admin/empresas` | Gestión de empresas del superadministrador: alta, edición, invitación del administrador y desactivación (HU23) |
+| `/invitacion?token=…` | Aceptar una invitación y crear la cuenta (HU23) |
 | `/api/auth/*` | API de Better Auth |
 
 Detalle de la autenticación en [docs/arquitectura/autenticacion.md](../../docs/arquitectura/autenticacion.md).
 
 ## Nota sobre Next.js 16
 
-El antiguo `middleware.ts` ahora se llama **`proxy.ts`** (`src/proxy.ts`). Hoy hace la comprobación optimista de sesión en `/panel`. Las protecciones por rol de HU32 también van ahí.
+El antiguo `middleware.ts` ahora se llama **`proxy.ts`** (`src/proxy.ts`). Hoy hace la comprobación optimista de sesión en `/panel`. Los permisos por rol (HU32) los comprueba cada página con `getPageAccess()` y cada Server Action con `authorize()` (`src/lib/authz`).

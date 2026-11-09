@@ -86,7 +86,7 @@ function createAuth() {
       },
     },
     hooks: {
-      // Antes de comprobar la contraseña: cuentas bloqueadas o desactivadas.
+      // Antes de comprobar la contraseña: cuentas bloqueadas, desactivadas o de empresas desactivadas.
       before: createAuthMiddleware(async (ctx) => {
         if (ctx.path !== SIGN_IN_PATH) return;
         const email = emailFromBody(ctx.body);
@@ -94,9 +94,11 @@ function createAuth() {
         if ((await getLockState(email)).locked) throw lockedError();
         const user = await getDb().user.findUnique({
           where: { email: email.trim().toLowerCase() },
-          select: { active: true },
+          select: { active: true, company: { select: { status: true } } },
         });
-        if (user && !user.active) {
+        // Cuenta o empresa desactivada (HU23, criterio 3). Mismo error que una
+        // contraseña incorrecta, para no revelar qué cuentas existen.
+        if (user && (!user.active || user.company?.status === "INACTIVE")) {
           throw new APIError("UNAUTHORIZED", {
             code: "INVALID_EMAIL_OR_PASSWORD",
             message: "Invalid email or password",

@@ -46,3 +46,44 @@ export async function sendPasswordResetEmail({ to, name, url }: PasswordResetEma
   // No se relanza: la respuesta al usuario debe ser la misma exista o no la cuenta.
   if (error) console.error("No se pudo enviar el correo de recuperación", error.message);
 }
+
+type InvitationEmail = { to: string; name: string; companyName: string; url: string; days: number };
+
+/**
+ * Envía la invitación a crear la cuenta (HU23-T02). Devuelve false si no se
+ * pudo enviar, para que la pantalla ofrezca copiar el enlace.
+ */
+export async function sendInvitationEmail({ to, name, companyName, url, days }: InvitationEmail): Promise<boolean> {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    if (process.env.NODE_ENV !== "production") {
+      console.info(`[desarrollo] Invitación para ${to}: ${url}`);
+    }
+    return false;
+  }
+
+  const from = process.env.AUTH_EMAIL_FROM ?? process.env.LEAD_NOTIFICATION_FROM ?? "RikuyDeep <onboarding@resend.dev>";
+  const text = [
+    `Hola, ${name}:`,
+    "",
+    `Te invitamos a administrar ${companyName} en RikuyDeep, la plataforma de inspección de piezas de fundición.`,
+    "Abre este enlace para crear tu cuenta y elegir tu contraseña:",
+    "",
+    url,
+    "",
+    `El enlace vence en ${days} días y solo se puede usar una vez.`,
+    "Si no esperabas esta invitación, ignora este correo.",
+  ].join("\n");
+
+  const { error } = await new Resend(apiKey).emails.send({
+    from,
+    to,
+    subject: `Invitación para administrar ${companyName} en RikuyDeep`,
+    text,
+  });
+  if (error) {
+    console.error("No se pudo enviar la invitación", error.message);
+    return false;
+  }
+  return true;
+}

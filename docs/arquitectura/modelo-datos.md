@@ -306,11 +306,11 @@ Con estaciones automáticas, cada una registra unas 28 800 inspecciones por turn
 
 ## Roles
 
-Resumen de la matriz de permisos de HU32. El detalle por acción se implementa en RIKDP-179.
+Resumen de la matriz de permisos de HU32. El detalle por acción está en [`apps/web/src/lib/authz`](../../apps/web/src/lib/authz/README.md).
 
 | Rol | Alcance |
 | --- | --- |
-| `SUPERADMIN` | Plataforma: empresas, leads, monitoreo y versiones del modelo |
+| `SUPERADMIN` | Plataforma: empresas, leads, monitoreo y versiones del modelo. No inspecciona, no corrige y no ve datos de las empresas |
 | `ADMIN` | Su empresa: usuarios, catálogos, lotes, turnos, dashboard y reportes |
 | `INSPECTOR` | Su empresa: inspeccionar, corregir veredictos y ver el historial |
 | `VIEWER` | Su empresa: solo lectura de dashboard, historial y reportes |

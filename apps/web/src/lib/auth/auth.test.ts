@@ -113,6 +113,19 @@ describe.skipIf(!process.env.DATABASE_URL)("autenticación (HU19)", async () => 
       expect(await response.json()).toMatchObject({ code: "INVALID_EMAIL_OR_PASSWORD" });
     });
 
+    it("los usuarios de una empresa desactivada no pueden entrar (HU23)", async () => {
+      const user = await newUser();
+      await db.company.update({ where: { id: companyId }, data: { status: "INACTIVE" } });
+      try {
+        const response = await signIn(user.email, PASSWORD);
+        expect(response.status).toBe(401);
+        expect((await response.json()).code).toBe("INVALID_EMAIL_OR_PASSWORD");
+      } finally {
+        await db.company.update({ where: { id: companyId }, data: { status: "ACTIVE" } });
+      }
+      expect((await signIn(user.email, PASSWORD)).status).toBe(200);
+    });
+
     it("un login correcto pone a cero los intentos fallidos", async () => {
       const user = await newUser();
       await signIn(user.email, "mal-1");

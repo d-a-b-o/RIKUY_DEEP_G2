@@ -17,10 +17,10 @@ Inicio de sesión, bloqueo por intentos y recuperación de contraseña con [Bett
 
 ## Decisiones
 
-- **Sin registro público.** `disableSignUp: true`. Las cuentas las crea un administrador (HU23, HU30). Mientras tanto, el seed y las pruebas crean usuarios con `createCredentialUser()`, que usa el mismo hash scrypt que Better Auth.
+- **Sin registro público.** `disableSignUp: true`. Las cuentas se crean al aceptar una invitación ([empresas e invitaciones](empresas-e-invitaciones.md), HU23; HU30 para los usuarios de planta). El seed y las pruebas usan `createCredentialUser()`, que usa el mismo hash scrypt que Better Auth.
 - **Sesión en base de datos**, cookie `HttpOnly`. Dura 8 horas (un turno) y se renueva cada hora de uso.
 - **Las pantallas llaman a `/api/auth` desde el navegador** y no desde una Server Action. Así el rate limit de Better Auth, que solo actúa sobre peticiones HTTP, protege también el formulario.
-- **Doble comprobación.** `proxy.ts` solo mira si existe la cookie, sin ir a la base, para redirigir rápido. La comprobación que cuenta la hace `getCurrentUser()` en cada página: valida la sesión y que la cuenta siga activa. Los permisos por rol se añaden en HU32.
+- **Doble comprobación.** `proxy.ts` solo mira si existe la cookie, sin ir a la base, para redirigir rápido. La comprobación que cuenta la hace `getCurrentUser()` en cada página: valida la sesión, que la cuenta siga activa y que su empresa no esté desactivada. Los permisos por rol los comprueba `getPageAccess()` (HU32).
 - **Instancia perezosa.** `getAuth()` crea Better Auth en la primera petición, así `next build` no necesita la base ni `BETTER_AUTH_SECRET`.
 
 ## Inicio de sesión y bloqueo (criterio 1)

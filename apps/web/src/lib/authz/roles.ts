@@ -20,7 +20,7 @@ export const ROLE_LABELS: Record<Role, string> = {
 
 /** Permisos con formato `recurso:accion`. */
 export const PERMISSIONS = [
-  "empresas:gestionar", // EP07 · alta y edición de empresas (multiempresa)
+  "empresas:gestionar", // HU23 · alta, edición y desactivación de empresas
   "usuarios:gestionar", // HU30 · usuarios de mi planta
   "catalogos:ver", // HU31
   "catalogos:gestionar", // HU31 · piezas, moldes, lotes y turnos
@@ -31,13 +31,17 @@ export const PERMISSIONS = [
   "reportes:descargar", // HU37
   "modelos:gestionar", // versiones del modelo TF.js
   "auditoria:ver", // HU32 · accesos denegados registrados
+  "leads:gestionar", // solicitudes de demo de la landing
+  "monitoreo:ver", // HU43 · salud de la aplicación y del modelo
 ] as const;
 export type Permission = (typeof PERMISSIONS)[number];
 
 const LECTURA: Permission[] = ["catalogos:ver", "inspecciones:ver", "dashboard:ver", "reportes:descargar"];
 
 export const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
-  SUPERADMIN: PERMISSIONS,
+  // Opera la plataforma, no la planta (modelo-datos.md, ADR 0003): no pertenece a
+  // ninguna empresa, así que no inspecciona, no corrige y no ve datos de clientes.
+  SUPERADMIN: ["empresas:gestionar", "modelos:gestionar", "leads:gestionar", "monitoreo:ver", "auditoria:ver"],
   ADMIN: [
     ...LECTURA,
     "usuarios:gestionar",

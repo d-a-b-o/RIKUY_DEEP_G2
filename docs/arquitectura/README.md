@@ -9,6 +9,7 @@ Documentos relacionados:
 - [Modelo de datos](modelo-datos.md) (RIKDP-87)
 - [Inferencia en el navegador y manifest de modelos](inferencia-navegador.md) (RIKDP-88)
 - [Autenticación](autenticacion.md) (HU19)
+- [Empresas e invitaciones](empresas-e-invitaciones.md) (HU23)
 - [Acta de la revisión de arquitectura](revisiones/2026-11-01-hu08.md) (RIKDP-89)
 - [Decisiones de arquitectura (ADR)](../adr/README.md)
 - [Identidad visual](../identidad-visual.md)
