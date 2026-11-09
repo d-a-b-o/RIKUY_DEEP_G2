@@ -7,7 +7,8 @@
  *   await authorize(user, "catalogos:gestionar", { empresaId });
  *
  * Si no tiene permiso lanza ForbiddenError (status 403) y registra el intento
- * con el registrador configurado (HU32-T03 lo conectará a Prisma).
+ * con el registrador configurado. En el servidor, src/instrumentation.ts instala
+ * el que guarda en la tabla access_denied_log (HU32-T03, ./denied-log.ts).
  */
 import { isRole, ROLE_PERMISSIONS, type Permission, type Role } from "./roles";
 
@@ -33,10 +34,21 @@ export interface DeniedAccess {
   empresaId: string | null;
   /** Ruta o acción que se intentó usar, p. ej. "/catalogos" o "crearPieza". */
   path?: string;
+  /** Método HTTP (GET, POST…). Sin indicar, se trata de una server action o un servicio. */
+  method?: string;
+  /** IP de origen. El registrador guarda solo su hash (HU32-T03). */
+  ip?: string | null;
   at: Date;
 }
 
 export type DeniedAccessLogger = (entry: DeniedAccess) => void | Promise<void>;
+
+/** Datos de la petición que se guardan junto al intento denegado. */
+export interface RequestInfo {
+  path?: string;
+  method?: string;
+  ip?: string | null;
+}
 
 export class ForbiddenError extends Error {
   readonly status = 403 as const;
@@ -49,13 +61,55 @@ export class ForbiddenError extends Error {
   }
 }
 
-let logger: DeniedAccessLogger = (entry) => {
+const consoleLogger: DeniedAccessLogger = (entry) => {
   console.warn("[authz] acceso denegado", JSON.stringify(entry));
 };
 
+/**
+ * El registrador vive en globalThis y no en una variable del módulo: Next.js
+ * empaqueta instrumentation.ts, las páginas y las server actions por separado,
+ * y cada paquete tendría su propia copia de este archivo. Así, el registrador
+ * que instala src/instrumentation.ts lo usan todos.
+ */
+const LOGGER_KEY = Symbol.for("rikuydeep.authz.deniedAccessLogger");
+const loggerHolder = globalThis as unknown as Record<symbol, DeniedAccessLogger | undefined>;
+
+function currentLogger(): DeniedAccessLogger {
+  return loggerHolder[LOGGER_KEY] ?? consoleLogger;
+}
+
 /** Reemplaza el registrador de accesos denegados (p. ej. para guardarlos en la base de datos). */
 export function setDeniedAccessLogger(next: DeniedAccessLogger): void {
-  logger = next;
+  loggerHolder[LOGGER_KEY] = next;
+}
+
+/** Registra un intento denegado sin propagar errores: un fallo al registrar nunca abre el acceso. */
+export async function logDeniedAccess(entry: DeniedAccess, logger: DeniedAccessLogger = currentLogger()): Promise<void> {
+  try {
+    await logger(entry);
+  } catch (error) {
+    console.error("[authz] no se pudo registrar el acceso denegado", error);
+  }
+}
+
+/** Datos que se registran cuando `check` deniega. */
+export function deniedEntry(
+  user: AuthzUser | null | undefined,
+  permission: Permission,
+  reason: DenialReason,
+  request: RequestInfo = {},
+): DeniedAccess {
+  return {
+    userId: user?.id ?? null,
+    role: user?.role ?? null,
+    permission,
+    reason,
+    empresaId: user?.empresaId ?? null,
+    path: request.path,
+    method: request.method,
+    ip: request.ip,
+    at: new Date(),
+  };
 }
 
 export interface Decision {
@@ -91,26 +145,13 @@ export function can(user: AuthzUser | null | undefined, permission: Permission, 
 export async function authorize(
   user: AuthzUser | null | undefined,
   permission: Permission,
-  target: AuthzTarget & { path?: string } = {},
+  target: AuthzTarget & RequestInfo = {},
 ): Promise<void> {
   const decision = check(user, permission, target);
   if (decision.allowed) return;
 
   const reason = decision.reason ?? "SIN_PERMISO";
-  try {
-    await logger({
-      userId: user?.id ?? null,
-      role: user?.role ?? null,
-      permission,
-      reason,
-      empresaId: user?.empresaId ?? null,
-      path: target.path,
-      at: new Date(),
-    });
-  } catch (error) {
-    // Un fallo al registrar nunca debe convertir un 403 en acceso permitido.
-    console.error("[authz] no se pudo registrar el acceso denegado", error);
-  }
+  await logDeniedAccess(deniedEntry(user, permission, reason, target));
   throw new ForbiddenError(permission, reason);
 }
 

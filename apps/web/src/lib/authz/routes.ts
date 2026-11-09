@@ -1,9 +1,10 @@
 /**
  * HU32 · Acceder según mi rol (RIKDP-43) — permisos por ruta.
  *
- * El proxy de Next.js 16, antes llamado middleware (HU32-T02), usará requiredPermission(pathname) para
- * cortar con 403 antes de renderizar la página. Las rutas son las previstas en
- * las historias; ajústalas cuando existan las pantallas reales.
+ * El proxy de Next.js 16, antes llamado middleware (src/proxy.ts, HU32-T02), usa
+ * requiredPermission(pathname) para responder 403 antes de renderizar la página.
+ * Las rutas fuera de /panel son las previstas en las historias; muévelas a
+ * /panel cuando existan las pantallas reales.
  */
 import type { Permission } from "./roles";
 
@@ -12,10 +13,14 @@ export interface RouteRule {
   permission: Permission;
 }
 
+/** Página que el proxy muestra, con estado 403, cuando el rol no alcanza. */
+export const FORBIDDEN_PATH = "/panel/sin-permiso";
+
 // Orden: de lo más específico a lo más general.
 export const ROUTE_RULES: readonly RouteRule[] = [
   // Pantallas ya construidas, dentro de /panel (protegido por src/proxy.ts).
   { prefix: "/panel/admin/empresas", permission: "empresas:gestionar" },
+  { prefix: "/panel/admin/auditoria", permission: "auditoria:ver" },
   { prefix: "/panel/inspeccion", permission: "inspecciones:crear" },
   // Previstas por las historias.
   { prefix: "/admin/empresas", permission: "empresas:gestionar" },

@@ -4,6 +4,8 @@ import {
   authorize,
   can,
   check,
+  clientIp,
+  FORBIDDEN_PATH,
   ForbiddenError,
   forbiddenResponse,
   PERMISSIONS,
@@ -135,6 +137,20 @@ describe("authorize", () => {
     error.mockRestore();
   });
 
+  it("guarda el método y la IP de la petición cuando se indican", async () => {
+    await expect(
+      authorize(inspector, "usuarios:gestionar", { path: "/panel/admin/usuarios", method: "GET", ip: "10.0.0.7" }),
+    ).rejects.toBeInstanceOf(ForbiddenError);
+    expect(registros[0]).toMatchObject({ method: "GET", ip: "10.0.0.7" });
+  });
+
+  it("el registrador se comparte entre copias del módulo (vive en globalThis)", async () => {
+    vi.resetModules();
+    const otraCopia = await import("./authorize");
+    await expect(otraCopia.authorize(visor, "usuarios:gestionar")).rejects.toBeInstanceOf(otraCopia.ForbiddenError);
+    expect(registros).toHaveLength(1);
+  });
+
   it("forbiddenResponse devuelve un 403 JSON", async () => {
     const res = forbiddenResponse(new ForbiddenError("usuarios:gestionar", "SIN_PERMISO"));
     expect(res.status).toBe(403);
@@ -153,6 +169,7 @@ describe("requiredPermission", () => {
     ["/panel/admin/empresas", "empresas:gestionar"],
     ["/panel/admin/empresas/123", "empresas:gestionar"],
     ["/panel/inspeccion", "inspecciones:crear"],
+    ["/panel/admin/auditoria", "auditoria:ver"],
   ])("%s exige %s", (path, permission) => {
     expect(requiredPermission(path)).toBe(permission);
   });
@@ -164,5 +181,21 @@ describe("requiredPermission", () => {
   it("las rutas públicas no exigen permiso", () => {
     expect(requiredPermission("/")).toBeNull();
     expect(requiredPermission("/login")).toBeNull();
+  });
+
+  it("la página del aviso 403 no exige permiso (si no, el proxy entraría en bucle)", () => {
+    expect(requiredPermission(FORBIDDEN_PATH)).toBeNull();
+    expect(requiredPermission("/panel")).toBeNull();
+  });
+});
+
+describe("clientIp", () => {
+  it("toma la primera IP de x-forwarded-for", () => {
+    expect(clientIp(new Headers({ "x-forwarded-for": "190.1.2.3, 10.0.0.1" }))).toBe("190.1.2.3");
+  });
+
+  it("usa x-real-ip si no hay x-forwarded-for, y null si no hay ninguna", () => {
+    expect(clientIp(new Headers({ "x-real-ip": "190.9.9.9" }))).toBe("190.9.9.9");
+    expect(clientIp(new Headers())).toBeNull();
   });
 });
