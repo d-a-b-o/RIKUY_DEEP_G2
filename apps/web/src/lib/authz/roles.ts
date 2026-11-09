@@ -50,7 +50,8 @@ export const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     "veredictos:corregir",
     "auditoria:ver",
   ],
-  INSPECTOR: [...LECTURA, "inspecciones:crear", "veredictos:corregir"],
+  // HU38, criterio 3: el reporte de fin de turno lo descargan solo Admin de planta y Visualizador.
+  INSPECTOR: [...LECTURA.filter((p) => p !== "reportes:descargar"), "inspecciones:crear", "veredictos:corregir"],
   VIEWER: LECTURA,
   // ADR 0007: cuenta técnica de una estación; registra inspecciones de línea y lee el lote y turno activos.
   STATION: ["catalogos:ver", "inspecciones:crear"],

@@ -20,7 +20,7 @@ Los roles son los del enum `Role` de Prisma: `SUPERADMIN`, `ADMIN` (admin de pla
 | catalogos:ver | | ✅ | ✅ | ✅ | ✅ |
 | inspecciones:ver | | ✅ | ✅ | ✅ | |
 | dashboard:ver | | ✅ | ✅ | ✅ | |
-| reportes:descargar | | ✅ | ✅ | ✅ | |
+| reportes:descargar | | ✅ | | ✅ | |
 
 El Superadmin opera la plataforma (empresas, modelos, leads, monitoreo y auditoría), no la planta: no pertenece a ninguna empresa, así que no inspecciona, no corrige veredictos y no ve datos de los clientes. Coincide con las reglas de trazabilidad de `src/lib/inspections/rules.ts` (HU24).
 
