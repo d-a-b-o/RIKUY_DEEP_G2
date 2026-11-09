@@ -25,6 +25,7 @@ export const ROUTE_RULES: readonly RouteRule[] = [
   { prefix: "/panel/inspecciones", permission: "inspecciones:ver" },
   { prefix: "/panel/reportes", permission: "reportes:descargar" },
   { prefix: "/panel/catalogos", permission: "catalogos:ver" },
+  { prefix: "/panel/admin/usuarios", permission: "usuarios:gestionar" },
   // Previstas por las historias.
   { prefix: "/admin/empresas", permission: "empresas:gestionar" },
   { prefix: "/admin/modelos", permission: "modelos:gestionar" },

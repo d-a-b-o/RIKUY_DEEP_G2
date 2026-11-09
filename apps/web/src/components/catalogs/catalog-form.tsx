@@ -20,7 +20,7 @@ export type FieldSpec = {
 };
 
 /**
- * Formulario de catálogo (HU31/HU33): campos simples, una intención y un
+ * Formulario de catálogo (HU31/HU33; también lo usa HU30): campos simples, una intención y un
  * mensaje de resultado. Tras guardar, el formulario de alta se vacía.
  */
 export function CatalogForm({
@@ -32,7 +32,10 @@ export function CatalogForm({
   variant = "primary",
   confirm,
   inline = false,
+  action = catalogAction,
 }: {
+  /** Server Action que recibe el formulario. Por defecto, la de catálogos; HU30 pasa la de usuarios. */
+  action?: (previous: CatalogFormState, form: FormData) => Promise<CatalogFormState>;
   intent: string;
   id?: string;
   fields?: FieldSpec[];
@@ -42,7 +45,7 @@ export function CatalogForm({
   confirm?: string;
   inline?: boolean;
 }) {
-  const [state, formAction, pending] = useActionState(catalogAction, initialState);
+  const [state, formAction, pending] = useActionState(action, initialState);
   const errors = state.status === "error" ? state.fields : {};
   const values = state.status === "error" ? state.values : {};
   const formKey = state.status === "saved" ? state.at : "form";
