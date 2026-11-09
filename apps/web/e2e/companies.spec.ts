@@ -3,6 +3,7 @@ import AxeBuilder from "@axe-core/playwright";
 import type { Page } from "@playwright/test";
 import { expect, test } from "./fixtures";
 import { SignInPage } from "./pages/sign-in-page";
+import { totpCode } from "./support/totp";
 import {
   createSuperadmin,
   deleteAccount,
@@ -25,7 +26,7 @@ async function signInAs(page: Page, email: string, password: string) {
 test.skip(!hasDatabase(), "Necesita DATABASE_URL para crear usuarios de prueba.");
 
 test.describe("Empresas (superadministrador)", () => {
-  let superadmin: TestAccount;
+  let superadmin: TestAccount & { totpSecret: string };
   const companyName = `Fundición E2E ${randomUUID().slice(0, 8)}`;
   const adminEmail = `e2e-admin-${randomUUID().slice(0, 8)}@rikuydeep.test`;
 
@@ -44,6 +45,7 @@ test.describe("Empresas (superadministrador)", () => {
     async ({ page, signInPage, browser }) => {
       await signInPage.goto("/panel/admin/empresas");
       await signInPage.signIn(superadmin.email, superadmin.password);
+      await signInPage.completeTwoFactor(await totpCode(superadmin.totpSecret));
       await expect(page).toHaveURL(/\/panel\/admin\/empresas$/);
       await expect(page.getByRole("link", { name: "Inspeccionar" })).toHaveCount(0);
 
@@ -117,7 +119,7 @@ test("un usuario de planta no puede entrar a la gestión de empresas", { tag: "@
 });
 
 test.describe("Empresas: responsive y accesibilidad", () => {
-  let superadmin: TestAccount;
+  let superadmin: TestAccount & { totpSecret: string };
   const companyName = `Fundición Responsive ${randomUUID().slice(0, 8)}`;
 
   test.beforeEach(async () => {
@@ -135,6 +137,7 @@ test.describe("Empresas: responsive y accesibilidad", () => {
   }) => {
     await signInPage.goto("/panel/admin/empresas/nueva");
     await signInPage.signIn(superadmin.email, superadmin.password);
+    await signInPage.completeTwoFactor(await totpCode(superadmin.totpSecret));
     await expect(page).toHaveURL(/\/nueva$/);
     const datos = page.getByRole("group", { name: "Datos de la empresa" });
     const administrador = page.getByRole("group", { name: "Administrador de la planta" });

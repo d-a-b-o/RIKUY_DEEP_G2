@@ -10,54 +10,16 @@
  * Better Auth, así que la cuenta entra por /ingresar como cualquier otra.
  */
 import { randomUUID } from "node:crypto";
-import { stdin, stdout } from "node:process";
-import { createInterface, type Interface } from "node:readline";
 import { hashPassword } from "better-auth/crypto";
 import { config } from "dotenv";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH } from "../src/lib/auth/config";
+import { createPrompter } from "./prompt";
 
 config({ path: [".env.local", ".env"], quiet: true });
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-/** Lee todas las líneas de stdin de antemano cuando no es una terminal (por ejemplo, en pruebas). */
-function createPrompter() {
-  const rl: Interface & { _writeToOutput?: (text: string) => void } = createInterface({
-    input: stdin,
-    output: stdout,
-    terminal: stdin.isTTY,
-  });
-  const queued: string[] = [];
-  const waiting: ((line: string) => void)[] = [];
-  let muted = false;
-  const write = rl._writeToOutput?.bind(rl);
-  rl._writeToOutput = (text: string) => {
-    if (!muted || text.includes("\n")) write?.(muted ? "\n" : text);
-  };
-  rl.on("line", (line) => {
-    const next = waiting.shift();
-    if (next) next(line);
-    else queued.push(line);
-  });
-
-  function ask(question: string, hidden = false): Promise<string> {
-    stdout.write(question);
-    muted = hidden && Boolean(stdin.isTTY);
-    return new Promise((resolve) => {
-      const take = (line: string) => {
-        muted = false;
-        if (hidden && !stdin.isTTY) stdout.write("\n");
-        resolve(line.trim());
-      };
-      const ready = queued.shift();
-      if (ready !== undefined) take(ready);
-      else waiting.push(take);
-    });
-  }
-  return { ask, close: () => rl.close() };
-}
 
 function databaseLabel(connectionString: string): string {
   try {

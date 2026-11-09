@@ -195,10 +195,16 @@ model Verification {
 }
 
 model TwoFactor {
-  id          String @id
-  userId      String @unique @map("user_id")
-  secret      String
-  backupCodes String @map("backup_codes")
+  id                      String    @id
+  userId                  String    @unique @map("user_id")
+  /// Secreto TOTP cifrado con BETTER_AUTH_SECRET.
+  secret                  String
+  /// Códigos de respaldo cifrados; cada uno sirve una vez.
+  backupCodes             String    @map("backup_codes")
+  /// false mientras no se confirme el primer código (HU29, criterio 1).
+  verified                Boolean   @default(true)
+  failedVerificationCount Int       @default(0) @map("failed_verification_count")
+  lockedUntil             DateTime? @map("locked_until") @db.Timestamptz(3)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 

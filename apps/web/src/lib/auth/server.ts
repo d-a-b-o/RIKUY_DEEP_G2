@@ -1,22 +1,30 @@
 import "server-only";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { APIError, createAuthMiddleware, isAPIError } from "better-auth/api";
+import { APIError, createAuthMiddleware, getSessionFromCtx, isAPIError } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
+import { twoFactor } from "better-auth/plugins";
 import { headers } from "next/headers";
 import { getDb } from "@/lib/db";
 import { getSiteUrl } from "@/lib/site";
 import {
   ACCOUNT_LOCKED,
   AUTH_RATE_LIMITS,
+  BACKUP_CODES_AMOUNT,
   MAX_PASSWORD_LENGTH,
   MIN_PASSWORD_LENGTH,
   RESET_PASSWORD_TOKEN_MINUTES,
   SESSION_EXPIRES_IN_SECONDS,
   SESSION_UPDATE_AGE_SECONDS,
+  TRUST_DEVICE_DAYS,
+  TWO_FACTOR_REQUIRED,
+  TWO_FACTOR_ISSUER,
+  TWO_FACTOR_LOCK_MINUTES,
+  TWO_FACTOR_MAX_FAILED_ATTEMPTS,
 } from "./config";
 import { sendPasswordResetEmail } from "./emails";
 import { getLockState, registerFailedLogin, resetFailedLogins } from "./lockout";
+import { isTwoFactorRequired } from "./two-factor-policy";
 
 const SIGN_IN_PATH = "/sign-in/email";
 
@@ -34,6 +42,25 @@ function lockedError(): APIError {
 function emailFromBody(body: unknown): string | null {
   const email = (body as { email?: unknown } | undefined)?.email;
   return typeof email === "string" && email.length > 0 ? email : null;
+}
+
+/**
+ * Quien tiene 2FA obligatoria (superadmin o empresa que la exige) no puede
+ * desactivarla (HU29, criterio 3). La interfaz oculta el botón; esto es la defensa real.
+ */
+async function assertTwoFactorOptional(ctx: Parameters<typeof getSessionFromCtx>[0]): Promise<void> {
+  const session = await getSessionFromCtx(ctx);
+  if (!session) return;
+  const user = await getDb().user.findUnique({
+    where: { id: session.user.id },
+    select: { role: true, company: { select: { requireTwoFactor: true } } },
+  });
+  if (user && isTwoFactorRequired(user)) {
+    throw new APIError("FORBIDDEN", {
+      code: TWO_FACTOR_REQUIRED,
+      message: "La verificación en dos pasos es obligatoria para esta cuenta",
+    });
+  }
 }
 
 function createAuth() {
@@ -83,11 +110,16 @@ function createAuth() {
         "/sign-in/email": AUTH_RATE_LIMITS["/sign-in/email"],
         "/request-password-reset": AUTH_RATE_LIMITS["/request-password-reset"],
         "/reset-password": AUTH_RATE_LIMITS["/reset-password"],
+        "/two-factor/*": AUTH_RATE_LIMITS["/two-factor/*"],
       },
     },
     hooks: {
       // Antes de comprobar la contraseña: cuentas bloqueadas, desactivadas o de empresas desactivadas.
       before: createAuthMiddleware(async (ctx) => {
+        if (ctx.path === "/two-factor/disable") {
+          await assertTwoFactorOptional(ctx);
+          return;
+        }
         if (ctx.path !== SIGN_IN_PATH) return;
         const email = emailFromBody(ctx.body);
         if (!email) return;
@@ -120,8 +152,22 @@ function createAuth() {
         await resetFailedLogins({ email });
       }),
     },
-    // Debe ir al final: guarda las cookies de sesión al llamar a auth.api desde el servidor.
-    plugins: [nextCookies()],
+    plugins: [
+      // HU29: TOTP con app autenticadora y códigos de respaldo. El secreto y los
+      // códigos se guardan cifrados con BETTER_AUTH_SECRET.
+      twoFactor({
+        issuer: TWO_FACTOR_ISSUER,
+        trustDeviceMaxAge: TRUST_DEVICE_DAYS * 24 * 60 * 60,
+        backupCodeOptions: { amount: BACKUP_CODES_AMOUNT, length: 10, storeBackupCodes: "encrypted" },
+        accountLockout: {
+          enabled: true,
+          maxFailedAttempts: TWO_FACTOR_MAX_FAILED_ATTEMPTS,
+          durationSeconds: TWO_FACTOR_LOCK_MINUTES * 60,
+        },
+      }),
+      // Debe ir al final: guarda las cookies de sesión al llamar a auth.api desde el servidor.
+      nextCookies(),
+    ],
   });
 }
 
