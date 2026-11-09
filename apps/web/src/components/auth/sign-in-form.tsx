@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
 import { authClient } from "@/lib/auth/client";
 import { authErrorMessage, safeNextPath } from "@/lib/auth/config";
@@ -11,7 +11,6 @@ import { TwoFactorStep } from "./two-factor-step";
 type Errors = { email?: string; password?: string };
 
 export function SignInForm() {
-  const router = useRouter();
   const next = safeNextPath(useSearchParams().get("next"));
   const [errors, setErrors] = useState<Errors>({});
   const [alert, setAlert] = useState<string | null>(null);
@@ -22,8 +21,9 @@ export function SignInForm() {
     // Next conserva el estado de las páginas visitadas: sin esto, tras cerrar
     // sesión /ingresar volvería a mostrar el paso del código.
     setSecondStep(false);
-    router.replace(next);
-    router.refresh();
+    // Navegación completa: la caché del router puede guardar una redirección
+    // al login pedida mientras no había sesión, y reutilizarla tras entrar.
+    window.location.assign(next);
   }
 
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
