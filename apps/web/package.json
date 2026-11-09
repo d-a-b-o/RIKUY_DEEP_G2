@@ -10,6 +10,7 @@
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run --passWithNoTests",
     "test:e2e": "playwright test",
+    "test:camera": "playwright test --config playwright.camera.config.ts",
     "test:smoke": "playwright test --grep @smoke",
     "postinstall": "prisma generate && node scripts/copy-tfjs-wasm.mjs",
     "db:migrate": "prisma migrate dev",

@@ -15,6 +15,8 @@ const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${port}`;
 
 export default defineConfig({
   testDir: "./e2e",
+  // Harness aislado; se ejecuta explícitamente con playwright.camera.config.ts.
+  testIgnore: "**/camera-exploratory.spec.ts",
   outputDir: "./test-results",
   fullyParallel: true,
   forbidOnly: isCI,
