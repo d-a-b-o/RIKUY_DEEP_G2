@@ -50,6 +50,10 @@ describe("matriz de permisos", () => {
     ["VIEWER", "dashboard:ver", true],
     ["VIEWER", "inspecciones:ver", true],
     ["VIEWER", "inspecciones:crear", false],
+    // HU38, criterio 3: el reporte de turno es de Admin de planta y Visualizador.
+    ["VIEWER", "reportes:descargar", true],
+    ["ADMIN", "reportes:descargar", true],
+    ["INSPECTOR", "reportes:descargar", false],
     ["VIEWER", "veredictos:corregir", false],
     ["STATION", "inspecciones:crear", true],
     ["STATION", "catalogos:ver", true],
@@ -172,6 +176,8 @@ describe("requiredPermission", () => {
     ["/panel/admin/auditoria", "auditoria:ver"],
     ["/panel/inspecciones", "inspecciones:ver"],
     ["/panel/inspecciones/123", "inspecciones:ver"],
+    ["/panel/reportes", "reportes:descargar"],
+    ["/panel/reportes/turno", "reportes:descargar"],
   ])("%s exige %s", (path, permission) => {
     expect(requiredPermission(path)).toBe(permission);
   });
