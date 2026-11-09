@@ -17,6 +17,7 @@
     "db:seed": "prisma db seed",
     "db:check": "prisma migrate diff --from-config-datasource --to-schema prisma/schema.prisma --exit-code",
     "create:superadmin": "tsx scripts/create-superadmin.ts",
+    "reset:two-factor": "tsx scripts/reset-two-factor.ts",
     "build:vercel": "prisma migrate deploy && next build"
   },
   "dependencies": {
@@ -29,6 +30,7 @@
     "better-auth": "1.7.15",
     "next": "16.4.3",
     "pg": "^8.23.1",
+    "qrcode": "^1.5.4",
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "resend": "^6.37.0",
@@ -41,6 +43,7 @@
     "@tailwindcss/turbopack": "^4",
     "@types/node": "^26",
     "@types/pg": "^8.23.1",
+    "@types/qrcode": "^1.5.6",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "dotenv": "^18.0.9",

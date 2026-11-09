@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { hashPassword } from "better-auth/crypto";
+import { generateRandomString, hashPassword, symmetricEncrypt } from "better-auth/crypto";
 import { Client } from "pg";
 
 /**
@@ -65,8 +65,35 @@ export async function deleteAccount(account: TestAccount): Promise<void> {
   });
 }
 
-/** Superadministrador de plataforma (sin empresa) para las pruebas de HU23. */
-export async function createSuperadmin(): Promise<TestAccount> {
+/**
+ * Activa la verificación en dos pasos de una cuenta directamente en la base,
+ * igual que la deja Better Auth (HU29). Devuelve el secreto TOTP en claro para
+ * que la prueba genere los códigos con totpCode().
+ */
+export async function enableTwoFactor(email: string): Promise<{ totpSecret: string; backupCodes: string[] }> {
+  const key = process.env.BETTER_AUTH_SECRET;
+  if (!key) throw new Error("Las pruebas de 2FA necesitan BETTER_AUTH_SECRET");
+  const totpSecret = generateRandomString(32);
+  const backupCodes = Array.from({ length: 10 }, () => generateRandomString(10, "a-z", "0-9", "A-Z")).map(
+    (code) => `${code.slice(0, 5)}-${code.slice(5)}`,
+  );
+  const secret = await symmetricEncrypt({ key, data: totpSecret });
+  const codes = await symmetricEncrypt({ key, data: JSON.stringify(backupCodes) });
+  await withClient(async (client) => {
+    const { rows } = await client.query<{ id: string }>(
+      `UPDATE "user" SET two_factor_enabled = true WHERE email = $1 RETURNING id`,
+      [email],
+    );
+    await client.query(
+      `INSERT INTO two_factor (id, user_id, secret, backup_codes, verified) VALUES ($1, $2, $3, $4, true)`,
+      [randomUUID(), rows[0].id, secret, codes],
+    );
+  });
+  return { totpSecret, backupCodes };
+}
+
+/** Superadministrador de plataforma (sin empresa), con 2FA ya activada como exige HU29. */
+export async function createSuperadmin(): Promise<TestAccount & { totpSecret: string }> {
   const suffix = randomUUID().slice(0, 8);
   const account: TestAccount = {
     email: `e2e-sa-${suffix}@rikuydeep.test`,
@@ -90,7 +117,8 @@ export async function createSuperadmin(): Promise<TestAccount> {
     );
     await client.query("COMMIT");
   });
-  return account;
+  const { totpSecret } = await enableTwoFactor(account.email);
+  return { ...account, totpSecret };
 }
 
 /** Borra una empresa creada desde la interfaz, con sus usuarios e invitaciones. */
