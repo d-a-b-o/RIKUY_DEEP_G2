@@ -5,4 +5,4 @@ numpy==2.5.4
 pillow==13.0.0
 dvc==3.67.1
 # Pruebas del contrato de entrada con TensorFlow real (PT1).
-pytest>=8,<10
+pytest>=9.2.0,<10
