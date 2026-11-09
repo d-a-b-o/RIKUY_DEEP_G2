@@ -30,6 +30,7 @@ npm run lint         # ESLint
 npm run typecheck    # tipos (next typegen + tsc)
 npm test             # pruebas (Vitest); las de base de datos se ejecutan si hay DATABASE_URL
 npm run test:e2e     # pruebas de sistema (Playwright); requiere npm run build antes
+npm run test:camera  # exploración aislada de cámara simulada; requiere build, no DB/modelo
 npm run test:smoke   # solo la prueba de humo (@smoke), la misma que corre en CI
                      # la prueba del modelo real necesita E2E_MODEL_DIR con una copia del bucket
 npm run db:migrate   # crea y aplica una migración tras cambiar prisma/schema.prisma
@@ -44,6 +45,10 @@ Las pantallas privadas requieren PostgreSQL de pruebas. Los casos de inferencia
 real y cámara simulada también requieren los fixtures `E2E_MODEL_DIR`, descritos
 en `e2e/inspection.spec.ts`; no usan la cámara física.
 Auditoría, capturas y resultados de RIKDP-274: [docs/ui-ux](../../docs/ui-ux/RIKDP-274-resultados.md).
+Validación exploratoria de cámara, límites del flujo HU35 y reproducción de
+RIKDP-288: [informe y evidencias](../../docs/ui-ux/RIKDP-288-resultados.md).
+`test:camera` usa el Inspector real con dobles de cámara/modelo; las pruebas de
+`camera-flow.spec.ts` usan la ruta autenticada y TF.js real con dispositivo ficticio.
 
 ## Estructura
 

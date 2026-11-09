@@ -15,7 +15,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
       - run: pip install -r ml/requirements-ci.txt
@@ -43,7 +43,7 @@ jobs:
       TF_ENABLE_ONEDNN_OPTS: '0'
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           # numpy 2.5 exige Python >= 3.12; 3.12 es también la versión de Colab.
           python-version: '3.12'

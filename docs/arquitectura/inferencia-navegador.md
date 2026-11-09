@@ -8,6 +8,8 @@ Decisiones relacionadas: [ADR 0002 · inferencia en el navegador](../adr/0002-in
 
 ## Implementación (HU26)
 
+Estado de integración manual auditado en `98bbd55` (2026-11-09): [HU35](inspeccion-manual-hu35.md), [contratos](inspeccion-manual-contratos.md) y [reproducción](../pruebas/hu35-reproduccion.md). Las secciones de diseño de registro/telemetría no demuestran que el inspector manual las invoque; actualmente su resultado permanece local. Las versiones y métricas históricas de este documento no sustituyen consultar el manifest efectivo ni ejecutar el quality gate.
+
 | Pieza | Archivo |
 | --- | --- |
 | Manifest, versión activa y veredicto | `apps/web/src/lib/model/manifest.ts` |
@@ -177,7 +179,7 @@ veredicto = DEFECTIVE si p ≥ threshold, OK en otro caso
 confianza = p si DEFECTIVE, 1 − p si OK
 ```
 
-La función `classify()` de `apps/web/src/lib/model/manifest.ts` lo implementa y tiene pruebas. Se guardan en la inspección `predicted_verdict`, `confidence`, `threshold_applied` y `model_version_id`.
+La función `classify()` de `apps/web/src/lib/model/manifest.ts` lo implementa y tiene pruebas. El servicio de registro HU24 permite guardar `predicted_verdict`, `confidence`, `threshold_applied` y `model_version_id`; la pantalla manual aún no llama a dicho servicio.
 
 Con un umbral de 0,2649, una pieza con `p = 0,30` es **defectuosa con confianza 0,30**. Es lo esperado: el umbral bajo prioriza no dejar pasar defectos. La interfaz debe mostrar el veredicto de forma destacada y la confianza como dato secundario.
 
