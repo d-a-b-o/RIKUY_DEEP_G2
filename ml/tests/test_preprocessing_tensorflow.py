@@ -9,7 +9,7 @@ import os
 
 import numpy as np
 import pytest
-from ml.preprocessing import make_tf_dataset
+from ml.preprocessing import make_tf_dataset, preprocess_image
 from PIL import Image
 
 
@@ -83,3 +83,13 @@ def test_augmented_training_inputs_stay_in_contract(tmp_path, tf):
     images, labels = next(iter(make_tf_dataset([path], [1], training=True, batch_size=1, seed=84)))
     assert_batch(images, labels, 1, tf)
     np.testing.assert_array_equal(labels.numpy(), [1])
+
+
+@pytest.mark.parametrize("size", [1, 128, 400, 512, 517])
+def test_numpy_resize_matches_training_pixels(tmp_path, tf, size):
+    pixels = np.random.default_rng(85).integers(0, 256, (size, size, 3), dtype=np.uint8)
+    path = tmp_path / "pattern.png"
+    Image.fromarray(pixels).save(path)
+    images, _ = next(iter(make_tf_dataset([path], [1], training=False, augment=False, batch_size=1)))
+    actual = preprocess_image(path)
+    np.testing.assert_allclose(actual, images.numpy()[0], rtol=0, atol=1e-6)

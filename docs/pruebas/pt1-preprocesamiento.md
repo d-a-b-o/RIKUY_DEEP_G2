@@ -68,3 +68,19 @@ Para cerrar RIKDP-84, conservar el SHA y la URL de ejecución, descargar el JUni
 registrar el resultado en Jira. Una prueba local aprobada no acredita todavía la
 ejecución remota. Los resultados no demuestran la paridad TF.js ni las métricas
 del modelo, que se evalúan en otras subtareas de PT1.
+
+## Cierre técnico verificado el 08/11/2026
+
+El [run 41703755247](https://github.com/d-a-b-o/RIKUY_DEEP_G2/actions/runs/41703755247/job/126153538948)
+del commit `d168901d63b20a3158e434d897027a160c34d1e7` terminó aprobado.
+El log del paso de TensorFlow acredita **19 passed in 2.53s**, con TensorFlow
+obligatorio. El artefacto `pt1-preprocessing-evidence` se conserva hasta el
+17/11/2026; su identificador y digest están en
+[`RIKDP-84-ci.json`](../evidencias/RIKDP-84-ci.json).
+Esto resuelve la evidencia remota pendiente descrita arriba. No se cambió el
+estado de Jira. Descargar el JUnit antes de que expire el artefacto si se necesita
+conservar el XML original fuera de Actions.
+
+El XML ya fue descargado y conservado en
+[`RIKDP-84-ci.xml`](../evidencias/RIKDP-84-ci.xml), verificando primero el digest
+del ZIP contra GitHub. No depende de la retención futura del artefacto.

@@ -111,3 +111,13 @@ máxima de 3.0994415283203125e-06. No se volvió a ejecutar ese modelo en la rev
 fallido bloquea todas las escrituras, que la subida precede a la activación y que
 fallos intermedios o conflictos no cambian la versión activa. No se ha realizado
 una publicación real en R2 durante esta tarea.
+
+### Evidencia PT1 conservada el 08/11/2026
+
+Se recuperó y verificó el reporte original de 195 muestras contra los artefactos
+de la corrida y los pesos de exportación. También se repitió la inferencia real
+Keras/TF.js CPU sobre las 50 imágenes versionadas: cero discrepancias y máxima
+diferencia 2.92e-06. Los archivos, métricas recalculadas, límites del ensayo y
+pendientes de cierre están en [PT1](pruebas/pt1-cierre.md). Los nuevos tests
+incluyen el límite exacto 94,9/95,0 y el bloqueo de publicación; no cambian la
+política, el tamaño del conjunto exigido al publicar ni el modelo.

@@ -1,0 +1,49 @@
+{
+  "brier_absolute_difference": 3.6418150795372584e-08,
+  "brier_tolerance": 1e-06,
+  "checks": [
+    "completed artifact hashes",
+    "selected run and export identity",
+    "195 reserved test rows",
+    "Keras and TF.js weight hashes",
+    "policy recomputation",
+    "independent sklearn metrics"
+  ],
+  "classification_discrepancies": 0,
+  "fresh_inference": false,
+  "golden_sha256": "d5b666ee0c81fb4838ee8870dd42f83b186ff437916fbc98f912dfee68965456",
+  "human_independent_reviewer": null,
+  "independent_sklearn_metrics": {
+    "accuracy": 0.9846153846153847,
+    "average_precision": 0.9997833014424267,
+    "brier": 0.011269993053377527,
+    "confusion_matrix_0_ok_1_defect": [
+      [
+        75,
+        3
+      ],
+      [
+        0,
+        117
+      ]
+    ],
+    "f1": 0.9873417721518988,
+    "precision": 0.975,
+    "recall": 1.0,
+    "roc_auc": 0.9996712689020382
+  },
+  "keras_sha256": "28f54a232e3dbdf2498cba8a5d8aa2002d9a312c560ce3acd818023b77ba949e",
+  "max_absolute_difference": 3.0994415283203125e-06,
+  "model_sha256": "2d71811095fae6a8db32df391239a5a0f610ca11963e7598565ec5ef701f8c58",
+  "passed": true,
+  "run_identity": "af731904844ed80545ae9ae56b131fb4cf4c465acbeaf8af2620a4e36d46e07e",
+  "runtime": {
+    "python": "3.13.1",
+    "scikit_learn": "1.9.1"
+  },
+  "sample_count": 195,
+  "scope": "original_inference_evidence_revalidated",
+  "source_report_sha256": "70d1a08ef656f35b62a7802a69f12610b012671feaeb6efe9b43222818fd59c7",
+  "test_report_sha256": "f8b8c64c80819d8e224d59822434edb2f436b7496458680ea7ac0c439241adbd",
+  "threshold": 0.24371959269046783
+}

@@ -1,5 +1,5 @@
 """Preprocesamiento compartido HU06 para fundición.
-Entrada: imagen decodificada RGB. Resize bilinear a 400x400. RGB float32 en [0,1].
+Entrada: imagen decodificada RGB. Resize bilinear half-pixel a 400x400, como TensorFlow.
 Este módulo no recorta; verificar equivalencia con el recorte de la web antes de exportar.
 Ver docs/arquitectura/inferencia-navegador.md.
 Augmentation solo se activa con training=True en el conjunto train.
@@ -13,15 +13,47 @@ from PIL import Image, ImageEnhance, ImageOps
 TARGET_SIZE = (400, 400)
 
 
-def preprocess_image(image):
-    """Acepta ruta, PIL.Image o ndarray RGB; retorna float32 (400,400,3) en [0,1]."""
+def _rgb_image(image):
     if isinstance(image, (str, Path)):
         with Image.open(image) as source:
             image = source.convert("RGB")
     elif isinstance(image, np.ndarray):
         image = Image.fromarray(np.asarray(image, dtype=np.uint8))
-    image = image.convert("RGB").resize(TARGET_SIZE, Image.Resampling.BILINEAR)
+    return image.convert("RGB")
+
+
+def preprocess_regression_image(image):
+    """Contrato PIL v1 congelado de HU22; no usar para la inferencia nueva."""
+    image = _rgb_image(image).resize(TARGET_SIZE, Image.Resampling.BILINEAR)
     return np.asarray(image, dtype=np.float32) / 255.0
+
+
+def preprocess_image(image):
+    """RGB float32 [0,1], bilinear half-pixel sin antialias como tf.image.resize.
+
+    NumPy mantiene utilizable el entorno ligero sin importar TensorFlow.
+    No redondear la interpolación a uint8 antes de normalizar.
+    """
+    pixels = np.asarray(_rgb_image(image), dtype=np.float32)
+    height, width = pixels.shape[:2]
+    target_height, target_width = TARGET_SIZE
+
+    def coordinates(length, target):
+        positions = (np.arange(target, dtype=np.float32) + np.float32(0.5)) * np.float32(length / target)
+        positions = np.maximum(positions - np.float32(0.5), np.float32(0))
+        lower = np.floor(positions).astype(np.int32)
+        upper = np.minimum(lower + 1, length - 1)
+        return lower, upper, (positions - lower.astype(np.float32))
+
+    y0, y1, fy = coordinates(height, target_height)
+    x0, x1, fx = coordinates(width, target_width)
+    top_left = pixels[y0[:, None], x0[None, :]]
+    top_right = pixels[y0[:, None], x1[None, :]]
+    bottom_left = pixels[y1[:, None], x0[None, :]]
+    bottom_right = pixels[y1[:, None], x1[None, :]]
+    top = top_left + (top_right - top_left) * fx[None, :, None]
+    bottom = bottom_left + (bottom_right - bottom_left) * fx[None, :, None]
+    return (top + (bottom - top) * fy[:, None, None]) / np.float32(255)
 
 
 def augment_training_image(image, seed=None):

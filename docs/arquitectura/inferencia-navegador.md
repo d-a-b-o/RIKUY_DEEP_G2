@@ -14,7 +14,7 @@ Estado de integración manual auditado en `98bbd55` (2026-11-09): [HU35](inspecc
 | --- | --- |
 | Manifest, versión activa y veredicto | `apps/web/src/lib/model/manifest.ts` |
 | Carga: manifest sin caché, hash, IndexedDB, WebGL → WASM → CPU, calentamiento | `apps/web/src/lib/model/loader.ts` |
-| Recorte cuadrado centrado y canvas a 400×400 | `apps/web/src/lib/model/preprocess.ts` |
+| Recorte cuadrado nativo y resize bilinear half-pixel float32 | `apps/web/src/lib/model/preprocess.ts` |
 | Pantalla `/panel/inspeccion`: foto subida o cámara | `apps/web/src/components/inspection/inspector.tsx` |
 | Binarios WASM servidos desde el propio dominio | `apps/web/scripts/copy-tfjs-wasm.mjs` → `public/tfjs-wasm/` |
 
@@ -163,13 +163,19 @@ La web debe reproducir exactamente el preprocesamiento del entrenamiento (`ml/pr
 | Paso | Entrenamiento (Python) | Web (TensorFlow.js) |
 | --- | --- | --- |
 | 1. Encuadre | Imágenes del dataset ya cuadradas | Recorte cuadrado centrado del fotograma o la imagen (la guía de encuadre de HU35 marca ese cuadrado) |
-| 2. Redimensionado | `PIL.Image.resize((400, 400), BILINEAR)` | Dibujar el recorte en un `<canvas>` de 400×400 con `imageSmoothingQuality = "high"` |
+| 2. Redimensionado | `tf.image.resize(..., method="bilinear")`, half-pixel sin antialias | Canvas conserva recorte nativo; `resizeModelPixels` interpola a 400×400 con operaciones float32 y coordenadas half-pixel |
 | 3. Canales | `convert("RGB")` | `tf.browser.fromPixels(canvas, 3)` |
 | 4. Tipo y escala | `float32 / 255` | `.toFloat().mul(scale).add(offset)` con los valores del manifest |
 | 5. Lote | — | `.expandDims(0)` → `[1, 400, 400, 3]` |
 | 6. [-1, 1] | Dentro del modelo | Dentro del modelo |
 
-Se redimensiona con el canvas y no con `tf.image.resizeBilinear` porque los fotogramas de la cámara (por ejemplo 1280×720) se **reducen**, y el bilineal de TF.js no suaviza al reducir, mientras que PIL sí. Esa diferencia produce bordes dentados y cambia la predicción. La paridad se comprueba en el conjunto dorado (RIKDP-154).
+La corrección RIKDP-85 del 09/11/2026 alinea el resize con el TensorFlow que se
+usó al entrenar. Canvas no interpola ni cuantiza el resultado a 8 bits; el loader
+normaliza el resultado float32. Se usan operaciones TensorFlow.js con redondeo
+float32 explícito porque el resize CPU estándar calcula coordenadas double.
+La comparación de 16 PNG cuadrados contra Python y TensorFlow real conserva
+tolerancia absoluta 1e-6. Ver [evidencia y límites](../pruebas/pt1-paridad.md).
+La regresión HU22 conserva por separado su antiguo contrato PIL v1.
 
 ## Postprocesamiento
 

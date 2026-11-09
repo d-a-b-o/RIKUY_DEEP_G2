@@ -16,6 +16,7 @@ import {
   resolveActiveModel,
   ManifestError,
 } from "./manifest";
+import { resizeModelPixels } from "./preprocess";
 
 export type Backend = "webgl" | "wasm" | "cpu";
 export type LoadStage =
@@ -397,8 +398,9 @@ async function initializeInspectionModel(
       const begin = performance.now();
       const output = tf.tidy(() => {
         const pixels = tf.cast(tf.browser.fromPixels(canvas, 3), "float32");
+        const resized = resizeModelPixels(tf, pixels, active.input);
         const batch = tf.expandDims(
-          tf.add(tf.mul(pixels, active.input.scale), active.input.offset),
+          tf.add(tf.mul(resized, active.input.scale), active.input.offset),
           0,
         );
         return loaded.predict(batch) as InstanceType<typeof tf.Tensor>;

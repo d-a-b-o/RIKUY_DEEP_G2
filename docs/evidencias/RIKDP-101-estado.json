@@ -1,0 +1,90 @@
+{
+  "evidence": "RIKDP-101-reproducibilidad.json",
+  "passed": true,
+  "provenance": {
+    "local_source_matches_after_crlf_to_lf_normalization": true,
+    "origin": "user_supplied_colab_output",
+    "pasted_output_sha256": "1acbb91333aaa0649122ddef8110dfe4bcdea1e648afd284a6618aa64b7834ac",
+    "received_on": "2026-11-09",
+    "remote_artifact_bytes_independently_retrieved": false,
+    "source_comparison_reference_commit": "9764d5a1ea229b602e2be1def5c91ea7aaa05528",
+    "subsequent_rikdp85_change": "Inference helpers changed; make_tf_dataset AST unchanged from reference commit"
+  },
+  "reason": "Dos replicas independientes con semilla 42; nueve epocas e historiales y metricas iguales.",
+  "status": "passed_user_supplied_colab_report",
+  "training_executed_during_this_change": true,
+  "variants": [
+    {
+      "identity": "af731904844ed80545ae9ae56b131fb4cf4c465acbeaf8af2620a4e36d46e07e",
+      "params": {
+        "augmentation": true,
+        "batch_size": 16,
+        "dataset": "ravirajsinh45/real-life-industrial-dataset-of-casting-product",
+        "dropout": 0.3,
+        "epochs": 35,
+        "experiment_tag": "v1",
+        "fraction": 0.15,
+        "hpo_epochs": 10,
+        "kind": "mobilenetv2",
+        "learning_rate": 0.0001,
+        "root": null,
+        "seed": 42,
+        "target_recall": 0.95
+      }
+    },
+    {
+      "identity": "2fe164cd077eb4d7f540fff1c42327e2d19aface253f056131cdd8fc744035ab",
+      "params": {
+        "augmentation": true,
+        "batch_size": 16,
+        "dataset": "ravirajsinh45/real-life-industrial-dataset-of-casting-product",
+        "dropout": 0.5,
+        "epochs": 35,
+        "experiment_tag": "v1",
+        "fraction": 0.5,
+        "hpo_epochs": 10,
+        "kind": "mobilenetv2",
+        "learning_rate": 1e-05,
+        "root": null,
+        "seed": 42,
+        "target_recall": 0.95
+      }
+    },
+    {
+      "identity": "f59da46250076d5e545f55df347dec608c356e456d8889c3b2061f86676bfff8",
+      "params": {
+        "augmentation": true,
+        "batch_size": 16,
+        "dataset": "ravirajsinh45/real-life-industrial-dataset-of-casting-product",
+        "dropout": 0.3,
+        "epochs": 35,
+        "experiment_tag": "v1",
+        "fraction": 0.35,
+        "hpo_epochs": 10,
+        "kind": "mobilenetv2",
+        "learning_rate": 2e-05,
+        "root": null,
+        "seed": 42,
+        "target_recall": 0.95
+      }
+    },
+    {
+      "identity": "74584ad0b3b09a4ff8dfb312bfe4e8d41782245460397de57964cdddb1ae15d4",
+      "params": {
+        "augmentation": true,
+        "batch_size": 16,
+        "dataset": "ravirajsinh45/real-life-industrial-dataset-of-casting-product",
+        "dropout": 0.4,
+        "epochs": 35,
+        "experiment_tag": "v1",
+        "fraction": 0.25,
+        "hpo_epochs": 10,
+        "kind": "mobilenetv2",
+        "learning_rate": 5e-05,
+        "root": null,
+        "seed": 42,
+        "target_recall": 0.95
+      }
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "absolute_tolerance": 1e-06,
+  "code": {
+    "preprocessing.py": "ea02fee9182baf5139c6ab80da80cc055e4881a6758c6e3d9c7893ae0088e04c",
+    "workflow.py": "1161e30d4aa2391e2133da959a9f14b94400bb3ad72ddbf5c1b8eb36afc3e769"
+  },
+  "dataset_sha256": "59e042381506be3ccbfdac0a380d20fb98b6173fc3df338859306503abf643dd",
+  "differences": [],
+  "params": {
+    "augmentation": true,
+    "batch_size": 16,
+    "dataset": "ravirajsinh45/real-life-industrial-dataset-of-casting-product",
+    "dropout": 0.3,
+    "epochs": 35,
+    "fraction": 0.15,
+    "hpo_epochs": 10,
+    "kind": "mobilenetv2",
+    "learning_rate": 0.0001,
+    "seed": 42,
+    "target_recall": 0.95
+  },
+  "passed": true,
+  "runs": [
+    {
+      "artifacts": {
+        "best.keras": "abad9bc5aaebc330f9e089d77380066fb7c2daae6dd81f5f169b32fc0785a678",
+        "history.csv": "13952a490de5cc49001d0530d432faa6f4eb11713ecf304daf341c492e951092",
+        "started.json": "7def2d9ec3c0b1a274f230125f6d8328c4eddaac90d8bde1966c09f897841328",
+        "validation.json": "d3aacf46a5992c06ad5714b33a5c35484142bcf50d0bb17284f3837abb4b324e"
+      },
+      "epochs": 9,
+      "identity": "62dcbd133928422519630acd448daad0997ba977e241a7684ea76cab4c312cd6",
+      "validation": {
+        "accuracy": 1.0,
+        "average_precision": 1.0,
+        "brier": 0.004625238011586294,
+        "confusion_matrix_0_ok_1_defect": [
+          [
+            78,
+            0
+          ],
+          [
+            0,
+            117
+          ]
+        ],
+        "f1": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "roc_auc": 1.0,
+        "threshold": 0.3573272228240967
+      }
+    },
+    {
+      "artifacts": {
+        "best.keras": "50f03ce4677f1e0293e47c4279f5bd7bd1d1c804fcf33c0e29aef3023237c474",
+        "history.csv": "13952a490de5cc49001d0530d432faa6f4eb11713ecf304daf341c492e951092",
+        "started.json": "6736f9224db90b2f16ed95ac97a9bc501c1273e67b6332ed3bc5b6e65a442ee3",
+        "validation.json": "d3aacf46a5992c06ad5714b33a5c35484142bcf50d0bb17284f3837abb4b324e"
+      },
+      "epochs": 9,
+      "identity": "4aaf55ab4165074a699ef80c7bc429f31fc4d7cedd3fbc1acfbb53331092d8e4",
+      "validation": {
+        "accuracy": 1.0,
+        "average_precision": 1.0,
+        "brier": 0.004625238011586294,
+        "confusion_matrix_0_ok_1_defect": [
+          [
+            78,
+            0
+          ],
+          [
+            0,
+            117
+          ]
+        ],
+        "f1": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "roc_auc": 1.0,
+        "threshold": 0.3573272228240967
+      }
+    }
+  ],
+  "scope": "two_independent_training_runs",
+  "seed": 42,
+  "versions": {
+    "numpy": "2.4.6",
+    "pillow": "11.3.0",
+    "scikit-learn": "1.6.1",
+    "tensorflow": "2.21.0"
+  }
+}

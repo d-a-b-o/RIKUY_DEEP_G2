@@ -1,0 +1,21 @@
+{
+  "after_report_sha256": "4157ca75e1a1d0e7a8f37bd0d9f4482bb3368d6e8aa3f850d1b9c635ff77e0df",
+  "all_50_probability_pairs_identical": true,
+  "before_report_sha256": "4157ca75e1a1d0e7a8f37bd0d9f4482bb3368d6e8aa3f850d1b9c635ff77e0df",
+  "discrepancies": 2,
+  "historical_contract": {
+    "classes": {
+      "def_front": 1,
+      "ok_front": 0
+    },
+    "preprocessing": "ml.preprocessing.preprocess_image:rgb-bilinear-400x400-float32-0-1:v1",
+    "threshold": 0.26489877700805664
+  },
+  "keras_sha256": {
+    "baseline": "9664b2497f6b578e2f68a6b147cf991e1cbb8d2987d09c41222502346bfa05a1",
+    "candidate": "28f54a232e3dbdf2498cba8a5d8aa2002d9a312c560ce3acd818023b77ba949e"
+  },
+  "passed": true,
+  "sample_count": 50,
+  "scope": "legacy_pil_v1_unchanged_real_inference"
+}

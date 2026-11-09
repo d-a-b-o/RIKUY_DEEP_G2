@@ -1,0 +1,27 @@
+{
+  "policy_sha256": "0021a0365d93a81335964e30a8d32274290ad83134c9f4b230b6392f1c601029",
+  "policy_test_expected_count": 2000,
+  "production_expected_count": 195,
+  "publication_boundary_test": "test_recall_boundary_reaches_publication_guard[94-False,95-True]",
+  "results": [
+    {
+      "accuracy": 0.9745,
+      "failures": [
+        "python: recall de defectos inferior a 95%.",
+        "tensorflowjs: recall de defectos inferior a 95%."
+      ],
+      "passed": false,
+      "recall": 0.949,
+      "true_positives": 949
+    },
+    {
+      "accuracy": 0.975,
+      "failures": [],
+      "passed": true,
+      "recall": 0.95,
+      "true_positives": 950
+    }
+  ],
+  "scope": "synthetic_policy_boundary_not_model_metrics",
+  "suite_junit_sha256": "1fe84d3c3f1d3341840575d9e8a3df6663e0a2e326a3d205fa6b7242d6b25b40"
+}

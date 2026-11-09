@@ -1,0 +1,49 @@
+name: PT1 preprocessing parity
+
+# Diagnostic run: current resizing differences are a documented defect (RIKDP-85).
+# Keep the measured parity failure visible; do not relax tolerances to get green.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  parity:
+    name: RIKDP-85 · Python y navegador real
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CUDA_VISIBLE_DEVICES: '-1'
+      TF_CPP_MIN_LOG_LEVEL: '2'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Instalar herramientas declaradas
+        run: |
+          python -m pip install -r ml/requirements-regression.txt
+          npm ci --prefix apps/web --ignore-scripts --no-audit --no-fund
+          python -m playwright install --with-deps chromium
+      - name: Probar la política de comparación
+        run: >-
+          python -m pytest -c ml/pytest.ini ml/tests/test_preprocessing_parity.py
+          --junitxml=reports/preprocessing-parity/policy.xml
+      - name: Medir paridad real (falla si los tensores difieren)
+        run: python -m ml.preprocessing_parity --output reports/preprocessing-parity
+      - name: Conservar evidencia incluso si no hay paridad
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: pt1-parity-evidence
+          path: reports/preprocessing-parity/
+          if-no-files-found: error
+          retention-days: 14

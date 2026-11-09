@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from ml.preprocessing import TARGET_SIZE, augment_training_image, preprocess_image
+from ml.preprocessing import TARGET_SIZE, augment_training_image, preprocess_image, preprocess_regression_image
 from PIL import Image
 
 
@@ -65,3 +65,11 @@ def test_augment_keeps_size_and_mode():
     augmented = augment_training_image(image, seed=1)
     assert augmented.size == image.size
     assert augmented.mode == "RGB"
+
+
+def test_historical_regression_keeps_pil_v1_pixels():
+    pixels = np.random.default_rng(85).integers(0, 256, (512, 512, 3), dtype=np.uint8)
+    image = Image.fromarray(pixels)
+    expected = np.asarray(image.resize(TARGET_SIZE, Image.Resampling.BILINEAR), dtype=np.float32) / 255.0
+    np.testing.assert_array_equal(preprocess_regression_image(image), expected)
+    assert np.max(np.abs(preprocess_image(image) - expected)) > 1e-3
