@@ -8,6 +8,7 @@ const LINKS: readonly (PanelLink & { permission?: Permission })[] = [
   { href: "/panel", label: "Inicio", icon: "grid" },
   { href: "/panel/inspeccion", label: "Inspeccionar", icon: "scan", permission: "inspecciones:crear" },
   { href: "/panel/admin/empresas", label: "Empresas", icon: "building", permission: "empresas:gestionar" },
+  { href: "/panel/admin/auditoria", label: "Auditoría", icon: "shield", permission: "auditoria:ver" },
 ];
 
 export const BASE_LINKS: readonly PanelLink[] = [LINKS[0]];

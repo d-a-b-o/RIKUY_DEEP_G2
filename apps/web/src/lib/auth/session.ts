@@ -1,7 +1,8 @@
 import "server-only";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getDb } from "@/lib/db";
-import { authorize, ForbiddenError, type AuthzUser, type Permission } from "@/lib/authz";
+import { authorize, clientIp, ForbiddenError, type AuthzUser, type Permission } from "@/lib/authz";
 import { SIGN_IN_PATH } from "./config";
 import { getSession } from "./server";
 
@@ -76,7 +77,7 @@ export async function getPageAccess(
 ): Promise<{ user: CurrentUser; allowed: boolean }> {
   const user = await getCurrentUser(nextPath);
   try {
-    await authorize(toAuthzUser(user), permission, { path: nextPath });
+    await authorize(toAuthzUser(user), permission, { path: nextPath, method: "GET", ip: clientIp(await headers()) });
     return { user, allowed: true };
   } catch (error) {
     if (error instanceof ForbiddenError) return { user, allowed: false };
