@@ -59,6 +59,12 @@ describe("matriz de permisos", () => {
     ["STATION", "catalogos:ver", true],
     ["STATION", "inspecciones:ver", false],
     ["STATION", "veredictos:corregir", false],
+    // HU44: la estación opera su pantalla; el Admin de planta la configura.
+    ["STATION", "estacion:operar", true],
+    ["STATION", "estaciones:gestionar", false],
+    ["ADMIN", "estaciones:gestionar", true],
+    ["ADMIN", "estacion:operar", false],
+    ["INSPECTOR", "estacion:operar", false],
   ] as const)("%s → %s = %s", (role, permission, expected) => {
     const user: AuthzUser = { id: "x", role, empresaId: "emp-A" };
     expect(can(user, permission)).toBe(expected);
@@ -181,6 +187,9 @@ describe("requiredPermission", () => {
     ["/panel/catalogos", "catalogos:ver"],
     ["/panel/admin/usuarios", "usuarios:gestionar"],
     ["/panel/dashboard", "dashboard:ver"],
+    ["/panel/estacion", "estacion:operar"],
+    ["/panel/admin/estaciones", "estaciones:gestionar"],
+    ["/panel/admin/estaciones/123", "estaciones:gestionar"],
   ])("%s exige %s", (path, permission) => {
     expect(requiredPermission(path)).toBe(permission);
   });

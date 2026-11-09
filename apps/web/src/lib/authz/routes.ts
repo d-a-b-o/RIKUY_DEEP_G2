@@ -21,6 +21,8 @@ export const ROUTE_RULES: readonly RouteRule[] = [
   // Pantallas ya construidas, dentro de /panel (protegido por src/proxy.ts).
   { prefix: "/panel/admin/empresas", permission: "empresas:gestionar" },
   { prefix: "/panel/admin/auditoria", permission: "auditoria:ver" },
+  { prefix: "/panel/admin/estaciones", permission: "estaciones:gestionar" },
+  { prefix: "/panel/estacion", permission: "estacion:operar" },
   { prefix: "/panel/inspeccion", permission: "inspecciones:crear" },
   { prefix: "/panel/inspecciones", permission: "inspecciones:ver" },
   { prefix: "/panel/reportes", permission: "reportes:descargar" },

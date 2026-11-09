@@ -15,7 +15,9 @@ Los roles son los del enum `Role` de Prisma: `SUPERADMIN`, `ADMIN` (admin de pla
 | auditoria:ver | ✅ | ✅ | | | |
 | usuarios:gestionar | | ✅ | | | |
 | catalogos:gestionar | | ✅ | | | |
+| estaciones:gestionar | | ✅ | | | |
 | inspecciones:crear | | ✅ | ✅ | | ✅ |
+| estacion:operar | | | | | ✅ |
 | veredictos:corregir | | ✅ | ✅ | | |
 | catalogos:ver | | ✅ | ✅ | ✅ | ✅ |
 | inspecciones:ver | | ✅ | ✅ | ✅ | |

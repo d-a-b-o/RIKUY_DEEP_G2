@@ -43,6 +43,8 @@ export type InspectionModel = {
   info: LoadedModelInfo;
   /** Ejecuta el modelo sobre un canvas ya preparado con drawModelInput(). */
   predict(input: HTMLCanvasElement): Promise<Prediction>;
+  /** Tensores vivos en TF.js; debe mantenerse estable en la estación (HU44). */
+  tensorCount(): number;
   dispose(): void;
 };
 
@@ -410,6 +412,9 @@ async function initializeInspectionModel(
       } finally {
         output.dispose();
       }
+    },
+    tensorCount() {
+      return tf.memory().numTensors;
     },
     dispose() {
       loaded.dispose();
