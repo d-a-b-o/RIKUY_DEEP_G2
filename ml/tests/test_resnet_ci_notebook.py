@@ -145,3 +145,60 @@ def test_unconfigured_bundle_is_pending_not_a_successful_remote_reference(ci_ref
 def test_testing_rejects_a_run_from_another_architecture():
     with pytest.raises(ValueError, match="ResNet50V2"):
         require_resnet_run({"params": {"kind": "cnn"}})
+
+
+def bind_existing_bundle():
+    notebook = json.loads((Path(__file__).resolve().parents[2] / "RIKUY_DEEP_G2.ipynb").read_text(encoding="utf-8"))
+    source = next(
+        "".join(c["source"]) for c in notebook["cells"] if "def bind_ci_reference_bundle(" in "".join(c["source"])
+    )
+    node = next(
+        n for n in ast.parse(source).body if isinstance(n, ast.FunctionDef) and n.name == "bind_ci_reference_bundle"
+    )
+    namespace = dict(
+        Path=Path,
+        json=json,
+        re=__import__("re"),
+        hashlib=hashlib,
+        zipfile=zipfile,
+        read_json=read_json,
+        write_json=write_json,
+        file_hash=file_hash,
+    )
+    exec(compile(ast.Module(body=[node], type_ignores=[]), "<notebook>", "exec"), namespace)
+    return namespace["bind_ci_reference_bundle"]
+
+
+def test_bind_existing_bundle_after_kernel_restart_preserves_archive(ci_reference):
+    build, config, context, report = ci_reference
+    build(config, context, report)
+    before = file_hash(config.root / "ci-reference-resnet.zip")
+    catalog = bind_existing_bundle()(config.root, "new-public-id")
+    assert catalog["status"] == "ready"
+    assert catalog["bundle"] == {"drive_id": "new-public-id", "sha256": before}
+    assert file_hash(config.root / "ci-reference-resnet.zip") == before
+
+
+def test_bind_existing_bundle_rejects_link_query_before_mutation(ci_reference):
+    build, config, context, report = ci_reference
+    build(config, context, report)
+    before = file_hash(config.root / "ml/regression-sources.json")
+    with pytest.raises(ValueError, match="sin \\?hl"):
+        bind_existing_bundle()(config.root, "file-id?hl")
+    assert file_hash(config.root / "ml/regression-sources.json") == before
+
+
+def test_bind_existing_bundle_rejects_modified_zip(ci_reference):
+    build, config, context, report = ci_reference
+    build(config, context, report)
+    archive = config.root / "ci-reference-resnet.zip"
+    with zipfile.ZipFile(archive) as zipped:
+        members = {name: zipped.read(name) for name in zipped.namelist()}
+    members[next(iter(members))] = b"modified"
+    with zipfile.ZipFile(archive, "w") as zipped:
+        for name, data in members.items():
+            zipped.writestr(name, data)
+    before = file_hash(config.root / "ml/regression-sources.json")
+    with pytest.raises(ValueError, match="Contenido del ZIP modificado"):
+        bind_existing_bundle()(config.root, "valid-public-id")
+    assert file_hash(config.root / "ml/regression-sources.json") == before

@@ -1,6 +1,38 @@
 {
   "schema_version": 1,
+  "status": "ready",
   "architecture": "resnet50v2",
-  "status": "pending_resnet50v2_training",
-  "reason": "Generar referencias nuevas desde el notebook despues de entrenar y aprobar el gate; no hay artefactos anteriores habilitados."
+  "golden": "../golden/real",
+  "contract": {
+    "classes": {
+      "ok_front": 0,
+      "def_front": 1
+    },
+    "preprocessing": "ml.preprocessing.preprocess_image:rgb-half-pixel-400x400-float32-0-1:v2",
+    "threshold": 0.14451949298381805
+  },
+  "baseline": {
+    "path": "../models/regression/baseline.keras",
+    "sha256": "3ad3c0fb89bcae79e8a811ae7b98ab08753386d025a5be7e253e007fdffa9994",
+    "contract": {
+      "classes": {
+        "ok_front": 0,
+        "def_front": 1
+      },
+      "preprocessing": "ml.preprocessing.preprocess_image:rgb-half-pixel-400x400-float32-0-1:v2",
+      "threshold": 0.14451949298381805
+    }
+  },
+  "candidate": {
+    "path": "../models/regression/candidate.keras",
+    "sha256": "3ad3c0fb89bcae79e8a811ae7b98ab08753386d025a5be7e253e007fdffa9994",
+    "contract": {
+      "classes": {
+        "ok_front": 0,
+        "def_front": 1
+      },
+      "preprocessing": "ml.preprocessing.preprocess_image:rgb-half-pixel-400x400-float32-0-1:v2",
+      "threshold": 0.14451949298381805
+    }
+  }
 }
