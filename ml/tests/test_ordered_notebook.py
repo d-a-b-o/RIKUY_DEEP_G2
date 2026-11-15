@@ -9,8 +9,8 @@ import types
 import unittest
 from datetime import datetime, timezone
 from pathlib import Path
-from uuid import uuid4
 from unittest.mock import MagicMock, Mock, patch
+from uuid import uuid4
 
 import numpy as np
 from PIL import Image

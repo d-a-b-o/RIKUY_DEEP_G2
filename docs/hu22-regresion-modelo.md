@@ -11,3 +11,9 @@ No se inicializa una referencia fingiendo hashes de pesos todavía no entrenados
 El workflow HU22 model regression conserva los tests sintéticos y el job real. Si falta la referencia nueva,
 el job real devuelve error de configuración, distinto de un rechazo por discrepancias de un modelo degradado.
 Los artefactos del job se conservan incluso al fallar.
+
+La descarga pública admite la confirmación de Drive para archivos grandes y rechaza páginas HTML
+de permisos o cuota. El SHA256 del ZIP y los hashes de sus objetos se verifican antes de usar los pesos.
+Si el ZIP descargado tiene otro SHA256, el error informa el hash esperado, el recibido, el tamaño
+y si el contenido es un ZIP válido. El archivo compartido debe coincidir exactamente con el paquete
+validado en Colab; no se desactiva este control para hacer pasar CI.

@@ -10,7 +10,9 @@ import sys
 import time
 import zipfile
 from concurrent.futures import ThreadPoolExecutor
+from html.parser import HTMLParser
 from pathlib import Path
+from urllib.parse import parse_qsl, urlencode, urlsplit
 from urllib.request import urlopen
 
 from ml.regression import require_ready_reference, sha256, write_json
@@ -29,17 +31,66 @@ def verify(path, spec):
         raise ValueError("MD5 del objeto DVC no coincide con la referencia.")
 
 
+class DriveConfirmation(HTMLParser):
+    """Leer únicamente el formulario de confirmación de descarga pública de Drive."""
+
+    def __init__(self):
+        super().__init__()
+        self.action = None
+        self.fields = {}
+        self.active = False
+
+    def handle_starttag(self, tag, attrs):
+        attrs = dict(attrs)
+        if tag == "form":
+            self.active = attrs.get("id") == "download-form" and attrs.get("method", "get").lower() == "get"
+            if self.active:
+                self.action = attrs.get("action", "")
+        elif tag == "input" and self.active and attrs.get("name") in {"id", "export", "confirm", "uuid"}:
+            self.fields[attrs["name"]] = attrs.get("value", "")
+
+    def handle_endtag(self, tag):
+        if tag == "form":
+            self.active = False
+
+    def download_url(self, identifier):
+        action = urlsplit(self.action or "")
+        if action.scheme != "https" or action.netloc != "drive.usercontent.google.com" or action.path != "/download":
+            raise ValueError(
+                "Drive devolvió HTML sin una confirmación válida. Verifica acceso público y cuota del ZIP."
+            )
+        fields = {**dict(parse_qsl(action.query)), **self.fields}
+        if fields.get("id") != identifier or not fields.get("confirm"):
+            raise ValueError("La confirmación de Drive no corresponde al archivo solicitado.")
+        return f"https://drive.usercontent.google.com/download?{urlencode(fields)}"
+
+
 def download_public(identifier, target):
-    """Endpoint de contenido público; sin cookies ni credenciales y con timeout."""
+    """Descarga pública con confirmación de archivos grandes; nunca guardar HTML como ZIP."""
     if not re.fullmatch(r"[A-Za-z0-9_-]+", identifier):
         raise ValueError("ID público de Drive inválido.")
     url = f"https://drive.usercontent.google.com/download?id={identifier}&export=download&confirm=t"
     for attempt in range(3):
         try:
-            with urlopen(url, timeout=30) as stream, Path(target).open("wb") as output:
-                shutil.copyfileobj(stream, output)
-            return
-        except Exception:
+            current = url
+            for _confirmation in range(3):
+                with urlopen(current, timeout=30) as stream:
+                    prefix = stream.read(4096)
+                    content_type = getattr(stream, "headers", {}).get("Content-Type", "").lower()
+                    html = "text/html" in content_type or prefix.lstrip().lower().startswith(
+                        (b"<!doctype html", b"<html")
+                    )
+                    if html:
+                        parser = DriveConfirmation()
+                        parser.feed((prefix + stream.read(1024 * 1024)).decode("utf-8", errors="replace"))
+                        current = parser.download_url(identifier)
+                        continue
+                    with Path(target).open("wb") as output:
+                        output.write(prefix)
+                        shutil.copyfileobj(stream, output)
+                    return
+            raise ValueError("Drive repitió la confirmación de descarga; no se obtuvo el archivo público.")
+        except OSError:
             if attempt == 2:
                 raise
             time.sleep(2 ** (attempt + 1))
@@ -77,8 +128,14 @@ def hydrate(catalog_path, remote, downloader):
             temporary = archive_path.with_suffix(".partial")
             try:
                 downloader(bundle["drive_id"], temporary)
-                if sha256(temporary) != bundle["sha256"]:
-                    raise ValueError("SHA256 del paquete de referencia inválido.")
+                received = sha256(temporary)
+                if received != bundle["sha256"]:
+                    raise ValueError(
+                        f"SHA256 del paquete de referencia inválido: esperado={bundle['sha256']}, "
+                        f"recibido={received}, bytes={temporary.stat().st_size}, "
+                        f"zip_valido={zipfile.is_zipfile(temporary)}. "
+                        "El archivo público debe ser exactamente el ZIP validado en Colab."
+                    )
                 temporary.replace(archive_path)
             finally:
                 temporary.unlink(missing_ok=True)

@@ -3,6 +3,7 @@ import io
 import json
 import zipfile
 from pathlib import Path
+from urllib.parse import parse_qs, urlsplit
 
 import pytest
 from ml.regression import write_json
@@ -170,3 +171,60 @@ def test_public_download_retries_are_bounded(tmp_path, monkeypatch, always_fail)
         assert len(calls) == 2
         assert waits == [2]
     assert all(timeout == 30 for _, timeout in calls)
+
+
+def test_public_large_file_confirmation_returns_binary_not_html(tmp_path, monkeypatch):
+    confirmation = b"""<!doctype html><html><form id="download-form"
+        action="https://drive.usercontent.google.com/download" method="get">
+        <input type="hidden" name="id" value="public-id">
+        <input type="hidden" name="export" value="download">
+        <input type="hidden" name="confirm" value="t">
+        <input type="hidden" name="uuid" value="confirmation-token">
+        </form></html>"""
+    calls = []
+
+    def open_stream(url, timeout):
+        calls.append(url)
+        return io.BytesIO(confirmation if len(calls) == 1 else b"PK-binary-zip-fixture")
+
+    monkeypatch.setattr("ml.regression_data.urlopen", open_stream)
+    target = tmp_path / "bundle"
+    download_public("public-id", target)
+    assert target.read_bytes() == b"PK-binary-zip-fixture"
+    assert len(calls) == 2
+    assert parse_qs(urlsplit(calls[1]).query)["uuid"] == ["confirmation-token"]
+
+
+@pytest.mark.parametrize(
+    "html",
+    [
+        b"<html>Access denied</html>",
+        b'<html><form id="download-form" action="https://untrusted.example/download">'
+        b'<input name="id" value="public-id"></form></html>',
+        b'<html><form id="download-form" action="https://drive.usercontent.google.com/download">'
+        b'<input name="id" value="other-id"><input name="confirm" value="t"></form></html>',
+    ],
+)
+def test_public_html_errors_are_not_saved_as_artifacts(tmp_path, monkeypatch, html):
+    monkeypatch.setattr("ml.regression_data.urlopen", lambda *args, **kwargs: io.BytesIO(html))
+    target = tmp_path / "bundle"
+    with pytest.raises(ValueError):
+        download_public("public-id", target)
+    assert not target.exists()
+
+
+def test_public_confirmation_loop_is_bounded(tmp_path, monkeypatch):
+    calls = []
+    html = (
+        b'<html><form id="download-form" action="https://drive.usercontent.google.com/download">'
+        b'<input name="id" value="public-id"><input name="confirm" value="t"></form></html>'
+    )
+
+    def open_stream(*args, **kwargs):
+        calls.append(True)
+        return io.BytesIO(html)
+
+    monkeypatch.setattr("ml.regression_data.urlopen", open_stream)
+    with pytest.raises(ValueError, match="repiti"):
+        download_public("public-id", tmp_path / "bundle")
+    assert len(calls) == 3

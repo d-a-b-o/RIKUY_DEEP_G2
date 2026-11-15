@@ -10,12 +10,11 @@ import zipfile
 from pathlib import Path
 
 import pytest
-from PIL import Image
-
 from ml.quality_gate import evaluate_quality_gate, require_quality_gate
 from ml.regression import CLASSES, require_resnet_run, validate_golden
 from ml.regression_data import hydrate, object_path
 from ml.workflow import file_hash, read_json, write_json
+from PIL import Image
 
 
 @pytest.fixture
@@ -158,6 +157,7 @@ def bind_existing_bundle():
     namespace = dict(
         Path=Path,
         json=json,
+        os=os,
         re=__import__("re"),
         hashlib=hashlib,
         zipfile=zipfile,
