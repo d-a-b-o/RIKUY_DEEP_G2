@@ -7,7 +7,7 @@ from pathlib import Path
 
 import numpy as np
 from ml.preprocessing import preprocess_image
-from ml.regression import write_json
+from ml.regression import require_resnet_run, write_json
 from ml.workflow import check_artifacts, file_hash, read_json, scores
 from PIL import Image, ImageOps
 
@@ -112,6 +112,7 @@ def measure(manifest_path, run, baseline_path):
     manifest_path, run = Path(manifest_path).resolve(), Path(run).resolve()
     manifest = validate_capture_manifest(manifest_path)
     completed = read_json(run / "completed.json")
+    require_resnet_run(read_json(run / "started.json"))
     check_artifacts(run, completed)
     baseline = read_json(baseline_path)
     threshold = read_json(run / "validation.json")["threshold"]
@@ -120,10 +121,11 @@ def measure(manifest_path, run, baseline_path):
         or baseline.get("sample_count") != 195
         or baseline.get("keras_sha256") != file_hash(run / "best.keras")
         or baseline.get("run_identity") != completed["identity"]
-        or baseline.get("threshold") != threshold
+        or baseline.get("threshold_from_validation") != threshold
     ):
         raise ValueError("La referencia no corresponde al mismo modelo original, test y umbral.")
     model = tf.keras.models.load_model(run / "best.keras", compile=False, safe_mode=True)
+    model.get_layer("resnet50v2")
     probabilities = []
     for row in manifest["rows"]:
         output = np.asarray(model(capture_tensor(manifest_path.parent / row["path"]), training=False))
@@ -140,8 +142,8 @@ def measure(manifest_path, run, baseline_path):
         "sample_count": len(probabilities),
         "class_counts": {name: sum(r["label"] == label for r in manifest["rows"]) for name, label in CLASSES.items()},
         "metrics": metrics,
-        "baseline_metrics": baseline["independent_sklearn_metrics"],
-        "metric_changes": compare_metrics(baseline["independent_sklearn_metrics"], metrics),
+        "baseline_metrics": baseline["metrics"],
+        "metric_changes": compare_metrics(baseline["metrics"], metrics),
         "meets_original_targets": metrics["accuracy"] >= 0.97 and metrics["recall"] >= 0.95,
         "threshold_from_validation": threshold,
         "keras_sha256": file_hash(run / "best.keras"),
@@ -164,7 +166,7 @@ def main():
     parser.add_argument("--device", help="Webcam/celular y condiciones de captura")
     parser.add_argument("--manifest")
     parser.add_argument("--run")
-    parser.add_argument("--baseline", default="docs/evidencias/RIKDP-131-metricas.json")
+    parser.add_argument("--baseline", default="reports/independent-metrics/RIKDP-131.json")
     parser.add_argument("--output", default="reports/captures/RIKDP-254.json")
     args = parser.parse_args()
     try:

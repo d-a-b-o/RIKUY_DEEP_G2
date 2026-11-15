@@ -16,7 +16,7 @@ def make_run(directory, tag="first", seed=42, recall=1.0):
     (directory / "history.csv").write_text("epoch,loss,val_accuracy\n0,0.1,1.0\n", encoding="utf-8")
     write_json(directory / "validation.json", {"threshold": 0.5, "recall": recall, "accuracy": 1.0})
     started = {
-        "params": {"seed": seed, "experiment_tag": tag, "root": None},
+        "params": {"seed": seed, "experiment_tag": tag, "root": None, "kind": "resnet50v2"},
         "manifest": {"identity": "test-dataset", "rows": []},
         "code": {"workflow.py": "unit-fixture"},
         "versions": {"tensorflow": "unit-fixture"},
@@ -52,6 +52,29 @@ def test_two_independent_runs_match_but_copies_do_not(tmp_path):
     make_run(tmp_path / "copy")
     with pytest.raises(ValueError, match="misma corrida"):
         compare_runs(left, tmp_path / "copy")
+
+
+def test_notebook_execution_ids_are_verified_without_manual_tags(tmp_path):
+    directories = [make_run(tmp_path / name) for name in ("first", "second")]
+    for index, directory in enumerate(directories):
+        started = read_json(directory / "started.json")
+        started.pop("identity")
+        started["params"].pop("experiment_tag")
+        experiment = digest(started)
+        started["experiment_identity"] = experiment
+        started["execution_id"] = f"automatic-{index}"
+        started["identity"] = digest({"experiment": experiment, "execution": started["execution_id"]})
+        write_json(directory / "started.json", started)
+        completed = read_json(directory / "completed.json")
+        completed["identity"] = started["identity"]
+        completed["artifacts"]["started.json"] = file_hash(directory / "started.json")
+        write_json(directory / "completed.json", completed)
+    assert compare_runs(*directories)["passed"]
+    value = read_json(directories[1] / "started.json")
+    value["experiment_identity"] = "forged"
+    write_json(directories[1] / "started.json", value)
+    with pytest.raises(ValueError):
+        compare_runs(*directories)
 
 
 def test_different_seed_is_not_reproducibility(tmp_path):

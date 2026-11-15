@@ -9,14 +9,24 @@ import platform
 from pathlib import Path
 
 import numpy as np
-from ml.preprocessing import preprocess_regression_image as preprocess_image
+from ml.preprocessing import preprocess_image
 from ml.quality_gate import probability
 from PIL import Image
 
 CLASSES = {"ok_front": 0, "def_front": 1}
-PREPROCESSING = "ml.preprocessing.preprocess_image:rgb-bilinear-400x400-float32-0-1:v1"
-# Identificador histórico inmutable de HU22: conserva los tensores PIL v1
-# aunque la inferencia actual use bilinear half-pixel sin cuantización.
+PREPROCESSING = "ml.preprocessing.preprocess_image:rgb-half-pixel-400x400-float32-0-1:v2"
+
+
+def require_ready_reference(config):
+    if str(config.get("status", "")).startswith("pending"):
+        raise ValueError(
+            "Referencia ResNet50V2 pendiente: entrenar, aprobar el gate y generar las referencias desde el notebook."
+        )
+
+
+def require_resnet_run(started):
+    if started.get("params", {}).get("kind") != "resnet50v2":
+        raise ValueError("Testing ResNet50V2 requiere una corrida nueva de esa arquitectura.")
 
 
 def sha256(path):
@@ -121,6 +131,7 @@ def run(config_path, output):
     """Paths relativos al JSON; ambos contratos deben coincidir exactamente."""
     config_path = Path(config_path).resolve()
     config = json.loads(config_path.read_text(encoding="utf-8"))
+    require_ready_reference(config)
     root = config_path.parent
     contract = config["contract"]
     if contract.get("classes") != CLASSES or contract.get("preprocessing") != PREPROCESSING:
@@ -149,6 +160,8 @@ def run(config_path, output):
     predictions = {}
     for role, path in paths.items():
         model = tf.keras.models.load_model(path, compile=False, safe_mode=True)
+        if config.get("architecture") == "resnet50v2":
+            model.get_layer("resnet50v2")
         predictions[role] = predict(golden, manifest, lambda tensor, model=model: model(tensor, training=False))
     report = compare(manifest["rows"], predictions["baseline"], predictions["candidate"], threshold)
     report.update(

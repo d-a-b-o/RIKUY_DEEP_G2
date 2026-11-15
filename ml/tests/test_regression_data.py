@@ -120,19 +120,30 @@ def test_bundle_recovery_and_integrity(tmp_path, fault):
         assert object_path(remote, entry["md5"]).read_bytes() == body
 
 
-def test_real_metadata_is_pinned_and_balanced():
+def test_new_reference_stays_pending_and_never_downloads_old_objects(tmp_path):
     directory = Path(__file__).resolve().parents[1]
     catalog = json.loads((directory / "regression-sources.json").read_text())
-    rows = json.loads((directory / "regression-metadata/golden-manifest.json").read_text())["rows"]
-    assert len(rows) == len({row["id"] for row in rows}) == 50
-    assert sum(row["label"] == 0 for row in rows) == sum(row["label"] == 1 for row in rows) == 25
-    downloads = {entry["sha256"] for entry in catalog["objects"] if "drive_id" in entry}
-    assert {row["sha256"] for row in rows} <= downloads
     config = json.loads((directory / "regression-config.json").read_text())
-    for role in ("baseline", "candidate"):
-        assert config[role]["sha256"] in downloads
-        assert config[role]["contract"] == config["contract"]
-    assert config["contract"]["threshold"] == 0.26489877700805664
+    assert catalog["architecture"] == config["architecture"] == "resnet50v2"
+    if catalog["status"].startswith("pending"):
+        if catalog["status"] == "pending_resnet50v2_training":
+            assert catalog["objects"] == []
+
+        def forbidden_download(*args):
+            pytest.fail("No descargar artefactos retirados")
+
+        with pytest.raises(ValueError, match="pendiente"):
+            hydrate(directory / "regression-sources.json", tmp_path / "remote", forbidden_download)
+    else:
+        assert catalog["status"] == config["status"] == "ready"
+        rows = json.loads((directory / "regression-metadata/golden-manifest.json").read_text())["rows"]
+        assert len(rows) == len({r["id"] for r in rows}) == 50
+        assert sum(r["label"] == 0 for r in rows) == sum(r["label"] == 1 for r in rows) == 25
+        hashes = {entry["sha256"] for entry in catalog["objects"]}
+        assert {r["sha256"] for r in rows} <= hashes
+        for role in ("baseline", "candidate"):
+            assert config[role]["sha256"] in hashes
+            assert config[role]["contract"] == config["contract"]
 
 
 @pytest.mark.parametrize("always_fail", [False, True])

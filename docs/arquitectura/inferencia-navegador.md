@@ -20,24 +20,28 @@ Estado de integración manual auditado en `98bbd55` (2026-11-09): [HU35](inspecc
 
 Versión publicada hoy: **0.9.0 provisional** en `https://bucket.d-a-b-o.dev/dev/manifest.json`. Es la exportación `9f8457f52f63…` (umbral 0,2437), subida sin el quality gate para demos y desarrollo; en la pantalla aparece como «Provisional». La versión oficial 1.0.0 se publicará en el manifest de la raíz desde el notebook, tras el quality gate (HU25).
 
-## El modelo actual
+## Modelo candidato y referencia histórica
 
-Datos del notebook `RIKUY_DEEP_G2.ipynb` (HU17, corrida `run01_lr1e-4_unfreeze15_drop30`). La exportación final publicada como 0.9.0 usa otra corrida con umbral **0,2437**; sus métricas se actualizarán con el reporte del quality gate:
+La arquitectura nueva es ResNet50V2 con ImageNet, pendiente de entrenamiento,
+exportación y medición. Los valores publicados y métricas de la tabla siguiente
+pertenecen a la versión anterior y no se atribuyen al candidato nuevo.
+
+Contrato del candidato que se entrenará desde `RIKUY_DEEP_G2.ipynb` (HU17):
 
 | Propiedad | Valor |
 | --- | --- |
-| Arquitectura | MobileNetV2 (ImageNet) con fine-tuning, `GlobalAveragePooling2D`, `Dropout`, `Dense(1, sigmoid)` |
+| Arquitectura candidata | ResNet50V2 (ImageNet), pendiente de validar, `GlobalAveragePooling2D`, `Dropout`, `Dense(1, sigmoid)` |
 | Entrada | `[1, 400, 400, 3]`, RGB, `float32` en **[0, 1]** |
 | Normalización interna | Capa `Rescaling(2, offset=-1)` dentro del modelo: pasa de [0, 1] a [-1, 1]. **La web no la aplica** |
 | Salida | `[1, 1]`: probabilidad de que la pieza sea **defectuosa** (clase 1) |
-| Umbral | **0,2649**, elegido en validación para priorizar el recall de defectuosas |
-| Métricas en test | accuracy 98,97 %, recall de defectuosas 98,29 %, precisión de defectuosas 100 %, 2 falsos negativos de 117 |
+| Umbral | Pendiente del nuevo entrenamiento; se elige sólo en validation para priorizar el recall de defectuosas |
+| Métricas en test | Pendientes de evaluar el ResNet sobre el test reservado |
 
 El tamaño de entrada es **400×400**. Se decidió en la revisión de arquitectura del 2026-11-01 (RIKDP-89); HU06 y HU26 decían 224×224 y se corrigieron.
 
 ## Exportación (HU25)
 
-1. Cargar el mejor checkpoint `best_model.keras` y exportarlo como SavedModel: `model.export("export/saved_model")`.
+1. Cargar el checkpoint `best.keras` de la corrida seleccionada y exportarlo como SavedModel: `model.export("export/saved_model")`.
 2. Convertir a graph model:
 
    ```bash
@@ -76,7 +80,7 @@ El bucket necesita CORS con `GET` permitido para el dominio de la app.
 
 ## Manifest
 
-Esquema: [`apps/web/src/lib/model/manifest.ts`](../../apps/web/src/lib/model/manifest.ts) (tipos y validación, con pruebas). Ejemplo:
+Esquema: [`apps/web/src/lib/model/manifest.ts`](../../apps/web/src/lib/model/manifest.ts) (tipos y validación, con pruebas). El ejemplo siguiente ilustra el formato; sus porcentajes y umbral no son resultados del nuevo ResNet:
 
 ```json
 {

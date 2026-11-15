@@ -6,7 +6,7 @@ import math
 from dataclasses import fields
 from pathlib import Path
 
-from ml.regression import write_json
+from ml.regression import require_resnet_run, write_json
 from ml.workflow import Config, check_artifacts, digest, read_json, train
 
 TOLERANCE = 1e-6
@@ -19,6 +19,7 @@ def compare_runs(left, right):
     records = []
     for directory in (left, right):
         started, completed = read_json(directory / "started.json"), read_json(directory / "completed.json")
+        require_resnet_run(started)
         check_artifacts(directory, completed)
         if started["identity"] != completed["identity"]:
             raise ValueError("Identidad de corrida inconsistente.")
@@ -33,6 +34,10 @@ def compare_runs(left, right):
                 "versions": started["versions"],
             }
         )
+        if started.get("execution_id"):
+            if started.get("experiment_identity") != identity:
+                raise ValueError("La huella del experimento no coincide con sus datos/código.")
+            identity = digest({"experiment": identity, "execution": started["execution_id"]})
         if identity != completed["identity"]:
             raise ValueError("La identidad no corresponde al contenido de la corrida.")
         with (directory / "history.csv").open(encoding="utf-8", newline="") as stream:

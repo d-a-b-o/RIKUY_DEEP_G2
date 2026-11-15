@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "architecture": "resnet50v2",
+  "status": "pending_resnet50v2_training",
+  "reason": "Generar referencias nuevas desde el notebook despues de entrenar y aprobar el gate; no hay artefactos anteriores habilitados."
+}

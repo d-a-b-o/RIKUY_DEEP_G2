@@ -19,10 +19,13 @@ adicional a las discrepancias de clasificación y conserva el criterio del ensay
 
 ## Ejecutar en Colab
 
-1. Recuperar el modelo existente y la exportación, con `selected_run` y `export_dir`.
+1. Tener cargadas la corrida seleccionada y su exportación, con `selected_run` y `export_dir`.
 2. Cargar las librerías y las funciones de preprocesamiento del notebook.
-3. Ejecutar la celda con `run_golden_quality_gate`. Crea tensores temporales en `/content` y realiza las
-   inferencias en CPU; puede tardar varios minutos. No requiere el entorno del conversor.
+3. Ejecutar la celda con `run_golden_quality_gate`. Guarda tensores en
+   `ROOT/reports/golden-quality-gate`, donde ROOT es
+   `/content/drive/MyDrive/ColabNotebooks/RIKUY_DEEP_G2`. Keras usa CPU y TF.js usa
+   WASM, con las versiones fijadas a 4.22.0. Carga `model.json` y los shards
+   directamente del disco, sin localhost. No requiere el entorno del conversor.
 4. Revisar `reports/quality_gate/<exportación>/quality_gate.json`, en el repositorio de Drive.
 
 El reporte contiene las predicciones de cada imagen, las matrices de confusión,
@@ -31,7 +34,22 @@ aprobada se reutiliza sólo si esos artefactos coinciden. Los fallos dejan repor
 y una excepción; `PUBLICATION_ALLOWED` comienza en `False` en cada ejecución.
 
 No se modifica el contenido de `exports/` ni sus hashes después de exportar.
-Los datos temporales de `/content` se pueden reconstruir tras una desconexión.
+El runner guarda progreso después de cada predicción JavaScript. Al repetir la celda,
+reutiliza sólo entradas que coinciden con los hashes del modelo, los pesos, las muestras
+y el tensor correspondiente. Un timeout deja el gate incompleto y bloquea la publicación;
+no demuestra por sí solo que el modelo incumpla las métricas. Se conserva el límite de
+una hora por ejecución y no se reduce el conjunto de 195 imágenes para conseguir un aprobado.
+
+El runner registra un adaptador `_FusedConv2D` para la limitación de WASM 4.22 con
+sesgos `[1,1,1,C]`. Ejecuta Conv2D, BiasAdd y activación por separado, conservando
+el broadcasting NHWC. No reescribe pesos ni archivos de la exportación. Rechaza
+formatos, sesgos u operaciones no soportados. El reporte identifica este adaptador
+con `execution_adapter=unfused-conv2d-nhwc-v1`; su resultado acredita este runner,
+no el loader del navegador, que requiere su propia validación antes de publicar.
+
+Las salidas del proceso se guardan en `node-stdout.log` y `node-stderr.log`, dentro
+de la carpeta del ensayo. Si Node termina con error, su stderr también se incluye
+en el reporte para evitar perder la causa detrás de un simple código de salida.
 
 ## Antes de publicar
 
@@ -95,29 +113,16 @@ La semántica de escrituras condicionales se basa en
 
 ## Alcance y evidencia pendiente
 
-Este gate prueba la conversión y el umbral en TensorFlow.js CPU con **tensores de
+Este gate prueba la conversión y el umbral en TensorFlow.js WASM en Node con **tensores de
 entrada idénticos**. No prueba todavía el recorte/resize mediante canvas ni los
 backends WebGL/WASM del navegador. La prueba completa de inferencia del navegador
 y paridad de preprocesamiento sigue correspondiendo a RIKDP-154/HU26.
 
 Las pruebas de CI cubren aceptación/rechazo, cobertura de 195 IDs, finitud,
 métricas y reutilización de la política en el notebook. El recorrido JavaScript
-se prueba con un motor simulado; no se confunde con una ejecución del modelo real.
-El gate de las imágenes reales se ejecutó en Colab: el usuario aportó un reporte
-de 195 muestras, 98.46% de accuracy, 100% de recall, cero discrepancias y diferencia
-máxima de 3.0994415283203125e-06. No se volvió a ejecutar ese modelo en la revisión local.
-
-`ml/tests/test_publication.py` usa un cliente S3 simulado para demostrar que el gate
-fallido bloquea todas las escrituras, que la subida precede a la activación y que
-fallos intermedios o conflictos no cambian la versión activa. No se ha realizado
-una publicación real en R2 durante esta tarea.
-
-### Evidencia PT1 conservada el 08/11/2026
-
-Se recuperó y verificó el reporte original de 195 muestras contra los artefactos
-de la corrida y los pesos de exportación. También se repitió la inferencia real
-Keras/TF.js CPU sobre las 50 imágenes versionadas: cero discrepancias y máxima
-diferencia 2.92e-06. Los archivos, métricas recalculadas, límites del ensayo y
-pendientes de cierre están en [PT1](pruebas/pt1-cierre.md). Los nuevos tests
-incluyen el límite exacto 94,9/95,0 y el bloqueo de publicación; no cambian la
-política, el tamaño del conjunto exigido al publicar ni el modelo.
+se comprueba además con un graph-model mínimo real: lectura de shards sin HTTP,
+inferencia WASM y reanudación, incluyendo invalidación al cambiar un tensor.
+Esta prueba no acredita el rendimiento ni la paridad del ResNet entrenado.
+Las métricas reales del nuevo ResNet están pendientes de Colab. No se mantienen aprobaciones
+de otra arquitectura como evidencia del modelo nuevo. Ver [el flujo ResNet de testing](pruebas/pt1-cierre.md).
+La publicación permanece bloqueada hasta que el gate del nuevo checkpoint y exportación apruebe.

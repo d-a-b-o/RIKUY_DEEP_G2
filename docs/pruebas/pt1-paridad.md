@@ -34,10 +34,8 @@ en los bordes supera 1e-6 frente al cálculo float32 de TensorFlow. La correcci�
 calcula coordenadas, pesos y mezclas en float32 y libera los intermedios en
 `tf.tidy`. Conserva el recorte centrado existente para fotogramas rectangulares.
 
-El contrato PIL v1 de la regresión HU22 se conserva explícitamente en
-`preprocess_regression_image`; `ml.regression` lo usa con el identificador
-histórico inmutable. Los dos checkpoints siguen recibiendo sus mismos tensores
-PIL. No se cambia su baseline ni se reinterpreta como paridad de entrenamiento.
+La regresión nueva usa el mismo preprocesamiento half-pixel, contrato v2. Sus referencias
+sólo se generan después de aprobar los pesos ResNet; no se conservan baselines de otra arquitectura.
 
 La extracción reemplaza únicamente la llamada al modelo por la devolución del
 tensor de entrada. Si cambia la estructura del loader y no puede extraerse,
@@ -125,10 +123,8 @@ En Linux pueden necesitarse las bibliotecas de sistema que instala
 Los diez tests unitarios validan la política, formatos, fixtures y códigos de
 salida; que pasen no significa que exista paridad real. `RIKDP-85.json` es el
 resultado de la comparación real. `reports/` está excluido de Git.
-La suite ML corregida aprobó 164 pruebas y cuatro subtests antes de añadir las
-herramientas de evaluación de RIKDP-131/254. Incluye comparación
-de NumPy con TensorFlow real sobre píxeles aleatorios, tamaños 1/128/400/512/517
-y conservación exacta del resize PIL histórico. La medición real de Chromium
+La suite incluye comparación de NumPy con TensorFlow real sobre píxeles aleatorios
+de tamaños 1/128/400/512/517. La medición real de Chromium
 completó los 16 casos y devolvió salida 0. Los seis tests web del preprocesamiento
 comprueban recorte, interpolación y ausencia de crecimiento de tensores.
 TypeScript y ESLint de los archivos web modificados también aprobaron.
@@ -145,8 +141,9 @@ TensorFlow de 5.960464477539063e-08. Se conservan los resultados de
 [WebGL/SwiftShader](../evidencias/RIKDP-85-paridad-webgl.json) y
 [WASM](../evidencias/RIKDP-85-paridad-wasm.json), además del informe CPU.
 
-En el notebook sólo se cambió la consulta de ruta de una celda de diagnóstico
-(`r.__spec__.origin`); no se modificó el pipeline de entrenamiento.
+Estas mediciones acreditan el preprocesamiento, que no depende de los pesos.
+La migración posterior del notebook a ResNet50V2 requiere generar nuevas evidencias
+de inferencia Keras/TF.js; los informes de tensores no sustituyen esa comprobación.
 
 ## Ejecución en GitHub
 

@@ -4,16 +4,11 @@ La tarea requiere que una persona distinta del autor del modelo revise el test
 reservado. Una ejecución automatizada aprobada no sustituye esa revisión. No se
 ha registrado un revisor ni una aceptación ficticia.
 
-## Evidencia disponible
+## Evidencia nueva pendiente
 
-- Modelo original `af731904844ed80545ae`, SHA256
-  `28f54a232e3dbdf2498cba8a5d8aa2002d9a312c560ce3acd818023b77ba949e`.
-- Test original: 195 imágenes; 78 OK y 117 defectuosas.
-- Umbral fijado en validation: `0.24371959269046783`.
-- Resultado ya recalculado: accuracy 192/195 (98,4615 %), recall 117/117 (100 %),
-  matriz [[75, 3], [0, 117]].
-- [Reporte y hashes](../evidencias/RIKDP-131-metricas.json) y
-  [predicciones originales](../evidencias/RIKDP-154-quality-gate-original.json).
+Usar la corrida ResNet seleccionada por el notebook y el manifiesto nuevo. No hay métricas acreditadas
+hasta ejecutar test. Se requieren 195 imágenes reservadas, recall >=95 % y accuracy >=97 %.
+El umbral se calibra exclusivamente con validation. Los informes anteriores fueron retirados.
 
 ## Inferencia nueva sin entrenar
 
@@ -36,7 +31,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path('/content/drive/MyDrive/ColabNotebooks/RIKUY_DEEP_G2')
-RUN = ROOT / 'models/experiments/mobilenetv2_af731904844ed80545ae'
+SELECTION = json.loads((ROOT / 'data/prepared/final-selection.json').read_text())
+RUN = ROOT / 'models/experiments' / SELECTION['selected']
 OUTPUT = ROOT / 'reports/independent-metrics/RIKDP-131.json'
 assert (ROOT / 'ml/independent_metrics.py').is_file(), 'Copia primero el módulo nuevo a Drive'
 

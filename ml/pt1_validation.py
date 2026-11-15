@@ -7,13 +7,14 @@ import platform
 from pathlib import Path
 
 from ml.quality_gate import evaluate_quality_gate
-from ml.regression import write_json
+from ml.regression import require_resnet_run, write_json
 from ml.workflow import check_artifacts, digest, file_hash, read_json, scores
 
 
 def audit(source_report, run, export):
     run, export = Path(run), Path(export)
     started, completed = read_json(run / "started.json"), read_json(run / "completed.json")
+    require_resnet_run(started)
     check_artifacts(run, completed)
     if started["identity"] != completed["identity"]:
         raise ValueError("Identidades de corrida diferentes.")

@@ -92,6 +92,7 @@ def measure(root, backend="cpu"):
     import tensorflow as tf
     from playwright.sync_api import sync_playwright
 
+    root = Path(root).resolve()
     harness = subprocess.run(
         ["node", str(root / "ml/parity_browser.cjs"), str(root / "apps/web")],
         capture_output=True,
@@ -102,7 +103,9 @@ def measure(root, backend="cpu"):
     )
     scripts = json.loads(harness.stdout)
     results = []
-    with tempfile.TemporaryDirectory(prefix="rikdp-85-") as temporary, sync_playwright() as playwright:
+    work_root = root / "reports" / "preprocessing-parity"
+    work_root.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="run-", dir=work_root) as temporary, sync_playwright() as playwright:
         options = {"headless": True}
         if backend == "webgl":
             options["args"] = ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"]

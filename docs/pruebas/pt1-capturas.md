@@ -52,7 +52,7 @@ En el entorno de ML con TensorFlow, indicar la corrida original restaurada:
 python -m ml.capture_evaluation --manifest data/capturas-pt1/manifest.json --run RUTA_CORRIDA_ORIGINAL --output reports/captures/RIKDP-254.json
 ```
 
-La referencia por defecto es `docs/evidencias/RIKDP-131-metricas.json`; debe
+La referencia por defecto es `reports/independent-metrics/RIKDP-131.json`; debe
 corresponder al mismo modelo, identidad y umbral. Para Colab, copiar también
 esa referencia a la misma ruta de Drive o indicarla con `--baseline`.
 Sincronizar los módulos `capture_evaluation.py`, `preprocessing.py`,

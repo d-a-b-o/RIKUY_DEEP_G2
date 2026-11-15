@@ -22,12 +22,6 @@ def _rgb_image(image):
     return image.convert("RGB")
 
 
-def preprocess_regression_image(image):
-    """Contrato PIL v1 congelado de HU22; no usar para la inferencia nueva."""
-    image = _rgb_image(image).resize(TARGET_SIZE, Image.Resampling.BILINEAR)
-    return np.asarray(image, dtype=np.float32) / 255.0
-
-
 def preprocess_image(image):
     """RGB float32 [0,1], bilinear half-pixel sin antialias como tf.image.resize.
 

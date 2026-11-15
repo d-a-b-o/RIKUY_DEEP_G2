@@ -40,7 +40,7 @@ Este plan define qué se prueba, cómo, con qué herramientas, quién y cuándo,
 **Dentro del alcance**
 
 - Aplicación web Next.js: landing, autenticación (login, recuperación, 2FA), multiempresa y roles, catálogos, inspección por cámara, lote, imagen subida y video, historial, dashboard y reportes.
-- Modelo de IA (MobileNetV2): datos, preprocesamiento, entrenamiento, métricas objetivo, regresión en CI, exportación a TensorFlow.js y reentrenamiento con correcciones.
+- Modelo de IA (CNN baseline y ResNet50V2): datos, preprocesamiento, entrenamiento, métricas objetivo, regresión en CI, exportación a TensorFlow.js y reentrenamiento con correcciones.
 - Inferencia en el navegador con TensorFlow.js: carga del modelo desde el manifest, caché, preprocesamiento idéntico al de entrenamiento, backends WebGL y WASM.
 - Pipeline DevOps/MLOps: CI, despliegue en Vercel, migraciones, DVC, MLflow, quality gate y publicación versionada del modelo en R2.
 - Requisitos no funcionales: rendimiento, seguridad, accesibilidad, compatibilidad y monitoreo.
@@ -369,7 +369,7 @@ o una ejecución manual debe comprobar las referencias disponibles en ese moment
 | RIKDP-84 | PT1 | Componente | Forma y rango del preprocesamiento (400×400×3), PIL y TensorFlow real; [procedimiento](pt1-preprocesamiento.md) | pytest + TensorFlow CPU | A. Chumbiraico | HU06 |
 | RIKDP-85 | PT1 | Integración | Paridad del preprocesamiento Python ↔ TF.js (misma imagen cuadrada, mismo tensor); [corrección y evidencia](pt1-paridad.md) | pytest + Chromium + TF.js CPU/WebGL/WASM | D. Sánchez | HU06 |
 | RIKDP-96 | PT1 | Componente | Validación de datos con imágenes corruptas y duplicadas de muestra | pytest | D. Sánchez | HU10 |
-| RIKDP-101 | PT1 | Componente | Reproducibilidad: dos corridas con la misma semilla dan las mismas métricas; [ensayo y resultado de Colab](pt1-cierre.md#reproducibilidad--rikdp-101) | pytest + TensorFlow | D. Bravo | HU10 |
+| RIKDP-101 | PT1 | Componente | Reproducibilidad: dos corridas con la misma semilla dan las mismas métricas; [ensayo de Colab para ResNet50V2](pt1-colab-reproducibilidad.md) | pytest + TensorFlow | D. Bravo | HU10 |
 | RIKDP-131 | PT1 | Sistema | Verificación independiente de métricas en test (recall ≥ 95 %, accuracy ≥ 97 %); [inferencia nueva y revisión pendiente](pt1-revision-independiente.md) | pytest + scikit-learn | D. Sánchez | HU17 |
 | RIKDP-145 | PT1 | Integración | Un modelo degradado hace fallar el job de regresión en CI | GitHub Actions + pytest | D. Bravo | HU22 |
 | RIKDP-154 | PT1 | Integración | Paridad Keras ↔ TF.js en el conjunto dorado (≤ 2 discrepancias); [evidencia real CPU](pt1-cierre.md) | TF.js CPU + pytest | D. Bravo | HU25 |

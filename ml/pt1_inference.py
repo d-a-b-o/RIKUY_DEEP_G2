@@ -43,8 +43,11 @@ def measure(config_path, run, export, web, source_report):
     rows = manifest["rows"]
     tf.keras.utils.set_random_seed(42)
     model = tf.keras.models.load_model(run / "best.keras", compile=False, safe_mode=True)
+    model.get_layer("resnet50v2")
     handler = functools.partial(QuietHandler, directory=str(export / "web"))
-    with tempfile.TemporaryDirectory(prefix="pt1-inference-") as temporary:
+    work_root = root / "reports" / "pt1-inference"
+    work_root.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="run-", dir=work_root) as temporary:
         work = Path(temporary)
         dataset = make_tf_dataset(
             [golden / r["path"] for r in rows], [r["label"] for r in rows], training=False, augment=False, batch_size=1

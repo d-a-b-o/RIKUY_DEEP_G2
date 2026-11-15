@@ -6,7 +6,7 @@ from pathlib import Path
 
 import numpy as np
 from ml.preprocessing import make_tf_dataset
-from ml.regression import write_json
+from ml.regression import require_resnet_run, write_json
 from ml.workflow import Config, check_artifacts, file_hash, load_manifest, read_json, scores
 
 
@@ -47,6 +47,7 @@ def measure(root, run):
 
     root, run = Path(root).resolve(), Path(run).resolve()
     started, completed = read_json(run / "started.json"), read_json(run / "completed.json")
+    require_resnet_run(started)
     check_artifacts(run, completed)
     config = Config(root, seed=started["params"]["seed"])
     manifest = load_manifest(config)
@@ -63,11 +64,13 @@ def measure(root, run):
         seed=config.seed,
     )
     model = tf.keras.models.load_model(run / "best.keras", compile=False, safe_mode=True)
+    model.get_layer("resnet50v2")
     output = np.asarray(model.predict(dataset, verbose=0))
     if output.shape != (195, 1):
         raise ValueError("Salida del modelo distinta de [195,1].")
     report = evaluate_predictions(rows, output[:, 0], threshold)
     report.update(
+        architecture="resnet50v2",
         scope="fresh_inference_reserved_test",
         fresh_inference=True,
         human_independent_reviewer=None,

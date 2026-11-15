@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
-from ml.regression import sha256, validate_golden, write_json
+from ml.regression import require_ready_reference, sha256, validate_golden, write_json
 
 
 def prepare(config_path, output):
@@ -16,6 +16,7 @@ def prepare(config_path, output):
 
     config_path, output = Path(config_path).resolve(), Path(output).resolve()
     config = json.loads(config_path.read_text(encoding="utf-8"))
+    require_ready_reference(config)
     golden = (config_path.parent / config["golden"]).resolve()
     if validate_golden(golden)["kind"] != "real":
         raise ValueError("Se requiere el conjunto real.")
@@ -28,6 +29,8 @@ def prepare(config_path, output):
         spec["path"] = str(source)
     source = Path(config["candidate"]["path"])
     model = tf.keras.models.load_model(source, compile=False, safe_mode=True)
+    if config.get("architecture") == "resnet50v2":
+        model.get_layer("resnet50v2")
     head = model.layers[-1]
     if not isinstance(head, tf.keras.layers.Dense) or head.units != 1 or head.activation.__name__ != "sigmoid":
         raise ValueError("Se esperaba una cabeza Dense sigmoid de una unidad.")

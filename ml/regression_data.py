@@ -13,7 +13,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from urllib.request import urlopen
 
-from ml.regression import sha256, write_json
+from ml.regression import require_ready_reference, sha256, write_json
 
 
 def object_path(remote, md5):
@@ -49,6 +49,7 @@ def hydrate(catalog_path, remote, downloader):
     """El catálogo sólo contiene IDs públicos y hashes, nunca cookies ni credenciales."""
     catalog_path = Path(catalog_path).resolve()
     catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    require_ready_reference(catalog)
     if catalog.get("schema_version") != 1 or not catalog.get("objects"):
         raise ValueError("Catálogo de recuperación inválido.")
     seen = set()
@@ -59,14 +60,18 @@ def hydrate(catalog_path, remote, downloader):
         seen.add(spec["md5"])
         if not re.fullmatch(r"[0-9a-f]{64}", spec.get("sha256", "")):
             raise ValueError("SHA256 ausente o inválido.")
-        if ("metadata" in spec) == ("drive_id" in spec):
+        if sum(key in spec for key in ("metadata", "drive_id", "bundle_member")) != 1:
             raise ValueError("Cada objeto exige una única fuente.")
+        if "bundle_member" in spec and (spec["bundle_member"] is not True or "bundle" not in catalog):
+            raise ValueError("Un miembro de bundle requiere un paquete configurado.")
 
     if "bundle" in catalog:
         bundle = catalog["bundle"]
         if not re.fullmatch(r"[A-Za-z0-9_-]+", bundle.get("drive_id", "")):
             raise ValueError("ID del paquete de Drive inválido.")
-        archive_path = Path(remote).resolve().parent / "hu22-reference.zip"
+        if not re.fullmatch(r"[0-9a-f]{64}", bundle.get("sha256", "")):
+            raise ValueError("SHA256 del paquete de referencia inválido.")
+        archive_path = Path(remote).resolve().parent / f"hu22-reference-{bundle['sha256']}.zip"
         archive_path.parent.mkdir(parents=True, exist_ok=True)
         if not archive_path.exists():
             temporary = archive_path.with_suffix(".partial")
