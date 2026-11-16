@@ -3,6 +3,13 @@ name: HU22 model regression
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'ml/**'
+      - 'models/**'
+      - 'golden/**'
+      - '.dvc/**'
+      - '.github/workflows/model-regression.yml'
+      - 'RIKUY_DEEP_G2.ipynb'
   workflow_dispatch:
     inputs:
       degraded:
@@ -15,12 +22,16 @@ permissions:
 
 jobs:
   regression-contract:
+    permissions:
+      contents: read
     name: HU22 synthetic contract tests
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
         with:
           python-version: '3.13'
       - run: pip install -r ml/requirements-ci.txt
@@ -32,7 +43,7 @@ jobs:
           git diff --exit-code -- golden/synthetic.dvc
           dvc checkout golden/synthetic.dvc
           python -c "from ml.regression import validate_golden; validate_golden('golden/synthetic')"
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         if: always()
         with:
           name: hu22-contract-evidence
@@ -40,6 +51,8 @@ jobs:
           retention-days: 14
 
   model-regression:
+    permissions:
+      contents: read
     name: HU22 real model gate
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -47,8 +60,10 @@ jobs:
       CUDA_VISIBLE_DEVICES: '-1'
       TF_ENABLE_ONEDNN_OPTS: '0'
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
         with:
           # numpy 2.5 exige Python >= 3.12; 3.12 es también la versión de Colab.
           python-version: '3.12'
@@ -62,7 +77,7 @@ jobs:
           --junitxml=reports/preprocessing/RIKDP-84.xml
       - name: PT1 RIKDP-84 · Evidencia del preprocesamiento
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: pt1-preprocessing-evidence
           path: reports/preprocessing/
@@ -95,7 +110,7 @@ jobs:
           valid=verify_rejection(code,report);
           write_json('reports/pt1-negative/verification.json',dict(passed=valid,gate_exit_code=code));
           assert valid, 'No se acredito el rechazo del modelo degradado'"
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         if: always()
         with:
           name: hu22-real-regression-evidence

@@ -158,6 +158,14 @@ class R2ModelStore:
             if not identical:
                 raise RuntimeError(f"Versión inmutable: el objeto {key} ya existe con otros bytes.") from exc
 
+    def read_object(self, key):
+        response = self.client.get_object(Bucket=self.bucket, Key=key)
+        stream = response["Body"]
+        try:
+            return stream.read()
+        finally:
+            stream.close()
+
     def activate_manifest(self, catalog, expected_etag):
         condition = {"IfMatch": expected_etag} if expected_etag else {"IfNoneMatch": "*"}
         self.client.put_object(
@@ -220,10 +228,32 @@ def publish_tfjs_version(export_dir, run_dir, version, assert_ready, open_store,
         store.put_immutable(
             f"v{version}/{name}", body, "application/json" if name.endswith(".json") else "application/octet-stream"
         )
+    integrity = {"passed": False, "files": {}}
+    for name, expected in sorted(files.items()):
+        key = f"v{version}/{name}"
+        expected_sha = hashlib.sha256(expected).hexdigest()
+        try:
+            actual_sha = hashlib.sha256(store.read_object(key)).hexdigest()
+        except Exception as exc:
+            integrity["files"][key] = {"expected": expected_sha, "error": type(exc).__name__}
+            failure = {"status": "integrity_failed", "published": False, "integrity": integrity}
+            (Path(run_dir) / "publication-report.json").write_bytes(publication_json(failure))
+            raise RuntimeError(f"Publicación bloqueada: no se pudo verificar {key}.") from exc
+        integrity["files"][key] = {"expected": expected_sha, "actual": actual_sha}
+        if actual_sha != expected_sha:
+            failure = {"status": "integrity_failed", "published": False, "integrity": integrity}
+            (Path(run_dir) / "publication-report.json").write_bytes(publication_json(failure))
+            raise RuntimeError(f"Publicación bloqueada: hash remoto incorrecto para {key}.")
+    integrity["passed"] = True
     # Si cambian los artefactos/datos mientras se suben, dejar objetos inactivos, no activarlos.
     current = assert_ready()
     require_quality_gate(current, model_sha, report["golden_sha256"], report["golden_rows"])
     if current["threshold"] != report["threshold"]:
         raise RuntimeError("Publicación bloqueada: el umbral cambió durante la subida.")
+    (Path(run_dir) / "publication-report.json").write_bytes(
+        publication_json({"status": "verified_not_activated", "published": False, "integrity": integrity})
+    )
     store.activate_manifest(catalog, expected_etag=etag)
-    return {"status": "published", "published": True, "activeVersion": version, "plan": plan}
+    result = {"status": "published", "published": True, "activeVersion": version, "plan": plan, "integrity": integrity}
+    (Path(run_dir) / "publication-report.json").write_bytes(publication_json(result))
+    return result

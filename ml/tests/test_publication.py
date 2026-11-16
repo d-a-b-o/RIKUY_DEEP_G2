@@ -309,3 +309,47 @@ def test_notebook_embeds_tested_publisher_and_defaults_to_dry_run():
     keywords = {keyword.arg: ast.unparse(keyword.value) for keyword in call.keywords}
     assert keywords["assert_ready"] == "assert_publication_ready"
     assert keywords["dry_run"] == "not PUBLISH_MODEL"
+
+
+@pytest.mark.parametrize("name", ["model.json", "weights.bin", "preprocessing.json"])
+def test_remote_corruption_blocks_activation(release, name):
+    client = release["client"]
+    original = client.get_object
+
+    def corrupt(Bucket, Key):
+        response = original(Bucket, Key)
+        if Key == f"v1.0.0/{name}":
+            response["Body"] = io.BytesIO(b"corrupted in transit")
+        return response
+
+    client.get_object = corrupt
+    with pytest.raises(RuntimeError, match="hash remoto"):
+        publish(release, dry_run=False)
+    assert "manifest.json" not in client.objects
+    evidence = json.loads((release["run"] / "publication-report.json").read_bytes())
+    assert not evidence["integrity"]["passed"]
+
+
+def test_remote_integrity_is_reported(release):
+    result = publish(release, dry_run=False)
+    assert result["integrity"]["passed"]
+    assert len(result["integrity"]["files"]) == 4
+    for item in result["integrity"]["files"].values():
+        assert item["expected"] == item["actual"]
+
+
+def test_remote_read_failure_is_reported_without_activation(release):
+    client = release["client"]
+    original = client.get_object
+
+    def unavailable(Bucket, Key):
+        if Key == "v1.0.0/model.json":
+            raise OSError("unavailable")
+        return original(Bucket, Key)
+
+    client.get_object = unavailable
+    with pytest.raises(RuntimeError, match="no se pudo verificar"):
+        publish(release, dry_run=False)
+    assert "manifest.json" not in client.objects
+    evidence = json.loads((release["run"] / "publication-report.json").read_bytes())
+    assert evidence["integrity"]["files"]["v1.0.0/model.json"]["error"] == "OSError"

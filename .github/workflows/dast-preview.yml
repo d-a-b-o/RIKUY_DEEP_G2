@@ -1,0 +1,96 @@
+name: HU51 DAST preview
+on:
+  deployment_status:
+permissions:
+  contents: read
+jobs:
+  baseline:
+    if: github.event.deployment_status.state == 'success' && github.event.deployment.creator.login == 'vercel[bot]' && github.event.deployment.environment == 'Preview'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pull-requests: read
+      statuses: write
+    steps:
+      # Always load trusted default-branch code, never the deployed PR's code.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.repository.default_branch }}
+      - name: Validar URL, SHA y origen de la PR
+        id: preview
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERCEL_PROJECT: ${{ vars.DAST_VERCEL_PROJECT }}
+        run: python .github/scripts/dast_preview.py
+      - name: ZAP baseline (solo escaneo pasivo)
+        if: steps.preview.outputs.allowed == 'true'
+        env:
+          TARGET: ${{ steps.preview.outputs.url }}
+          BYPASS: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        run: |
+          mkdir -p zap-report
+          chmod 777 zap-report
+          # The header is scoped to this validated origin by the replacer URL.
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          import re
+          if os.environ.get('BYPASS'):
+              host = '^' + re.escape(os.environ['TARGET']) + r'/.*'
+              secret = os.environ['BYPASS']
+              if not re.fullmatch(r'[A-Za-z0-9_-]+', secret):
+                  raise ValueError('Invalid bypass token format')
+              lines = {
+                  'description': 'Vercel automation', 'enabled': 'true',
+                  'matchtype': 'REQ_HEADER', 'matchstr': 'x-vercel-protection-bypass',
+                  'regex': 'false', 'replacement': secret, 'url': host.replace(chr(92), chr(92)*2),
+              }
+              Path('zap.properties').write_text(''.join(
+                  f'replacer.full_list(0).{k}={v}\n' for k,v in lines.items()))
+          else:
+              Path('zap.properties').touch()
+          PY
+          chmod 644 zap.properties
+          set +e
+          docker run --rm -v "$PWD/zap-report:/zap/wrk:rw" -v "$PWD/zap.properties:/zap/config.properties:ro"             ghcr.io/zaproxy/zaproxy@sha256:9624669db72f54d86c4b46a7064518bd9bf79d8c61a4c31befa9923489f328af zap-baseline.py -t "$TARGET" -m 1             -J report.json -r report.html -z "-configfile /zap/config.properties"
+          code=$?
+          rm -f zap.properties
+          echo "$code" > zap-report/exit-code.txt
+          [ "$code" -le 2 ] && [ -f zap-report/report.json ]
+      - name: Conservar reporte
+        if: always() && steps.preview.outputs.allowed == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: zap-preview-${{ steps.preview.outputs.pr }}-${{ steps.preview.outputs.sha }}
+          path: zap-report/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Evaluar y publicar resultado en la PR
+        if: always() && steps.preview.outputs.allowed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ steps.preview.outputs.sha }}
+          ENFORCE: ${{ vars.DAST_ENFORCE_HIGH == 'true' }}
+        run: |
+          python - <<'PY'
+          import json, os, urllib.request
+          from pathlib import Path
+          valid = (Path('zap-report/report.json').is_file() and Path('zap-report/exit-code.txt').is_file()
+                   and Path('zap-report/exit-code.txt').read_text().strip() in {'0', '1', '2'})
+          high = 0
+          if valid:
+              report = json.loads(Path('zap-report/report.json').read_text())
+              valid = bool(report.get('site'))
+              high = sum(int(a['riskcode']) >= 3 for s in report.get('site', []) for a in s.get('alerts', []))
+          ok = valid and not (os.environ['ENFORCE'] == 'true' and high)
+          description = f'ZAP: {high} hallazgos altos; modo ' + ('bloqueante' if os.environ['ENFORCE'] == 'true' else 'informativo') if valid else 'ZAP: escaneo incompleto'
+          url = f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}"
+          Path(os.environ['GITHUB_STEP_SUMMARY']).write_text(description + '\n\n[Reporte HTML](' + url + ')')
+          data = json.dumps(dict(state='success' if ok else 'failure', context='HU51 / DAST preview', description=description, target_url=url)).encode()
+          request = urllib.request.Request(f"https://api.github.com/repos/{os.environ['GITHUB_REPOSITORY']}/statuses/{os.environ['SHA']}", data=data, headers={'Authorization': 'Bearer '+os.environ['GH_TOKEN'], 'Accept': 'application/vnd.github+json'})
+          urllib.request.urlopen(request, timeout=30).close()
+          if not ok:
+              raise SystemExit(1)
+          PY
