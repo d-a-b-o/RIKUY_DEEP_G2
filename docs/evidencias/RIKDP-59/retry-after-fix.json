@@ -1,0 +1,28 @@
+{
+  "task": "RIKDP-59",
+  "recorded_at_utc": "2026-11-16T20:37:19.451262+00:00",
+  "baseline_commit": "a3ad648",
+  "cause": "A request waiting for the row lock can see a window created by a later-started request. Subtracting the pre-query timestamp rounds Retry-After up to 61 seconds.",
+  "fix": "Subtract the current timestamp after the database query; do not cap the result or change quota limits.",
+  "deterministic_regression": {
+    "request_start_ms": 1000,
+    "window_created_ms": 1050,
+    "query_completed_ms": 1100,
+    "window_ms": 60000,
+    "before_seconds": 61,
+    "after_seconds": 60
+  },
+  "validation": {
+    "database": "Native PostgreSQL 16.15",
+    "passed": 464,
+    "failed": 0,
+    "skipped": 2,
+    "lint": "passed",
+    "typecheck": "passed",
+    "concurrent_inserts_and_expired_windows": "passed, same assertions and quotas"
+  },
+  "source_sha256": {
+    "apps/web/src/lib/security/write-limit.ts": "4634457fa4dce3d5a98ab0ffd169084ffa48eb989296941878b4887ab0f62f61",
+    "apps/web/src/lib/security/write-limit.test.ts": "ac3f48a152ad5e1ca5e918b1f0e4e56e01b2b9a3f7b5367d1b587dff0f34eee4"
+  }
+}

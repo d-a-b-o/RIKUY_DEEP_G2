@@ -35,6 +35,8 @@ export async function consumeWriteLimit(key: string, policy: WritePolicy): Promi
   `;
   const row = rows[0];
   if (!row) throw new Error("El limitador no devolvió un resultado");
-  return { allowed: row.count <= policy.max,
-    retryAfter: Math.max(1, Math.ceil((Number(row.last_request) + policy.windowMs - now) / 1000)) };
+  // Lock acquisition can reorder requests: a later-started request may create
+  // the window before this one. Measure remaining time only after the query.
+  const remainingMs = Number(row.last_request) + policy.windowMs - Date.now();
+  return { allowed: row.count <= policy.max, retryAfter: Math.max(1, Math.ceil(remainingMs / 1000)) };
 }

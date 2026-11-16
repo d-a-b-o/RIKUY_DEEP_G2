@@ -16,6 +16,18 @@ describe("HU48 write limiter", () => {
     expect(key).not.toContain("127.0.0.1");
     expect(writeLimitKey(new Headers(), policy)).toBe(writeLimitKey(new Headers({ "x-forwarded-for": "invalid" }), policy));
   });
+  it("calculates Retry-After after the query when a later request creates the window first", async () => {
+    // This request starts at 1000ms, but another creates the row at 1050ms
+    // while ours waits. Our query finishes at 1100ms: 59.95s remain, not 60.05s.
+    const clock = vi.spyOn(Date, "now").mockReturnValueOnce(1000).mockReturnValue(1100);
+    query.mockResolvedValueOnce([{ count: 6, last_request: BigInt(1050) }]);
+    try {
+      const result = await consumeWriteLimit("concurrent-window", { bucket: "test", max: 5, windowMs: 60_000 });
+      expect(result).toEqual({ allowed: false, retryAfter: 60 });
+    } finally {
+      clock.mockRestore();
+    }
+  });
   it("rejects over-quota requests with a bounded Retry-After and propagates storage errors", async () => {
     const policy = writePolicy("/");
     query.mockResolvedValueOnce([{ count: 6, last_request: BigInt(Date.now()) }]);
