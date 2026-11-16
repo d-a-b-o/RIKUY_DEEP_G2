@@ -13,6 +13,33 @@ def evidence():
     return rows, predictions
 
 
+@pytest.mark.parametrize("true_positives,passed", [(949, False), (950, True)])
+def test_exact_recall_boundary(true_positives, passed):
+    """2000 muestras permiten separar 94.9/95.0 sin incumplir accuracy."""
+    rows = [{"id": str(i), "label": int(i >= 1000)} for i in range(2000)]
+    predictions = [
+        {
+            "id": r["id"],
+            "python": 0.9 if 1000 <= i < 1000 + true_positives else 0.1,
+            "tfjs": 0.9 if 1000 <= i < 1000 + true_positives else 0.1,
+        }
+        for i, r in enumerate(rows)
+    ]
+    report = evaluate_quality_gate(rows, predictions, 0.5, expected_count=2000)
+    assert report["python"]["recall"] == true_positives / 1000
+    assert report["python"]["accuracy"] >= 0.97
+    assert report["classification_discrepancies"] == 0
+    assert report["passed"] is passed
+    assert report["failures"] == (
+        []
+        if passed
+        else [
+            "python: recall de defectos inferior a 95%.",
+            "tensorflowjs: recall de defectos inferior a 95%.",
+        ]
+    )
+
+
 def test_passes_complete_evidence_and_rejects_a_single_reference():
     rows, predictions = evidence()
     report = evaluate_quality_gate(rows, predictions, 0.2437)

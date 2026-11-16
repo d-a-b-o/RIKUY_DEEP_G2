@@ -44,6 +44,8 @@ class Config:
     batch_size: int = 16
     epochs: int = 35
     hpo_epochs: int = 10
+    head_epochs: int = 3
+    head_learning_rate: float = 1e-3
     augmentation: bool = True
     target_recall: float = 0.95
     experiment_tag: str = "v1"
@@ -53,7 +55,14 @@ class Config:
         object.__setattr__(self, "root", Path(self.root).resolve())
         if not (self.root / "ml" / "preprocessing.py").is_file():
             raise ValueError("root debe apuntar al repositorio RIKUY_DEEP_G2 existente.")
-        if self.batch_size < 1 or self.epochs < 1 or self.hpo_epochs < 1 or not 0 < self.target_recall <= 1:
+        if (
+            self.batch_size < 1
+            or self.epochs < 1
+            or self.hpo_epochs < 1
+            or self.head_epochs < 1
+            or self.head_learning_rate <= 0
+            or not 0 < self.target_recall <= 1
+        ):
             raise ValueError("batch_size/epochs deben ser positivos; target_recall en (0,1].")
 
     @property
@@ -311,12 +320,9 @@ def build_model(kind, learning_rate, dropout, fraction):
             x = layers.MaxPooling2D()(x)
         x = layers.GlobalAveragePooling2D()(x)
         x = layers.Dense(128, activation="relu")(x)
-    elif kind == "mobilenetv2":
-        base = tf.keras.applications.MobileNetV2(include_top=False, weights="imagenet", input_shape=(400, 400, 3))
-        base.trainable = True
-        cutoff = len(base.layers) - math.ceil(len(base.layers) * fraction)
-        for i, layer in enumerate(base.layers):
-            layer.trainable = i >= cutoff and not isinstance(layer, layers.BatchNormalization)
+    elif kind == "resnet50v2":
+        base = tf.keras.applications.ResNet50V2(include_top=False, weights="imagenet", input_shape=(400, 400, 3))
+        base.trainable = False
         x = base(layers.Rescaling(2.0, offset=-1)(inputs), training=False)
         x = layers.GlobalAveragePooling2D()(x)
     else:
@@ -377,7 +383,7 @@ def train(config, kind="cnn", augmentation=None, learning_rate=1e-3, dropout=0.3
     """Reutilizar corrida completa por huella; una corrida interrumpida exige un nuevo tag."""
     import tensorflow as tf
 
-    if kind not in {"cnn", "mobilenetv2"} or learning_rate <= 0 or not 0 <= dropout < 1 or not 0 <= fraction <= 1:
+    if kind not in {"cnn", "resnet50v2"} or learning_rate <= 0 or not 0 <= dropout < 1 or not 0 <= fraction <= 1:
         raise ValueError("Hiperparámetros inválidos.")
     manifest = load_manifest(config)
     augmentation = config.augmentation if augmentation is None else augmentation
@@ -420,10 +426,30 @@ def train(config, kind="cnn", augmentation=None, learning_rate=1e-3, dropout=0.3
     labels = [r["label"] for r in manifest["rows"] if r["split"] == "train"]
     class_weight = {label: len(labels) / (2 * labels.count(label)) for label in (0, 1)}
     model = build_model(kind, learning_rate, dropout, fraction)
+    if kind == "resnet50v2":
+        model.optimizer.learning_rate.assign(config.head_learning_rate)
+        model.fit(
+            ds["train"],
+            validation_data=ds["validation"],
+            epochs=config.head_epochs,
+            class_weight=class_weight,
+            callbacks=[tf.keras.callbacks.CSVLogger(str(directory / "warmup.csv"))],
+            verbose=2,
+        )
+        base = model.get_layer("resnet50v2")
+        base.trainable = True
+        cutoff = len(base.layers) - math.ceil(len(base.layers) * fraction)
+        for index, layer in enumerate(base.layers):
+            layer.trainable = index >= cutoff and not isinstance(layer, tf.keras.layers.BatchNormalization)
+        model.compile(
+            optimizer=tf.keras.optimizers.Adam(learning_rate),
+            loss="binary_crossentropy",
+            metrics=[tf.keras.metrics.BinaryAccuracy(name="accuracy"), tf.keras.metrics.AUC(curve="PR", name="auc_pr")],
+        )
     model.fit(
         ds["train"],
         validation_data=ds["validation"],
-        epochs=config.hpo_epochs if kind == "mobilenetv2" else config.epochs,
+        epochs=config.hpo_epochs if kind == "resnet50v2" else config.epochs,
         class_weight=class_weight,
         callbacks=[
             tf.keras.callbacks.ModelCheckpoint(
@@ -447,6 +473,7 @@ def train(config, kind="cnn", augmentation=None, learning_rate=1e-3, dropout=0.3
             "artifacts": {
                 name: file_hash(directory / name)
                 for name in ("best.keras", "history.csv", "validation.json", "started.json")
+                + (("warmup.csv",) if (directory / "warmup.csv").is_file() else ())
             },
         },
     )
@@ -457,7 +484,7 @@ def run_hpo(config):
     """Sólo validation selecciona el candidato. Cada corrida se puede reutilizar."""
     trials = [(1e-4, 0.15, 0.30), (5e-5, 0.25, 0.40), (2e-5, 0.35, 0.30), (1e-5, 0.50, 0.50)]
     directories = [
-        train(config, "mobilenetv2", learning_rate=lr, fraction=fraction, dropout=dropout)
+        train(config, "resnet50v2", learning_rate=lr, fraction=fraction, dropout=dropout)
         for lr, fraction, dropout in trials
     ]
     return select_model(config, directories)

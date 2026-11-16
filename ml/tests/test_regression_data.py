@@ -3,6 +3,7 @@ import io
 import json
 import zipfile
 from pathlib import Path
+from urllib.parse import parse_qs, urlsplit
 
 import pytest
 from ml.regression import write_json
@@ -120,19 +121,30 @@ def test_bundle_recovery_and_integrity(tmp_path, fault):
         assert object_path(remote, entry["md5"]).read_bytes() == body
 
 
-def test_real_metadata_is_pinned_and_balanced():
+def test_new_reference_stays_pending_and_never_downloads_old_objects(tmp_path):
     directory = Path(__file__).resolve().parents[1]
     catalog = json.loads((directory / "regression-sources.json").read_text())
-    rows = json.loads((directory / "regression-metadata/golden-manifest.json").read_text())["rows"]
-    assert len(rows) == len({row["id"] for row in rows}) == 50
-    assert sum(row["label"] == 0 for row in rows) == sum(row["label"] == 1 for row in rows) == 25
-    downloads = {entry["sha256"] for entry in catalog["objects"] if "drive_id" in entry}
-    assert {row["sha256"] for row in rows} <= downloads
     config = json.loads((directory / "regression-config.json").read_text())
-    for role in ("baseline", "candidate"):
-        assert config[role]["sha256"] in downloads
-        assert config[role]["contract"] == config["contract"]
-    assert config["contract"]["threshold"] == 0.26489877700805664
+    assert catalog["architecture"] == config["architecture"] == "resnet50v2"
+    if catalog["status"].startswith("pending"):
+        if catalog["status"] == "pending_resnet50v2_training":
+            assert catalog["objects"] == []
+
+        def forbidden_download(*args):
+            pytest.fail("No descargar artefactos retirados")
+
+        with pytest.raises(ValueError, match="pendiente"):
+            hydrate(directory / "regression-sources.json", tmp_path / "remote", forbidden_download)
+    else:
+        assert catalog["status"] == config["status"] == "ready"
+        rows = json.loads((directory / "regression-metadata/golden-manifest.json").read_text())["rows"]
+        assert len(rows) == len({r["id"] for r in rows}) == 50
+        assert sum(r["label"] == 0 for r in rows) == sum(r["label"] == 1 for r in rows) == 25
+        hashes = {entry["sha256"] for entry in catalog["objects"]}
+        assert {r["sha256"] for r in rows} <= hashes
+        for role in ("baseline", "candidate"):
+            assert config[role]["sha256"] in hashes
+            assert config[role]["contract"] == config["contract"]
 
 
 @pytest.mark.parametrize("always_fail", [False, True])
@@ -159,3 +171,72 @@ def test_public_download_retries_are_bounded(tmp_path, monkeypatch, always_fail)
         assert len(calls) == 2
         assert waits == [2]
     assert all(timeout == 30 for _, timeout in calls)
+
+
+def test_public_large_file_confirmation_returns_binary_not_html(tmp_path, monkeypatch):
+    confirmation = b"""<!doctype html><html><form id="download-form"
+        action="https://drive.usercontent.google.com/download" method="get">
+        <input type="hidden" name="id" value="public-id">
+        <input type="hidden" name="export" value="download">
+        <input type="hidden" name="confirm" value="t">
+        <input type="hidden" name="uuid" value="confirmation-token">
+        </form></html>"""
+    calls = []
+
+    def open_stream(url, timeout):
+        calls.append(url)
+        return io.BytesIO(confirmation if len(calls) == 1 else b"PK-binary-zip-fixture")
+
+    monkeypatch.setattr("ml.regression_data.urlopen", open_stream)
+    target = tmp_path / "bundle"
+    download_public("public-id", target)
+    assert target.read_bytes() == b"PK-binary-zip-fixture"
+    assert len(calls) == 2
+    assert parse_qs(urlsplit(calls[1]).query)["uuid"] == ["confirmation-token"]
+
+
+@pytest.mark.parametrize(
+    "html",
+    [
+        b"<html>Access denied</html>",
+        b'<html><form id="download-form" action="https://untrusted.example/download">'
+        b'<input name="id" value="public-id"></form></html>',
+        b'<html><form id="download-form" action="https://drive.usercontent.google.com/download">'
+        b'<input name="id" value="other-id"><input name="confirm" value="t"></form></html>',
+    ],
+)
+def test_public_html_errors_are_not_saved_as_artifacts(tmp_path, monkeypatch, html):
+    monkeypatch.setattr("ml.regression_data.urlopen", lambda *args, **kwargs: io.BytesIO(html))
+    target = tmp_path / "bundle"
+    with pytest.raises(ValueError):
+        download_public("public-id", target)
+    assert not target.exists()
+
+
+def test_public_confirmation_loop_is_bounded(tmp_path, monkeypatch):
+    calls = []
+    html = (
+        b'<html><form id="download-form" action="https://drive.usercontent.google.com/download">'
+        b'<input name="id" value="public-id"><input name="confirm" value="t"></form></html>'
+    )
+
+    def open_stream(*args, **kwargs):
+        calls.append(True)
+        return io.BytesIO(html)
+
+    monkeypatch.setattr("ml.regression_data.urlopen", open_stream)
+    with pytest.raises(ValueError, match="repiti"):
+        download_public("public-id", tmp_path / "bundle")
+    assert len(calls) == 3
+
+
+def test_public_download_rejects_google_login_redirect(tmp_path, monkeypatch):
+    class LoginResponse(io.BytesIO):
+        def geturl(self):
+            return "https://accounts.google.com/v3/signin/identifier"
+
+    monkeypatch.setattr("ml.regression_data.urlopen", lambda *args, **kwargs: LoginResponse(b"<html>Sign in</html>"))
+    target = tmp_path / "bundle"
+    with pytest.raises(ValueError, match="exige iniciar sesi"):
+        download_public("public-id", target)
+    assert not target.exists()

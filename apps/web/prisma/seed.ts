@@ -103,7 +103,7 @@ async function main() {
     },
   });
 
-  // Modelo de HU17 (MobileNetV2, 400×400) con sus métricas en el conjunto de prueba.
+  // Fixture histórico de HU17 (400×400); estas métricas no corresponden al nuevo ResNet.
   await db.modelVersion.upsert({
     where: { version: "1.0.0" },
     update: {},

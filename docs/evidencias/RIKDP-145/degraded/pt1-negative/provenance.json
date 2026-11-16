@@ -1,0 +1,7 @@
+{
+  "degraded_sha256": "309732019d6da1701b9440a0b447cf3e0f90a5c02fa282a6d7494fd53bba6ea7",
+  "mutation": "zero sigmoid kernel, bias=-12",
+  "scope": "deliberately_degraded_copy",
+  "source_sha256": "3ad3c0fb89bcae79e8a811ae7b98ab08753386d025a5be7e253e007fdffa9994",
+  "source_unchanged": true
+}

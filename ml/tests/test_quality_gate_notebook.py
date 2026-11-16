@@ -49,12 +49,13 @@ def test_javascript_runner_covers_all_golden_ids_in_order(tmp_path):
         and any(isinstance(t, ast.Name) and t.id == "GOLDEN_JS_RUNNER" for t in node.targets)
     )
     javascript = ast.literal_eval(assignment.value)
-    module = tmp_path / "node_modules" / "@tensorflow" / "tfjs"
+    module = tmp_path / "node_modules" / "@tensorflow" / "tfjs-core"
     module.mkdir(parents=True)
     (module / "index.js").write_text(
         """
 module.exports = {
-  setBackend: async () => {}, ready: async () => {},
+  version_core: '4.22.0', registerOp() {},
+  setBackend: async () => true, getBackend: () => 'wasm', ready: async () => {},
   tensor: (values, shape) => ({values, shape, dispose() {}}),
   loadGraphModel: async () => ({
     executeAsync: async input => ({size: 1, data: async () => [input.values[0]]}),
@@ -65,6 +66,14 @@ module.exports = {
 """,
         encoding="utf-8",
     )
+    converter = module.parent / "tfjs-converter"
+    converter.mkdir()
+    (converter / "index.js").write_text("module.exports = {};", encoding="utf-8")
+    wasm = module.parent / "tfjs-backend-wasm"
+    wasm.mkdir()
+    (wasm / "index.js").write_text("module.exports = {setWasmPaths() {}, setThreadsCount() {}};", encoding="utf-8")
+    model = tmp_path / "model.json"
+    model.write_text(json.dumps({"modelTopology": {}, "weightsManifest": []}), encoding="utf-8")
     samples = []
     for i in range(195):
         filename = f"input_{i:04}.bin"
@@ -74,7 +83,7 @@ module.exports = {
     runner = tmp_path / "runner.cjs"
     runner.write_text(javascript, encoding="utf-8")
     result = subprocess.run(
-        [shutil.which("node"), str(runner), "http://localhost/model.json", str(tmp_path)],
+        [shutil.which("node"), str(runner), str(model), str(tmp_path)],
         capture_output=True,
         text=True,
         check=True,

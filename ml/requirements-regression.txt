@@ -3,6 +3,9 @@ tensorflow-cpu==2.21.0
 keras==3.15.1
 numpy==2.5.4
 pillow==13.0.0
+scikit-learn>=1.5,<2
 dvc==3.67.1
 # Pruebas del contrato de entrada con TensorFlow real (PT1).
 pytest>=9.2.0,<10
+# Navegador real para la paridad del preprocesamiento (PT1 RIKDP-85).
+playwright==1.58.0

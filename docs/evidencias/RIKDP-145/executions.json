@@ -1,0 +1,31 @@
+{
+  "issue": "RIKDP-145",
+  "repo": "d-a-b-o/RIKUY_DEEP_G2",
+  "degraded": {
+    "run_id": 43781489981,
+    "run_url": "https://github.com/d-a-b-o/RIKUY_DEEP_G2/actions/runs/43781489981",
+    "head_sha": "f0527ac7e58f28f1e8e63035b90bf5eb38a337b2",
+    "branch": "main",
+    "degraded": true,
+    "artifact_id": 14188248770,
+    "artifact_sha256": "cab9bbf0d2fd2c4b705ebb303692c9cc526f14cb81239725da252b6ed2e1f280",
+    "rejection_verified": true,
+    "status": "completed",
+    "conclusion": "failure",
+    "discrepancies": 25
+  },
+  "normal": {
+    "run_id": 43783014384,
+    "run_url": "https://github.com/d-a-b-o/RIKUY_DEEP_G2/actions/runs/43783014384",
+    "branch": "main",
+    "degraded": false,
+    "status": "completed",
+    "conclusion": "success",
+    "head_sha": "f0527ac7e58f28f1e8e63035b90bf5eb38a337b2",
+    "artifact_id": 14189180946,
+    "artifact_sha256": "a156341a97764eb7d1a6d5ca2c277c55b4b21ae61fcc0a3fc0e043cf1169aa97",
+    "discrepancies": 0,
+    "passed": true
+  },
+  "acceptance_verified": true
+}

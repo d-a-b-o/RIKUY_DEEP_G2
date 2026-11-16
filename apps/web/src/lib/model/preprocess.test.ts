@@ -1,5 +1,40 @@
-import { describe, expect, it } from "vitest";
-import { centerSquareCrop } from "./preprocess";
+import { beforeAll, describe, expect, it, vi } from "vitest";
+import * as tf from "@tensorflow/tfjs-core";
+import "@tensorflow/tfjs-backend-cpu";
+import { centerSquareCrop, drawModelInput, resizeModelPixels } from "./preprocess";
+
+beforeAll(async () => {
+  await tf.setBackend("cpu");
+  await tf.ready();
+});
+
+it("conserva el recorte nativo sin resize ni cuantización del canvas", () => {
+  const context = { imageSmoothingEnabled: true, drawImage: vi.fn() };
+  const canvas = { width: 0, height: 0, getContext: () => context } as unknown as HTMLCanvasElement;
+  const source = { width: 1280, height: 720 } as HTMLCanvasElement;
+  drawModelInput(source, canvas, { width: 400, height: 400 });
+  expect([canvas.width, canvas.height]).toEqual([720, 720]);
+  expect(context.imageSmoothingEnabled).toBe(false);
+  expect(context.drawImage).toHaveBeenCalledWith(source, 280, 0, 720, 720, 0, 0, 720, 720);
+});
+
+it("half-pixel interpola en float32 y libera sus intermedios", () => {
+  const baseline = tf.memory().numTensors;
+  for (let iteration = 0; iteration < 3; iteration++) {
+    const output = tf.tidy(() => resizeModelPixels(tf, tf.tensor3d([0, 255, 255, 0], [2, 2, 1]), {
+      width: 4, height: 4,
+    }));
+    expect(output.shape).toEqual([4, 4, 1]);
+    expect(Array.from(output.dataSync())).toEqual([
+      0, 63.75, 191.25, 255,
+      63.75, 95.625, 159.375, 191.25,
+      191.25, 159.375, 95.625, 63.75,
+      255, 191.25, 63.75, 0,
+    ]);
+    output.dispose();
+    expect(tf.memory().numTensors).toBe(baseline);
+  }
+});
 
 describe("centerSquareCrop", () => {
   it("deja igual una imagen cuadrada", () => {

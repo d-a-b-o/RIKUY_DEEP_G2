@@ -12,6 +12,9 @@ venv/
 .pytest_cache/
 .ruff_cache/
 /reports/
+/ci-reference-resnet.zip
+/.cache/
+/.tools/
 
 # Jupyter
 .ipynb_checkpoints/
