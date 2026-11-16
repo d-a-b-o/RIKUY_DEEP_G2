@@ -1,0 +1,43 @@
+{
+  "task": "RIKDP-241",
+  "checked_at_utc": "2026-11-16T21:08:15.728706+00:00",
+  "npm_version": "10.9.9",
+  "clean_install": "npm ci --ignore-scripts --legacy-peer-deps=false",
+  "previous_error": "ESBOMPROBLEMS from upstream ESLint peer declarations",
+  "generator": "@cyclonedx/cyclonedx-npm 7.0.1",
+  "bom_format": "CycloneDX",
+  "spec_version": "1.6",
+  "schema_validation": true,
+  "components": 768,
+  "lock_coverage": {
+    "scope": "Full lockfile: production, development, peer and optional dependencies",
+    "lockfileSha256": "5eb987233d4f0e41a5be44790d3353755e80c68561b29b3c2f0b57c4acc315c3",
+    "reviewedPeerDeclarations": [
+      "node_modules/eslint-config-next/node_modules/eslint-plugin-import@2.32.0: eslint ^2 || ^3 || ^4 || ^5 || ^6 || ^7.2.0 || ^8 || ^9; resolved 10.14.0",
+      "node_modules/eslint-config-next/node_modules/eslint-plugin-jsx-a11y@6.10.2: eslint ^3 || ^4 || ^5 || ^6 || ^7 || ^8 || ^9; resolved 10.14.0",
+      "node_modules/eslint-config-next/node_modules/eslint-plugin-react@7.37.5: eslint ^3 || ^4 || ^5 || ^6 || ^7 || ^8 || ^9.7; resolved 10.14.0"
+    ],
+    "coveredPackageIdentities": 755,
+    "lockedPackageLocations": 768,
+    "notice": "Inventory does not certify peer compatibility. Lint, tests and security audits remain mandatory."
+  },
+  "sbom_sha256": "2f5e676c39744fc89c4838ccf497d58e6b2d8995c6e941ee1a1b850cfda52248",
+  "checks": {
+    "passed_tests": 471,
+    "failed_tests": 0,
+    "skipped_tests": 2,
+    "new_sbom_policy_tests": 7,
+    "lint": "passed",
+    "typecheck": "passed",
+    "actionlint": "passed",
+    "npm_audit": {
+      "info": 0,
+      "low": 0,
+      "moderate": 9,
+      "high": 0,
+      "critical": 0,
+      "total": 9
+    }
+  },
+  "execution_contract": "CI validates on web PRs; official SBOM artifacts are generated after successful push CI on main."
+}

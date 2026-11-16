@@ -30,8 +30,8 @@ Validar primero una preview limpia y una con un hallazgo alto conocido.
 ## SBOM
 
 Tras finalizar correctamente CI para un push a `main`, `sbom.yml` inventaría el
-SHA exacto que se validó. npm genera CycloneDX con el árbol web instalado, sin
-scripts de instalación. Para ML se resuelven por separado los cuatro requirements
+SHA exacto que se validó. El generador oficial CycloneDX obtiene el árbol web
+completo del lockfile; sus herramientas se instalan sin ejecutar scripts. Para ML se resuelven por separado los cuatro requirements
 (ci, publish, regression y train), evitando mezclar entornos incompatibles.
 CycloneDX inventaría los paquetes realmente instalados y sus transitivas;
 `resolved-requirements.txt` conserva las versiones resueltas. Los artefactos llevan
@@ -40,6 +40,9 @@ Ante un aviso CVE/GHSA, buscar nombre/purl y versión afectada en `components`,
 identificar los entornos afectados y actualizar sus manifests mediante Dependabot.
 Los SBOM no demuestran ausencia de vulnerabilidades: las auditorías de CI continúan.
 Herramienta Python declarada en `.github/requirements-sbom.txt` para Dependabot.
+
+Véase [la política de generación web](sbom-web.md) para el tratamiento explícito
+de las declaraciones peer de ESLint y la comprobación de cobertura.
 
 ## Workflows
 
