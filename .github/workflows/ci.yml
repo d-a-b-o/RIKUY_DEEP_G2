@@ -39,9 +39,11 @@ jobs:
       web: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.web == 'true' }}
       ml: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.ml == 'true' }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
-      - uses: dorny/paths-filter@v4
+      - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4
         id: filter
         with:
           filters: |
@@ -57,6 +59,8 @@ jobs:
               - ".github/scripts/tests/test_audit_python.py"
 
   web:
+    permissions:
+      contents: read
     name: Web · lint, typecheck, test y build
     needs: changes
     if: needs.changes.outputs.web == 'true'
@@ -85,16 +89,18 @@ jobs:
       run:
         working-directory: apps/web
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: 22
           cache: npm
           cache-dependency-path: apps/web/package-lock.json
 
       - name: Cache de Next.js
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: apps/web/.next/cache
           key: nextjs-${{ runner.os }}-${{ hashFiles('apps/web/package-lock.json') }}-${{ hashFiles('apps/web/src/**') }}
@@ -135,7 +141,7 @@ jobs:
 
       - name: Reporte de Playwright
         if: failure()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: playwright-report
           path: |
@@ -144,6 +150,8 @@ jobs:
           retention-days: 14
 
   ml:
+    permissions:
+      contents: read
     name: ML · pip-audit, ruff y pytest
     needs: changes
     if: needs.changes.outputs.ml == 'true'
@@ -153,9 +161,11 @@ jobs:
       run:
         working-directory: ml
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
-      - uses: actions/setup-python@v7
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
         with:
           python-version: "3.13"
           cache: pip
@@ -178,7 +188,7 @@ jobs:
 
       - name: Conservar reportes de auditoría Python
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: pip-audit-reports
           path: ${{ runner.temp }}/pip-audit-reports/*.json
@@ -198,6 +208,8 @@ jobs:
         run: pytest
 
   convenciones:
+    permissions:
+      contents: read
     name: Convenciones de la PR
     needs: changes
     if: github.event_name == 'pull_request' && github.event.pull_request.user.type != 'Bot' && (needs.changes.outputs.web == 'true' || needs.changes.outputs.ml == 'true')
@@ -219,6 +231,8 @@ jobs:
           fi
 
   archivos:
+    permissions:
+      contents: read
     name: Archivos grandes
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
@@ -226,8 +240,9 @@ jobs:
     env:
       MAX_KB: 5120
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          persist-credentials: false
           fetch-depth: 0
 
       - name: Rechazar archivos de más de 5 MB (usar DVC)
@@ -254,9 +269,11 @@ jobs:
       contents: read
       pull-requests: write
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
-      - uses: actions/dependency-review-action@v5
+      - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
         with:
           fail-on-severity: high
           comment-summary-in-pr: on-failure
@@ -266,6 +283,8 @@ jobs:
   # canceló. Solo admite omisiones justificadas por rutas o por el tipo de evento;
   # CodeQL y Gitleaks nunca pueden omitirse. pip-audit cuenta mediante el job ML.
   ci:
+    permissions:
+      contents: read
     name: CI
     needs:
       [changes, web, ml, convenciones, archivos, dependencias, codeql, gitleaks]
@@ -273,11 +292,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
 
-      - uses: actions/setup-python@v7
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
         with:
           python-version: "3.13"
 
