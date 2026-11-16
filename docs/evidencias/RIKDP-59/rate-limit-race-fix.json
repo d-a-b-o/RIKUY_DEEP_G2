@@ -1,0 +1,29 @@
+{
+  "task": "RIKDP-59",
+  "recorded_at_utc": "2026-11-16T20:30:29.067330+00:00",
+  "baseline_commit": "5aebd5fd3293d6b9e59346fff8f2dde098370adb",
+  "database": "Native PostgreSQL 16.15, temporary cluster, repository migrations applied",
+  "before": {
+    "failed_tests": 1,
+    "server_error": "23505: duplicate key value violates unique constraint rate_limit_pkey"
+  },
+  "fix": "Generate a random primary ID per INSERT; keep the shared unique quota key as the ON CONFLICT target.",
+  "regression": {
+    "fresh_quota_rows": 8,
+    "concurrent_requests_per_burst": 20,
+    "windows_per_quota": 2,
+    "allowed_per_burst": 5,
+    "storage_errors_after_fix": 0
+  },
+  "after": {
+    "passed": 463,
+    "failed": 0,
+    "skipped": 2,
+    "lint": "passed",
+    "typecheck": "passed"
+  },
+  "source_sha256": {
+    "apps/web/src/lib/security/write-limit.ts": "d65df38dcff097941e89140401873eccd8bc9f6e20cc82269e3ec7aace1a9f83",
+    "apps/web/src/lib/security/write-limit.integration.test.ts": "5e416f6e39223c8284fa6ff71743f40ec5f3a8c5bfaa76965b0e5049532abda7"
+  }
+}

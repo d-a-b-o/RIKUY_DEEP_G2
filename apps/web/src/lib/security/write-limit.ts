@@ -1,5 +1,5 @@
 import "server-only";
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { isIP } from "node:net";
 import { getDb } from "@/lib/db";
 
@@ -21,9 +21,11 @@ export function writeLimitKey(headers: Headers, policy: WritePolicy): string {
 /** Atomic, shared across serverless instances; uses the existing Better Auth rate_limit table. */
 export async function consumeWriteLimit(key: string, policy: WritePolicy): Promise<{ allowed: boolean; retryAfter: number }> {
   const now = Date.now();
+  // Each speculative INSERT needs a distinct primary key. The shared quota is
+  // identified only by key, the unique index targeted by ON CONFLICT below.
   const rows = await getDb().$queryRaw<{ count: number; last_request: bigint }[]>`
     INSERT INTO rate_limit (id, key, count, last_request)
-    VALUES (${key}, ${key}, 1, ${BigInt(now)})
+    VALUES (${randomUUID()}, ${key}, 1, ${BigInt(now)})
     ON CONFLICT (key) DO UPDATE SET
       count = CASE WHEN rate_limit.last_request <= ${BigInt(now - policy.windowMs)}
         THEN 1 ELSE LEAST(rate_limit.count + 1, ${policy.max + 1}) END,
