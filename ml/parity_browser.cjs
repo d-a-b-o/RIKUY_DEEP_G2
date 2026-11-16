@@ -32,7 +32,7 @@ let expression = ts.isReturnStatement(prediction) ? prediction.expression : unde
 while (expression && (ts.isAsExpression(expression) || ts.isTypeAssertionExpression(expression))) {
   expression = expression.expression;
 }
-if (expression?.getText(tree) !== "model.predict(batch)") {
+if (!["model.predict(batch)", "loaded.predict(batch)"].includes(expression?.getText(tree))) {
   throw new Error("El flujo de predict cambió; no se puede extraer su entrada de forma segura.");
 }
 const printer = ts.createPrinter();

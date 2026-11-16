@@ -22,20 +22,21 @@ Versión publicada hoy: **0.9.0 provisional** en `https://bucket.d-a-b-o.dev/dev
 
 ## Modelo candidato y referencia histórica
 
-La arquitectura nueva es ResNet50V2 con ImageNet, pendiente de entrenamiento,
-exportación y medición. Los valores publicados y métricas de la tabla siguiente
-pertenecen a la versión anterior y no se atribuyen al candidato nuevo.
+La arquitectura nueva es ResNet50V2 con ImageNet, entrenada y exportada en el notebook.
+El gate de 195 imágenes y la comparación con el cargador Chromium están documentados en
+[PT1](../pruebas/pt1-cierre.md). La publicación remota es un paso separado;
+las comprobaciones locales no cambian el manifest que utilizan los usuarios.
 
-Contrato del candidato que se entrenará desde `RIKUY_DEEP_G2.ipynb` (HU17):
+Contrato del candidato entrenado desde `RIKUY_DEEP_G2.ipynb` (HU17):
 
 | Propiedad | Valor |
 | --- | --- |
-| Arquitectura candidata | ResNet50V2 (ImageNet), pendiente de validar, `GlobalAveragePooling2D`, `Dropout`, `Dense(1, sigmoid)` |
+| Arquitectura candidata | ResNet50V2 (ImageNet), `GlobalAveragePooling2D`, `Dropout`, `Dense(1, sigmoid)` |
 | Entrada | `[1, 400, 400, 3]`, RGB, `float32` en **[0, 1]** |
 | Normalización interna | Capa `Rescaling(2, offset=-1)` dentro del modelo: pasa de [0, 1] a [-1, 1]. **La web no la aplica** |
 | Salida | `[1, 1]`: probabilidad de que la pieza sea **defectuosa** (clase 1) |
-| Umbral | Pendiente del nuevo entrenamiento; se elige sólo en validation para priorizar el recall de defectuosas |
-| Métricas en test | Pendientes de evaluar el ResNet sobre el test reservado |
+| Umbral | 0,14451949298381805, elegido sólo en validation |
+| Métricas en test | 195 imágenes reservadas: accuracy y recall de defectos 100 %; revisión humana independiente pendiente |
 
 El tamaño de entrada es **400×400**. Se decidió en la revisión de arquitectura del 2026-11-01 (RIKDP-89); HU06 y HU26 decían 224×224 y se corrigieron.
 

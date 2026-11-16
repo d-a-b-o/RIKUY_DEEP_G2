@@ -4,11 +4,12 @@ La tarea requiere que una persona distinta del autor del modelo revise el test
 reservado. Una ejecución automatizada aprobada no sustituye esa revisión. No se
 ha registrado un revisor ni una aceptación ficticia.
 
-## Evidencia nueva pendiente
+## Evidencia automatizada disponible
 
-Usar la corrida ResNet seleccionada por el notebook y el manifiesto nuevo. No hay métricas acreditadas
-hasta ejecutar test. Se requieren 195 imágenes reservadas, recall >=95 % y accuracy >=97 %.
-El umbral se calibra exclusivamente con validation. Los informes anteriores fueron retirados.
+El gate ResNet guardado cubre 195 imágenes reservadas, con recall y accuracy de 100 %.
+Su JSON se conserva en `docs/evidencias/RIKDP-154-quality-gate-resnet.json`.
+Esto acredita la evaluación automatizada; sigue faltando la aceptación independiente.
+El umbral procede de validation y no debe ajustarse con test.
 
 ## Inferencia nueva sin entrenar
 
@@ -19,7 +20,7 @@ otro modelo ni ajusta el umbral. Verifica la corrida y los datos, predice las
 
 Antes de Colab, copiar el nuevo `ml/independent_metrics.py` del repositorio a
 `ml/` de Drive. Los módulos `workflow.py`, `preprocessing.py` y `regression.py`
-deben estar sincronizados con esta rama. La corrida y el dataset ya restaurados
+deben estar sincronizados con esta rama. La corrida nueva y el dataset
 permanecen en Drive. No reinstalar TensorFlow CPU sobre la sesión GPU.
 
 Celda de Colab para el revisor:

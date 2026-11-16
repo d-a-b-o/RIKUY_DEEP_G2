@@ -42,8 +42,12 @@ def compare_runs(left, right):
             raise ValueError("La identidad no corresponde al contenido de la corrida.")
         with (directory / "history.csv").open(encoding="utf-8", newline="") as stream:
             history = list(csv.DictReader(stream))
+        if "warmup.csv" not in completed["artifacts"]:
+            raise ValueError("Falta warmup.csv versionado para comparar las dos fases de ResNet.")
+        with (directory / "warmup.csv").open(encoding="utf-8", newline="") as stream:
+            warmup = list(csv.DictReader(stream))
         validation = read_json(directory / "validation.json")
-        if not history or not {"threshold", "recall", "accuracy"} <= validation.keys():
+        if not history or not warmup or not {"threshold", "recall", "accuracy"} <= validation.keys():
             raise ValueError("Faltan épocas o métricas de validación.")
         records.append(
             {
@@ -53,6 +57,7 @@ def compare_runs(left, right):
                 "code": started["code"],
                 "versions": started["versions"],
                 "history": history,
+                "warmup": warmup,
                 "validation": validation,
                 "artifacts": completed["artifacts"],
             }
@@ -88,6 +93,7 @@ def compare_runs(left, right):
                 differences.append(prefix + ": valores distintos/no finitos")
 
     compare_values(a["history"], b["history"], "history")
+    compare_values(a["warmup"], b["warmup"], "warmup")
     compare_values(a["validation"], b["validation"], "validation")
     return {
         "passed": not differences,
@@ -103,6 +109,7 @@ def compare_runs(left, right):
             {
                 "identity": r["identity"],
                 "epochs": len(r["history"]),
+                "warmup_epochs": len(r["warmup"]),
                 "validation": r["validation"],
                 "artifacts": r["artifacts"],
             }

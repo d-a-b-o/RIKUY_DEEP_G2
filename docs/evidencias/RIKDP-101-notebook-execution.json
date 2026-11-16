@@ -1,0 +1,22 @@
+{
+  "scope": "persisted_notebook_execution_output",
+  "fresh_local_training": false,
+  "notebook": "RIKUY_DEEP_G2.ipynb",
+  "cell_index_zero_based": 29,
+  "notebook_sha256": "f7d5e011d00f76a2b5ae2f7f461b0e0e8a022ec75cb61cb31f2d8af8c19e3a77",
+  "cell_source_sha256": "aa13179b988f8b34d1a2a2da5561fe3692f9e1af0b38a57e6042a23c93ffc430",
+  "output_file": "RIKDP-101-notebook-output.txt",
+  "output_sha256": "b89bb418f70995ec3b54ea10a34327a725f8e9d41a3355d1dcdc83d63554a0f9",
+  "assertions_completed": true,
+  "replica_directories": [
+    "resnet50v2_52e198aa2f211cd968df",
+    "resnet50v2_23e7de708676a8ddb819"
+  ],
+  "absolute_tolerance": 1e-06,
+  "comparisons": [
+    "warmup.csv",
+    "history.csv",
+    "validation.json"
+  ],
+  "note": "La salida guardada registra dos fits y aprobación; los artefactos completos permanecen en DVC/Drive."
+}
