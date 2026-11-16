@@ -1,0 +1,79 @@
+{
+  "task": "RIKDP-59",
+  "recorded_at_utc": "2026-11-16T19:35:41.844953+00:00",
+  "scope": "local_production_build_unauthenticated_baseline",
+  "preview_https_verified": false,
+  "base_commit": "ac48b29b24eb258a57ff639d05160b54895c26e2",
+  "working_tree_changes": true,
+  "source_sha256": {
+    "apps/web/e2e/security.spec.ts": "42cc1695dddc0ab2a8bc81f3414471d49c51cb9532e574d5d8664392f27cb17c",
+    "apps/web/next.config.ts": "3664a590e82ab55ddd5803852be2b7c78aa70febed1db0db5e6097cd714579e6",
+    "apps/web/playwright.config.ts": "8c88aceba95bf9201e5d783ce1ebf94a326b529fbc3f6182d4feb20813a1c032",
+    "apps/web/src/app/layout.tsx": "616a6fe217be55fe508f11c02e52883c956056dc96c102de84b052637bff78eb",
+    "apps/web/src/lib/auth/server.ts": "11fbbd70a58bc63fb48efea25ec5e2d69b04c7b6feb58fb8c695bb9f8c123bb2",
+    "apps/web/src/lib/security/policy.test.ts": "3798badb2498b157a263d2f3605e42d807193434d840579569c6358aa257497d",
+    "apps/web/src/lib/security/policy.ts": "961c38c3f01a0f383d24687ab01cd2bdf963167300b96d2b8c140a9b9d3afc66",
+    "apps/web/src/lib/security/write-limit.integration.test.ts": "4da328a9fd7f6869cbce370daad1f298a73822d5b1af5b596fc065ab18fa9dab",
+    "apps/web/src/lib/security/write-limit.test.ts": "833086b918c5afc634c003b6ad8e7bc60cdb9f2c58b876e55adfe60bf5986019",
+    "apps/web/src/lib/security/write-limit.ts": "074cf7a2c2d2b0428524c130f0d7f535d567f233654a7fef5d1beef776cd844b",
+    "apps/web/src/proxy.test.ts": "a061e5383cda0e7c6e70b217cf25d0bf8066ecc6f94cfc39ea8d3f51aa62f2d8",
+    "apps/web/src/proxy.ts": "a9104f9bc33794925bbc36be64688bd9cc7c3f527669a974326440c773692738"
+  },
+  "checks": {
+    "lint": "passed",
+    "typecheck": "passed",
+    "production_build": "passed",
+    "vitest": {
+      "passed": 42,
+      "failed": 0,
+      "database": "ephemeral PostgreSQL WASM via PGlite TCP",
+      "concurrent_requests": 20,
+      "allowed_at_quota_5": 5
+    },
+    "playwright": {
+      "passed": 3,
+      "failed": 0,
+      "tfjs_backends": [
+        "wasm",
+        "webgl"
+      ],
+      "operation": "[1,2] + [3,4] = [4,6]",
+      "csrf_rejected": true,
+      "http_quota_429": true,
+      "injected_inline_script_blocked": true
+    },
+    "zap": {
+      "version": "2.17.0",
+      "spidered_urls": 53,
+      "alert_rules_by_riskcode": {
+        "0": 4,
+        "1": 0,
+        "2": 2,
+        "3": 0
+      },
+      "high_findings": 0,
+      "authenticated": false
+    },
+    "npm_production": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "npm_all": {
+      "info": 0,
+      "low": 0,
+      "moderate": 9,
+      "high": 0,
+      "critical": 0,
+      "total": 9
+    }
+  },
+  "pending": [
+    "Preview HTTPS/TLS and HSTS verification",
+    "Authenticated DAST and physical camera validation",
+    "Enable HU51 DAST_ENFORCE_HIGH only after accepting HU48"
+  ]
+}

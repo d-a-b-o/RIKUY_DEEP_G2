@@ -6,6 +6,7 @@ import { nextCookies } from "better-auth/next-js";
 import { twoFactor } from "better-auth/plugins";
 import { headers } from "next/headers";
 import { getDb } from "@/lib/db";
+import { applicationOrigins } from "@/lib/security/policy";
 import { getSiteUrl } from "@/lib/site";
 import {
   ACCOUNT_LOCKED,
@@ -67,11 +68,9 @@ function createAuth() {
   return betterAuth({
     appName: "RikuyDeep",
     database: prismaAdapter(getDb(), { provider: "postgresql", transaction: true }),
-    // En Vercel cada preview tiene su propia URL; se acepta cualquiera del proyecto.
-    baseURL: {
-      allowedHosts: ["localhost:*", "127.0.0.1:*", "*.vercel.app", getSiteUrl().host],
-      fallback: getSiteUrl().origin,
-    },
+    // Exact configured origins only; never trust another project's Vercel preview.
+    baseURL: { allowedHosts: applicationOrigins().map((value) => new URL(value).host), fallback: getSiteUrl().origin },
+    trustedOrigins: applicationOrigins(),
     emailAndPassword: {
       enabled: true,
       // Las cuentas las crea un administrador por invitación (HU23, HU30).

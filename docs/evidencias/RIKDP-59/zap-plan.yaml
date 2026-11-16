@@ -1,0 +1,40 @@
+env:
+  contexts:
+    - name: hu48-local
+      urls:
+        - http://127.0.0.1:3100
+      includePaths:
+        - http://127[.]0[.]0[.]1:3100/.*
+      excludePaths:
+        - http://127[.]0[.]0[.]1:3100/api/.*
+  parameters:
+    failOnError: true
+    progressToStdout: true
+jobs:
+  - type: spider
+    parameters:
+      context: hu48-local
+      maxDuration: 1
+      maxDepth: 3
+  - type: passiveScan-wait
+    parameters:
+      maxDuration: 2
+  - type: report
+    parameters:
+      template: traditional-json
+      reportDir: reports
+      reportFile: hu48-zap.json
+      reportTitle: HU48 local passive baseline
+  - type: report
+    parameters:
+      template: traditional-html
+      reportDir: reports
+      reportFile: hu48-zap.html
+      reportTitle: HU48 local passive baseline
+  - type: exitStatus
+    parameters:
+      errorLevel: High
+      warnLevel: Medium
+      okExitValue: 0
+      errorExitValue: 1
+      warnExitValue: 0
