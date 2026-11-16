@@ -210,6 +210,7 @@ jobs:
           PR_BRANCH: ${{ github.head_ref }}
         run: |
           if printf '%s\n%s\n' "$PR_TITLE" "$PR_BRANCH" | grep -Eq 'RIKDP-[0-9]+' \
+            || printf '%s\n' "$PR_BRANCH" | grep -Eq '^dependabot/(npm_and_yarn|pip|github_actions)/.+$' \
             || printf '%s\n' "$PR_BRANCH" | grep -Eq '^[[:alnum:]_.-]+-[[:alnum:]_.-]+-[0-9]+$'; then
             echo "Convención de PR válida."
           else

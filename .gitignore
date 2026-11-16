@@ -1,6 +1,6 @@
-/data/*
-!/data/*.dvc
-!/data/.gitignore
+/.idea/*
+
+/data/
 /dvc_remote/
 .dvcignore
 

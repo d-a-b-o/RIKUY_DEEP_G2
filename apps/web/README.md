@@ -23,6 +23,13 @@ La base de datos puede ser la rama `dev` de Neon o un PostgreSQL 16 local. Detal
 
 ## Comandos
 
+TypeScript 7 se instala como `@typescript/native` y proporciona `tsc` para
+`typecheck` y el build de Next.js. El paquete `typescript` es un alias de
+`@typescript/typescript6`, cuya API necesita `typescript-eslint` para ejecutar
+el lint. Mantener ambos alias evita que ESLint intente cargar la API de TS 7,
+que todavía no está disponible. Véase la
+[guía oficial de compatibilidad](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/#running-side-by-side-with-typescript-6.0).
+
 ```bash
 npm run dev          # servidor local en http://localhost:3000
 npm run build        # compilación de producción
