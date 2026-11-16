@@ -1,0 +1,426 @@
+{
+  "config_sha256": "403cd59847449fdb7c533d4cc363f948e0163e35e0e65418c654f25260f49429",
+  "contract": {
+    "classes": {
+      "def_front": 1,
+      "ok_front": 0
+    },
+    "preprocessing": "ml.preprocessing.preprocess_image:rgb-half-pixel-400x400-float32-0-1:v2",
+    "threshold": 0.14451949298381805
+  },
+  "discrepancies": 25,
+  "golden_manifest_sha256": "5d1948b6a18f21c59796de4b84d3084e692fbe1e3b3b3651763a27e4eb18dce3",
+  "max_discrepancies": 2,
+  "model_sha256": {
+    "baseline": "3ad3c0fb89bcae79e8a811ae7b98ab08753386d025a5be7e253e007fdffa9994",
+    "candidate": "309732019d6da1701b9440a0b447cf3e0f90a5c02fa282a6d7494fd53bba6ea7"
+  },
+  "passed": false,
+  "rows": [
+    {
+      "changed": false,
+      "id": "resnet-0-000",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 0,
+      "original_probability": 2.590700751170516e-05
+    },
+    {
+      "changed": false,
+      "id": "resnet-0-001",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 0,
+      "original_probability": 0.00244159041903913
+    },
+    {
+      "changed": false,
+      "id": "resnet-0-002",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 0,
+      "original_probability": 0.00970460381358862
+    },
+    {
+      "changed": false,
+      "id": "resnet-0-003",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 0,
+      "original_probability": 7.670253398828208e-05
+    },
+    {
+      "changed": false,
+      "id": "resnet-0-004",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 0,
+      "original_probability": 0.0015941399615257978
+    },
+    {
+      "changed": false,
+      "id": "resnet-0-005",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 0,
+      "original_probability": 0.0001167733789770864
+    },
+    {
+      "changed": false,
+      "id": "resnet-0-006",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 0,
+      "original_probability": 0.00014268157246988267
+    },
+    {
+      "changed": false,
+      "id": "resnet-0-007",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 0,
+      "original_probability": 0.007661099079996347
+    },
+    {
+      "changed": false,
+      "id": "resnet-0-008",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 0,
+      "original_probability": 0.0018653139704838395
+    },
+    {
+      "changed": false,
+      "id": "resnet-0-009",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 0,
+      "original_probability": 0.00025564496172592044
+    },
+    {
+      "changed": false,
+      "id": "resnet-0-010",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 0,
+      "original_probability": 0.0028348173946142197
+    },
+    {
+      "changed": false,
+      "id": "resnet-0-011",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 0,
+      "original_probability": 0.0027911325450986624
+    },
+    {
+      "changed": false,
+      "id": "resnet-0-012",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 0,
+      "original_probability": 0.00022264677681960166
+    },
+    {
+      "changed": false,
+      "id": "resnet-0-013",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 0,
+      "original_probability": 0.0017075284849852324
+    },
+    {
+      "changed": false,
+      "id": "resnet-0-014",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 0,
+      "original_probability": 6.552728154929355e-05
+    },
+    {
+      "changed": false,
+      "id": "resnet-0-015",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 0,
+      "original_probability": 0.0021542564500123262
+    },
+    {
+      "changed": false,
+      "id": "resnet-0-016",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 0,
+      "original_probability": 0.0007481780485250056
+    },
+    {
+      "changed": false,
+      "id": "resnet-0-017",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 0,
+      "original_probability": 1.8020688003161922e-05
+    },
+    {
+      "changed": false,
+      "id": "resnet-0-018",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 0,
+      "original_probability": 0.05330469086766243
+    },
+    {
+      "changed": false,
+      "id": "resnet-0-019",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 0,
+      "original_probability": 0.00016326173499692231
+    },
+    {
+      "changed": false,
+      "id": "resnet-0-020",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 0,
+      "original_probability": 0.001127516501583159
+    },
+    {
+      "changed": false,
+      "id": "resnet-0-021",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 0,
+      "original_probability": 7.761207962175831e-05
+    },
+    {
+      "changed": false,
+      "id": "resnet-0-022",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 0,
+      "original_probability": 0.0003696024650707841
+    },
+    {
+      "changed": false,
+      "id": "resnet-0-023",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 0,
+      "original_probability": 0.0031202102545648813
+    },
+    {
+      "changed": false,
+      "id": "resnet-0-024",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 0,
+      "original_probability": 4.0665756387170404e-05
+    },
+    {
+      "changed": true,
+      "id": "resnet-1-000",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 1,
+      "original_probability": 1.0
+    },
+    {
+      "changed": true,
+      "id": "resnet-1-001",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 1,
+      "original_probability": 1.0
+    },
+    {
+      "changed": true,
+      "id": "resnet-1-002",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 1,
+      "original_probability": 1.0
+    },
+    {
+      "changed": true,
+      "id": "resnet-1-003",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 1,
+      "original_probability": 1.0
+    },
+    {
+      "changed": true,
+      "id": "resnet-1-004",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 1,
+      "original_probability": 1.0
+    },
+    {
+      "changed": true,
+      "id": "resnet-1-005",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 1,
+      "original_probability": 1.0
+    },
+    {
+      "changed": true,
+      "id": "resnet-1-006",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 1,
+      "original_probability": 1.0
+    },
+    {
+      "changed": true,
+      "id": "resnet-1-007",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 1,
+      "original_probability": 1.0
+    },
+    {
+      "changed": true,
+      "id": "resnet-1-008",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 1,
+      "original_probability": 1.0
+    },
+    {
+      "changed": true,
+      "id": "resnet-1-009",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 1,
+      "original_probability": 0.9999826550483704
+    },
+    {
+      "changed": true,
+      "id": "resnet-1-010",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 1,
+      "original_probability": 1.0
+    },
+    {
+      "changed": true,
+      "id": "resnet-1-011",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 1,
+      "original_probability": 1.0
+    },
+    {
+      "changed": true,
+      "id": "resnet-1-012",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 1,
+      "original_probability": 1.0
+    },
+    {
+      "changed": true,
+      "id": "resnet-1-013",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 1,
+      "original_probability": 0.32850781083106995
+    },
+    {
+      "changed": true,
+      "id": "resnet-1-014",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 1,
+      "original_probability": 1.0
+    },
+    {
+      "changed": true,
+      "id": "resnet-1-015",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 1,
+      "original_probability": 1.0
+    },
+    {
+      "changed": true,
+      "id": "resnet-1-016",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 1,
+      "original_probability": 1.0
+    },
+    {
+      "changed": true,
+      "id": "resnet-1-017",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 1,
+      "original_probability": 1.0
+    },
+    {
+      "changed": true,
+      "id": "resnet-1-018",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 1,
+      "original_probability": 1.0
+    },
+    {
+      "changed": true,
+      "id": "resnet-1-019",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 1,
+      "original_probability": 1.0
+    },
+    {
+      "changed": true,
+      "id": "resnet-1-020",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 1,
+      "original_probability": 1.0
+    },
+    {
+      "changed": true,
+      "id": "resnet-1-021",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 1,
+      "original_probability": 1.0
+    },
+    {
+      "changed": true,
+      "id": "resnet-1-022",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 1,
+      "original_probability": 1.0
+    },
+    {
+      "changed": true,
+      "id": "resnet-1-023",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 1,
+      "original_probability": 0.9999939203262329
+    },
+    {
+      "changed": true,
+      "id": "resnet-1-024",
+      "new_prediction": 0,
+      "new_probability": 6.144174221844878e-06,
+      "original_prediction": 1,
+      "original_probability": 1.0
+    }
+  ],
+  "runtime": {
+    "python": "3.12.16",
+    "tensorflow": "2.21.0"
+  },
+  "scope": "real_keras_baseline_vs_candidate"
+}
