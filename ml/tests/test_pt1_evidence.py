@@ -14,6 +14,7 @@ def make_run(directory, tag="first", seed=42, recall=1.0):
     directory.mkdir(parents=True)
     (directory / "best.keras").write_bytes(b"unit-test-model-not-real")
     (directory / "history.csv").write_text("epoch,loss,val_accuracy\n0,0.1,1.0\n", encoding="utf-8")
+    (directory / "warmup.csv").write_text("epoch,loss,val_accuracy\n0,0.2,1.0\n", encoding="utf-8")
     write_json(directory / "validation.json", {"threshold": 0.5, "recall": recall, "accuracy": 1.0})
     started = {
         "params": {"seed": seed, "experiment_tag": tag, "root": None, "kind": "resnet50v2"},
@@ -38,7 +39,7 @@ def reseal(directory):
             "identity": started["identity"],
             "artifacts": {
                 name: file_hash(directory / name)
-                for name in ("best.keras", "history.csv", "started.json", "validation.json")
+                for name in ("best.keras", "history.csv", "warmup.csv", "started.json", "validation.json")
             },
         },
     )
@@ -80,6 +81,24 @@ def test_notebook_execution_ids_are_verified_without_manual_tags(tmp_path):
 def test_different_seed_is_not_reproducibility(tmp_path):
     left, right = make_run(tmp_path / "a"), make_run(tmp_path / "b", tag="second", seed=43)
     with pytest.raises(ValueError, match="params"):
+        compare_runs(left, right)
+
+
+def test_warmup_divergence_is_not_hidden_by_identical_fine_tuning(tmp_path):
+    left, right = make_run(tmp_path / "a"), make_run(tmp_path / "b", tag="second")
+    (right / "warmup.csv").write_text("epoch,loss,val_accuracy\n0,0.8,0.9\n", encoding="utf-8")
+    reseal(right)
+    report = compare_runs(left, right)
+    assert not report["passed"]
+    assert any(value.startswith("warmup") for value in report["differences"])
+
+
+def test_unversioned_warmup_is_incomplete_evidence(tmp_path):
+    left, right = make_run(tmp_path / "a"), make_run(tmp_path / "b", tag="second")
+    completed = read_json(right / "completed.json")
+    completed["artifacts"].pop("warmup.csv")
+    write_json(right / "completed.json", completed)
+    with pytest.raises(ValueError, match="warmup.csv versionado"):
         compare_runs(left, right)
 
 

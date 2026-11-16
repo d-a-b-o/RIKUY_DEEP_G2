@@ -17,6 +17,7 @@ import {
   ManifestError,
 } from "./manifest";
 import { resizeModelPixels } from "./preprocess";
+import { registerGraphCompatibility } from "./graph-compatibility";
 
 export type Backend = "webgl" | "wasm" | "cpu";
 export type LoadStage =
@@ -136,7 +137,9 @@ async function importTf() {
     import("@tensorflow/tfjs-converter"),
     import("@tensorflow/tfjs-backend-wasm"),
     import("@tensorflow/tfjs-backend-webgl"),
+    import("@tensorflow/tfjs-backend-cpu"),
   ]);
+  registerGraphCompatibility(tf, converter);
   return { tf, converter, wasm };
 }
 

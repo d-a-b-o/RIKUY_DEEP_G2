@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
   paths: vi.fn(),
   list: vi.fn(),
   remove: vi.fn(),
+  registerOp: vi.fn(),
 }));
 vi.mock("@tensorflow/tfjs-core", () => ({
   setBackend: mocks.setBackend,
@@ -16,9 +17,10 @@ vi.mock("@tensorflow/tfjs-core", () => ({
   zeros: vi.fn(),
   io: { listModels: mocks.list, removeModel: mocks.remove },
 }));
-vi.mock("@tensorflow/tfjs-converter", () => ({ loadGraphModel: mocks.load }));
+vi.mock("@tensorflow/tfjs-converter", () => ({ loadGraphModel: mocks.load, registerOp: mocks.registerOp }));
 vi.mock("@tensorflow/tfjs-backend-wasm", () => ({ setWasmPaths: mocks.paths }));
 vi.mock("@tensorflow/tfjs-backend-webgl", () => ({}));
+vi.mock("@tensorflow/tfjs-backend-cpu", () => ({}));
 
 const url = "https://models.example/dev/manifest.json";
 const version = {
@@ -95,6 +97,7 @@ describe("inicialización y recuperación TF.js · RIKDP-287", () => {
       "warmup",
     ]);
     expect(model.predict).toHaveBeenCalledOnce();
+    expect(mocks.registerOp).toHaveBeenCalledWith("_FusedConv2D", expect.any(Function));
     expect(model.save).toHaveBeenCalledWith(cacheKey);
     expect(storage.has("rikuydeep-model-active")).toBe(true);
     loaded.dispose();

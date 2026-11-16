@@ -1,6 +1,29 @@
 {
   "schema_version": 1,
   "architecture": "resnet50v2",
-  "status": "pending_resnet50v2_training",
-  "reason": "Generar referencias nuevas desde el notebook despues de entrenar y aprobar el gate; no hay artefactos anteriores habilitados."
+  "status": "pending_independent_review_and_physical_captures",
+  "review_date": "2026-11-16",
+  "jira_statuses_modified": false,
+  "automated_evidence": {
+    "RIKDP-84": "RIKDP-84-ci.json",
+    "RIKDP-85": "RIKDP-85-paridad-wasm.json",
+    "RIKDP-96": "RIKDP-96-datos.xml",
+    "RIKDP-101": "RIKDP-101-notebook-execution.json",
+    "RIKDP-145": "RIKDP-145/executions.json",
+    "RIKDP-154": [
+      "RIKDP-154-quality-gate-resnet.json",
+      "RIKDP-154-browser-wasm.json",
+      "RIKDP-154-browser-webgl.json"
+    ],
+    "RIKDP-166": "RIKDP-166-limite.json"
+  },
+  "pending": {
+    "RIKDP-131": "Aceptación de las métricas por una persona distinta del autor; el gate automatizado ya pasó.",
+    "RIKDP-254": "Al menos 100 capturas reales etiquetadas de hojas impresas y evaluación de la caída de métricas."
+  },
+  "limitations": [
+    "La evidencia de RIKDP-101 procede de la salida guardada del notebook; no se entrenó nuevamente en local.",
+    "La comparación del navegador usa píxeles RGB iguales transportados como PNG; no acredita decodificadores JPEG ni cámaras físicas.",
+    "El ensayo WebGL headless usa SwiftShader y no mide rendimiento de GPU física."
+  ]
 }

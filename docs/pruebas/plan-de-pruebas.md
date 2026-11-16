@@ -372,7 +372,7 @@ o una ejecución manual debe comprobar las referencias disponibles en ese moment
 | RIKDP-101 | PT1 | Componente | Reproducibilidad: dos corridas con la misma semilla dan las mismas métricas; [ensayo de Colab para ResNet50V2](pt1-colab-reproducibilidad.md) | pytest + TensorFlow | D. Bravo | HU10 |
 | RIKDP-131 | PT1 | Sistema | Verificación independiente de métricas en test (recall ≥ 95 %, accuracy ≥ 97 %); [inferencia nueva y revisión pendiente](pt1-revision-independiente.md) | pytest + scikit-learn | D. Sánchez | HU17 |
 | RIKDP-145 | PT1 | Integración | Un modelo degradado hace fallar el job de regresión en CI | GitHub Actions + pytest | D. Bravo | HU22 |
-| RIKDP-154 | PT1 | Integración | Paridad Keras ↔ TF.js en el conjunto dorado (≤ 2 discrepancias); [evidencia real CPU](pt1-cierre.md) | TF.js CPU + pytest | D. Bravo | HU25 |
+| RIKDP-154 | PT1 | Integración | Paridad Keras ↔ TF.js en el conjunto dorado (≤ 2 discrepancias, error ≤1e-4); [cargador real del navegador](pt1-paridad-navegador.md) | Keras + Chromium + TF.js | D. Bravo | HU25 |
 | RIKDP-166 | PT1 | Integración | El quality gate bloquea un modelo bajo la métrica (94,9 % falla, 95,0 % pasa) | GitHub Actions | A. Chumbiraico | HU25 |
 | RIKDP-254 ★ | PT1 | Sistema | Evaluación con ≥ 100 imágenes de webcam/celular sobre hojas impresas; [captura y evaluación](pt1-capturas.md) | pytest + TensorFlow + capturas físicas | A. Chumbiraico | HU17 |
 | RIKDP-135 | PT2 | Componente | Unitarias de validación de login, sesión y token de recuperación | Vitest | D. Bravo | HU19 |
