@@ -71,9 +71,7 @@ module.exports = {
     (converter / "index.js").write_text("module.exports = {};", encoding="utf-8")
     wasm = module.parent / "tfjs-backend-wasm"
     wasm.mkdir()
-    (wasm / "index.js").write_text(
-        "module.exports = {setWasmPaths() {}, setThreadsCount() {}};", encoding="utf-8"
-    )
+    (wasm / "index.js").write_text("module.exports = {setWasmPaths() {}, setThreadsCount() {}};", encoding="utf-8")
     model = tmp_path / "model.json"
     model.write_text(json.dumps({"modelTopology": {}, "weightsManifest": []}), encoding="utf-8")
     samples = []

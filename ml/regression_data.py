@@ -75,6 +75,13 @@ def download_public(identifier, target):
             current = url
             for _confirmation in range(3):
                 with urlopen(current, timeout=30) as stream:
+                    response_url = stream.geturl() if hasattr(stream, "geturl") else current
+                    if urlsplit(response_url).hostname == "accounts.google.com":
+                        raise ValueError(
+                            "Drive exige iniciar sesión: el ID configurado no permite descargar el ZIP anónimamente. "
+                            "Comparte el archivo como 'Cualquier persona con el enlace: Lector', habilita su descarga "
+                            "y comprueba el enlace sin iniciar sesión."
+                        )
                     prefix = stream.read(4096)
                     content_type = getattr(stream, "headers", {}).get("Content-Type", "").lower()
                     html = "text/html" in content_type or prefix.lstrip().lower().startswith(

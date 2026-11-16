@@ -228,3 +228,15 @@ def test_public_confirmation_loop_is_bounded(tmp_path, monkeypatch):
     with pytest.raises(ValueError, match="repiti"):
         download_public("public-id", tmp_path / "bundle")
     assert len(calls) == 3
+
+
+def test_public_download_rejects_google_login_redirect(tmp_path, monkeypatch):
+    class LoginResponse(io.BytesIO):
+        def geturl(self):
+            return "https://accounts.google.com/v3/signin/identifier"
+
+    monkeypatch.setattr("ml.regression_data.urlopen", lambda *args, **kwargs: LoginResponse(b"<html>Sign in</html>"))
+    target = tmp_path / "bundle"
+    with pytest.raises(ValueError, match="exige iniciar sesi"):
+        download_public("public-id", target)
+    assert not target.exists()
