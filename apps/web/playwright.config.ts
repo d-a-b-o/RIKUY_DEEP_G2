@@ -42,6 +42,7 @@ export default defineConfig({
     ? undefined
     : {
         command: `npm run start -- --port ${port}`,
+        env: { NEXT_PUBLIC_SITE_URL: baseURL },
         url: baseURL,
         reuseExistingServer: !isCI,
         timeout: 60_000,

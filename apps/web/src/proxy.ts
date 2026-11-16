@@ -1,5 +1,8 @@
 import { getSessionCookie } from "better-auth/cookies";
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
+import { applicationOrigins, contentSecurityPolicy, isSameOriginMutation, isUnsafeMethod } from "@/lib/security/policy";
+import { consumeWriteLimit, writeLimitKey, writePolicy } from "@/lib/security/write-limit";
+import { isDatabaseConfigured } from "@/lib/db";
 import { checkRouteAccess, type RouteAccess } from "@/lib/authz/route-access";
 
 /**
@@ -13,7 +16,7 @@ import { checkRouteAccess, type RouteAccess } from "@/lib/authz/route-access";
  * Las páginas y las server actions vuelven a comprobar el permiso: el proxy es
  * la primera barrera, no la única.
  */
-export async function proxy(request: NextRequest) {
+async function panelProxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
   if (!getSessionCookie(request)) {
     const signIn = new URL("/ingresar", request.url);
@@ -56,6 +59,60 @@ export async function proxy(request: NextRequest) {
   }
 }
 
+/** All writes pass through this boundary, including progressively enhanced forms. */
+export async function proxy(request: NextRequest) {
+  const nonce = Buffer.from(crypto.getRandomValues(new Uint8Array(24))).toString("base64");
+  const csp = contentSecurityPolicy(nonce);
+  const forwarded = new Headers(request.headers);
+  // Never reflect an inbound CSP/nonce supplied by the caller.
+  forwarded.set("content-security-policy", csp);
+  forwarded.set("x-nonce", nonce);
+  const nextRequest = new NextRequest(request, { headers: forwarded });
+  let response: Response;
+  if (isUnsafeMethod(request.method)) {
+    if (!isSameOriginMutation(request.headers, applicationOrigins())) {
+      response = NextResponse.json({ error: "CSRF_REJECTED" }, { status: 403 });
+    } else if (!request.nextUrl.pathname.startsWith("/api/auth/")) {
+      if (!isDatabaseConfigured()) {
+        response = NextResponse.json({ error: "SERVICE_UNAVAILABLE" }, { status: 503 });
+      } else {
+        try {
+          const policy = writePolicy(request.nextUrl.pathname);
+          const decision = await consumeWriteLimit(writeLimitKey(request.headers, policy), policy);
+          response = decision.allowed ? await dispatch(nextRequest, forwarded) : NextResponse.json(
+            { error: "TOO_MANY_REQUESTS", message: "Demasiadas solicitudes. Espera antes de volver a intentar." },
+            { status: 429, headers: { "Retry-After": String(decision.retryAfter) } },
+          );
+        } catch {
+          // A storage failure must never disable the limit.
+          response = NextResponse.json({ error: "SERVICE_UNAVAILABLE" }, { status: 503 });
+        }
+      }
+    } else {
+      response = await dispatch(nextRequest, forwarded);
+    }
+  } else {
+    response = await dispatch(nextRequest, forwarded);
+  }
+  response.headers.set("content-security-policy", response.headers.get("content-security-policy") ?? csp);
+  response.headers.set("cache-control", "private, no-store");
+  return response;
+}
+
+async function dispatch(request: NextRequest, forwarded: Headers): Promise<Response> {
+  if (request.nextUrl.pathname === "/panel" || request.nextUrl.pathname.startsWith("/panel/")) {
+    const response = await panelProxy(request);
+    // Preserve nonce headers for Next's document/RSC rendering and rewrites.
+    if (response.headers.has("x-middleware-next") || response.headers.has("x-middleware-rewrite")) {
+      const downstream = response.headers.get("x-middleware-rewrite");
+      return downstream ? NextResponse.rewrite(new URL(downstream), { request: { headers: forwarded } })
+        : NextResponse.next({ request: { headers: forwarded } });
+    }
+    return response;
+  }
+  return NextResponse.next({ request: { headers: forwarded } });
+}
+
 export const config = {
-  matcher: ["/panel/:path*"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|tfjs-wasm/).*)"],
 };

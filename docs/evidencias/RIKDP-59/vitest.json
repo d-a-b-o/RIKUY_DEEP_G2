@@ -1,0 +1,631 @@
+{
+  "numTotalTestSuites": 13,
+  "numPassedTestSuites": 13,
+  "numFailedTestSuites": 0,
+  "numPendingTestSuites": 0,
+  "numTotalTests": 42,
+  "numPassedTests": 42,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "numTodoTests": 0,
+  "snapshot": {
+    "added": 0,
+    "failure": false,
+    "filesAdded": 0,
+    "filesRemoved": 0,
+    "filesRemovedList": [],
+    "filesUnmatched": 0,
+    "filesUpdated": 0,
+    "matched": 0,
+    "total": 0,
+    "unchecked": 0,
+    "uncheckedKeysByFile": [],
+    "unmatched": 0,
+    "updated": 0,
+    "didUpdate": false
+  },
+  "startTime": 1794857552565,
+  "success": true,
+  "testResults": [
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "HU48 request boundary"
+          ],
+          "fullName": "HU48 request boundary rejects cross-origin and missing Origin before accessing storage or dispatching an action",
+          "status": "passed",
+          "title": "rejects cross-origin and missing Origin before accessing storage or dispatching an action",
+          "duration": 6.573700000000002,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "HU48 request boundary"
+          ],
+          "fullName": "HU48 request boundary limits progressively enhanced forms without depending on a Next-Action header",
+          "status": "passed",
+          "title": "limits progressively enhanced forms without depending on a Next-Action header",
+          "duration": 0.9730999999999881,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "HU48 request boundary"
+          ],
+          "fullName": "HU48 request boundary fails closed when the distributed limiter is unavailable",
+          "status": "passed",
+          "title": "fails closed when the distributed limiter is unavailable",
+          "duration": 0.680800000000005,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "HU48 request boundary"
+          ],
+          "fullName": "HU48 request boundary uses Better Auth's existing DB limiter for auth, but still checks CSRF",
+          "status": "passed",
+          "title": "uses Better Auth's existing DB limiter for auth, but still checks CSRF",
+          "duration": 1.0024000000000228,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "HU48 request boundary"
+          ],
+          "fullName": "HU48 request boundary preserves session redirects and forwards the nonce to private pages",
+          "status": "passed",
+          "title": "preserves session redirects and forwards the nonce to private pages",
+          "duration": 1.1143999999999892,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "HU48 request boundary"
+          ],
+          "fullName": "HU48 request boundary keeps the nonce belonging to a fetched 403 document",
+          "status": "passed",
+          "title": "keeps the nonce belonging to a fetched 403 document",
+          "duration": 0.6787999999999954,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "HU48 request boundary"
+          ],
+          "fullName": "HU48 request boundary replaces attacker-provided nonce/CSP, producing a different nonce for every document",
+          "status": "passed",
+          "title": "replaces attacker-provided nonce/CSP, producing a different nonce for every document",
+          "duration": 0.9750999999999976,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1794857554584,
+      "endTime": 1794857554595.975,
+      "status": "passed",
+      "message": "",
+      "name": "<repo>/apps/web/src/proxy.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "checkRouteAccess"
+          ],
+          "fullName": "checkRouteAccess deja pasar las rutas del panel que no exigen permiso sin leer la sesión",
+          "status": "passed",
+          "title": "deja pasar las rutas del panel que no exigen permiso sin leer la sesión",
+          "duration": 16.977499999999992,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "checkRouteAccess"
+          ],
+          "fullName": "checkRouteAccess deja pasar si el rol tiene el permiso",
+          "status": "passed",
+          "title": "deja pasar si el rol tiene el permiso",
+          "duration": 1.1185000000000116,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "checkRouteAccess"
+          ],
+          "fullName": "checkRouteAccess niega con 403 y registra el intento si el rol no alcanza",
+          "status": "passed",
+          "title": "niega con 403 y registra el intento si el rol no alcanza",
+          "duration": 1.6051999999999964,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "checkRouteAccess"
+          ],
+          "fullName": "checkRouteAccess el Superadmin no entra a la inspección: no opera la planta",
+          "status": "passed",
+          "title": "el Superadmin no entra a la inspección: no opera la planta",
+          "duration": 0.34480000000002065,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "checkRouteAccess"
+          ],
+          "fullName": "checkRouteAccess la auditoría es para Admin de planta y Superadmin",
+          "status": "passed",
+          "title": "la auditoría es para Admin de planta y Superadmin",
+          "duration": 0.41610000000000014,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "checkRouteAccess"
+          ],
+          "fullName": "checkRouteAccess sin sesión válida deja que la página lleve al login",
+          "status": "passed",
+          "title": "sin sesión válida deja que la página lleve al login",
+          "duration": 0.36249999999998295,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "checkRouteAccess"
+          ],
+          "fullName": "checkRouteAccess si leer la sesión falla, la página vuelve a decidir",
+          "status": "passed",
+          "title": "si leer la sesión falla, la página vuelve a decidir",
+          "duration": 0.5197000000000003,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "checkRouteAccess"
+          ],
+          "fullName": "checkRouteAccess un fallo al registrar no cambia la respuesta 403",
+          "status": "passed",
+          "title": "un fallo al registrar no cambia la respuesta 403",
+          "duration": 0.3418999999999812,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1794857553516,
+      "endTime": 1794857553537.5198,
+      "status": "passed",
+      "message": "",
+      "name": "<repo>/apps/web/src/lib/authz/route-access.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "safeNextPath"
+          ],
+          "fullName": "safeNextPath acepta rutas internas",
+          "status": "passed",
+          "title": "acepta rutas internas",
+          "duration": 1.078000000000003,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "safeNextPath"
+          ],
+          "fullName": "safeNextPath manda null al panel",
+          "status": "passed",
+          "title": "manda null al panel",
+          "duration": 0.14570000000000505,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "safeNextPath"
+          ],
+          "fullName": "safeNextPath manda undefined al panel",
+          "status": "passed",
+          "title": "manda undefined al panel",
+          "duration": 0.10699999999999932,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "safeNextPath"
+          ],
+          "fullName": "safeNextPath manda  al panel",
+          "status": "passed",
+          "title": "manda  al panel",
+          "duration": 0.10590000000000543,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "safeNextPath"
+          ],
+          "fullName": "safeNextPath manda https://otro.sitio al panel",
+          "status": "passed",
+          "title": "manda https://otro.sitio al panel",
+          "duration": 0.08689999999999998,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "safeNextPath"
+          ],
+          "fullName": "safeNextPath manda //otro.sitio al panel",
+          "status": "passed",
+          "title": "manda //otro.sitio al panel",
+          "duration": 0.0700999999999965,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "safeNextPath"
+          ],
+          "fullName": "safeNextPath manda /\\otro.sitio al panel",
+          "status": "passed",
+          "title": "manda /\\otro.sitio al panel",
+          "duration": 0.060000000000002274,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "safeNextPath"
+          ],
+          "fullName": "safeNextPath manda javascript:alert(1) al panel",
+          "status": "passed",
+          "title": "manda javascript:alert(1) al panel",
+          "duration": 0.06980000000000075,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "authErrorMessage"
+          ],
+          "fullName": "authErrorMessage distingue la cuenta bloqueada de la contraseña incorrecta",
+          "status": "passed",
+          "title": "distingue la cuenta bloqueada de la contraseña incorrecta",
+          "duration": 0.2383999999999986,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "authErrorMessage"
+          ],
+          "fullName": "authErrorMessage el rate limit tiene prioridad sobre el código",
+          "status": "passed",
+          "title": "el rate limit tiene prioridad sobre el código",
+          "duration": 0.15909999999999513,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "authErrorMessage"
+          ],
+          "fullName": "authErrorMessage un enlace inválido pide uno nuevo",
+          "status": "passed",
+          "title": "un enlace inválido pide uno nuevo",
+          "duration": 0.08230000000000359,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "authErrorMessage"
+          ],
+          "fullName": "authErrorMessage un error desconocido da un mensaje genérico según el flujo",
+          "status": "passed",
+          "title": "un error desconocido da un mensaje genérico según el flujo",
+          "duration": 0.07760000000000389,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1794857554924,
+      "endTime": 1794857554927.1592,
+      "status": "passed",
+      "message": "",
+      "name": "<repo>/apps/web/src/lib/auth/config.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "HU48 security policy"
+          ],
+          "fullName": "HU48 security policy trusts exact deployment hosts without granting access to other Vercel projects",
+          "status": "passed",
+          "title": "trusts exact deployment hosts without granting access to other Vercel projects",
+          "duration": 14.120000000000005,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "HU48 security policy"
+          ],
+          "fullName": "HU48 security policy rejects unsafe mutation origin undefined",
+          "status": "passed",
+          "title": "rejects unsafe mutation origin undefined",
+          "duration": 0.21719999999999118,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "HU48 security policy"
+          ],
+          "fullName": "HU48 security policy rejects unsafe mutation origin null",
+          "status": "passed",
+          "title": "rejects unsafe mutation origin null",
+          "duration": 0.16690000000001248,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "HU48 security policy"
+          ],
+          "fullName": "HU48 security policy rejects unsafe mutation origin https://evil.test",
+          "status": "passed",
+          "title": "rejects unsafe mutation origin https://evil.test",
+          "duration": 0.14990000000000236,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "HU48 security policy"
+          ],
+          "fullName": "HU48 security policy rejects unsafe mutation origin https://rikuy.example.evil.test",
+          "status": "passed",
+          "title": "rejects unsafe mutation origin https://rikuy.example.evil.test",
+          "duration": 0.12219999999999231,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "HU48 security policy"
+          ],
+          "fullName": "HU48 security policy rejects unsafe mutation origin https://u:p@rikuy.example",
+          "status": "passed",
+          "title": "rejects unsafe mutation origin https://u:p@rikuy.example",
+          "duration": 0.10779999999999745,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "HU48 security policy"
+          ],
+          "fullName": "HU48 security policy rejects unsafe mutation origin https://rikuy.example/path",
+          "status": "passed",
+          "title": "rejects unsafe mutation origin https://rikuy.example/path",
+          "duration": 0.09399999999999409,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "HU48 security policy"
+          ],
+          "fullName": "HU48 security policy rejects unsafe mutation origin https://rikuy.example:8443",
+          "status": "passed",
+          "title": "rejects unsafe mutation origin https://rikuy.example:8443",
+          "duration": 0.09950000000000614,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "HU48 security policy"
+          ],
+          "fullName": "HU48 security policy allows same-origin writes and rejects cross-site Fetch Metadata",
+          "status": "passed",
+          "title": "allows same-origin writes and rejects cross-site Fetch Metadata",
+          "duration": 0.2990999999999957,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "HU48 security policy"
+          ],
+          "fullName": "HU48 security policy uses nonces and WASM without allowing production JavaScript eval or inline scripts",
+          "status": "passed",
+          "title": "uses nonces and WASM without allowing production JavaScript eval or inline scripts",
+          "duration": 0.48520000000000607,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "HU48 security policy"
+          ],
+          "fullName": "HU48 security policy never accepts a caller supplied invalid nonce",
+          "status": "passed",
+          "title": "never accepts a caller supplied invalid nonce",
+          "duration": 0.5345000000000084,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1794857554209,
+      "endTime": 1794857554225.5344,
+      "status": "passed",
+      "message": "",
+      "name": "<repo>/apps/web/src/lib/security/policy.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "HU48 PostgreSQL atomic quota"
+          ],
+          "fullName": "HU48 PostgreSQL atomic quota allows exactly the configured quota under concurrent requests, then resets the window",
+          "status": "passed",
+          "title": "allows exactly the configured quota under concurrent requests, then resets the window",
+          "duration": 214.5321,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1794857552937,
+      "endTime": 1794857553151.532,
+      "status": "passed",
+      "message": "",
+      "name": "<repo>/apps/web/src/lib/security/write-limit.integration.test.ts"
+    },
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "HU48 write limiter"
+          ],
+          "fullName": "HU48 write limiter groups writes, avoiding unbounded keys from resource paths",
+          "status": "passed",
+          "title": "groups writes, avoiding unbounded keys from resource paths",
+          "duration": 1.5919000000000096,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "HU48 write limiter"
+          ],
+          "fullName": "HU48 write limiter hashes IPs and shares a conservative bucket when no trusted address is available",
+          "status": "passed",
+          "title": "hashes IPs and shares a conservative bucket when no trusted address is available",
+          "duration": 15.544700000000006,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        },
+        {
+          "ancestorTitles": [
+            "HU48 write limiter"
+          ],
+          "fullName": "HU48 write limiter rejects over-quota requests with a bounded Retry-After and propagates storage errors",
+          "status": "passed",
+          "title": "rejects over-quota requests with a bounded Retry-After and propagates storage errors",
+          "duration": 1.3787000000000091,
+          "failureMessages": [],
+          "meta": {},
+          "tags": [],
+          "benchmarks": []
+        }
+      ],
+      "startTime": 1794857553872,
+      "endTime": 1794857553890.3787,
+      "status": "passed",
+      "message": "",
+      "name": "<repo>/apps/web/src/lib/security/write-limit.test.ts"
+    }
+  ]
+}
