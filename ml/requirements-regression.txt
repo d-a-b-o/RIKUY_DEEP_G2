@@ -8,4 +8,4 @@ dvc==3.67.1
 # Pruebas del contrato de entrada con TensorFlow real (PT1).
 pytest>=9.2.0,<10
 # Navegador real para la paridad del preprocesamiento (PT1 RIKDP-85).
-playwright==1.58.0
+playwright==1.65.1
