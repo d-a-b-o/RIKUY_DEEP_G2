@@ -100,6 +100,35 @@ def publish(release, **kwargs):
     )
 
 
+@pytest.mark.parametrize("true_positives,passed", [(94, False), (95, True)])
+def test_recall_boundary_reaches_publication_guard(release, true_positives, passed):
+    # El publicador exige 195 muestras: con 100 positivas el límite es 95/100.
+    rows = [{"id": str(i), "label": int(i >= 95)} for i in range(195)]
+    predictions = [
+        {
+            "id": r["id"],
+            "python": 0.9 if 95 <= i < 95 + true_positives else 0.1,
+            "tfjs": 0.9 if 95 <= i < 95 + true_positives else 0.1,
+        }
+        for i, r in enumerate(rows)
+    ]
+    report = evaluate_quality_gate(rows, predictions, 0.5)
+    report.update(model_sha256=release["report"]["model_sha256"], golden_sha256="golden-hash")
+
+    def guard():
+        require_quality_gate(report, report["model_sha256"], "golden-hash", rows)
+        return report
+
+    assert report["python"]["recall"] == true_positives / 100
+    if passed:
+        publish(release, guard=guard, dry_run=True)
+    else:
+        with pytest.raises(RuntimeError, match="bloqueada"):
+            publish(release, guard=guard, dry_run=False)
+    release["factory"].assert_not_called()
+    assert release["client"].writes == []
+
+
 @pytest.mark.parametrize("reason", ["failed", "incomplete", "bad_metrics", "bad_parity", "model_changed"])
 def test_failed_gate_performs_zero_storage_operations(release, reason):
     report = release["report"]

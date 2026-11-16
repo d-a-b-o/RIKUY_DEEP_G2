@@ -208,3 +208,40 @@ class WorkflowTests(unittest.TestCase):
                 if not source.lstrip().startswith(("!", "%")):
                     compile(source, f"cell-{i}", "exec")
         json.dumps(notebook)
+
+    def test_resnet_helper_warms_head_then_unfreezes_and_recompiles(self):
+        prepare_data(self.config)
+        model, fake_tf = MagicMock(), MagicMock()
+        fake_tf.keras.models.load_model.return_value.predict.return_value = np.array([[0.1], [0.9]])
+
+        class BatchNorm:
+            trainable = False
+
+        base = MagicMock()
+        base.trainable = False
+        base.layers = [MagicMock() for _ in range(9)] + [BatchNorm()]
+        model.get_layer.return_value = base
+        fake_tf.keras.layers.BatchNormalization = BatchNorm
+        phases = []
+
+        def fit(*args, **kwargs):
+            phases.append(base.trainable)
+            directory = next((self.root / "models/experiments").iterdir())
+            (directory / "best.keras").write_bytes(b"test checkpoint")
+            (directory / "history.csv").write_text("epoch,loss\n0,0.1\n")
+
+        model.fit.side_effect = fit
+        with (
+            patch.dict("sys.modules", {"tensorflow": fake_tf}),
+            patch("ml.workflow.runtime_versions", return_value={"tensorflow": "test"}),
+            patch("ml.workflow.datasets", return_value={"train": [], "validation": [], "test": []}),
+            patch("ml.workflow.build_model", return_value=model),
+            patch("ml.workflow.choose_threshold", return_value=0.5),
+            patch("ml.workflow.scores", return_value={"recall": 1.0}),
+        ):
+            train(self.config, kind="resnet50v2", fraction=0.3)
+        self.assertEqual(phases, [False, True])
+        model.compile.assert_called_once()
+        self.assertFalse(base.layers[-1].trainable)
+        self.assertTrue(base.layers[-2].trainable)
+        self.assertFalse(base.layers[0].trainable)

@@ -1,0 +1,5 @@
+outs:
+- md5: a1ad6b3e0ce16ee250a68bf28279a355
+  size: 180593098
+  hash: md5
+  path: ci-reference-resnet.zip

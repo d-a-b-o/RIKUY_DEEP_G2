@@ -10,9 +10,11 @@ import unittest
 from datetime import datetime, timezone
 from pathlib import Path
 from unittest.mock import MagicMock, Mock, patch
+from uuid import uuid4
 
 import numpy as np
 from PIL import Image
+from sklearn.metrics import classification_report
 
 
 class OrderedNotebookTests(unittest.TestCase):
@@ -32,6 +34,8 @@ class OrderedNotebookTests(unittest.TestCase):
             plt=MagicMock(),
             TARGET_SIZE=TARGET_SIZE,
             types=types,
+            uuid4=uuid4,
+            classification_report=classification_report,
             datetime=datetime,
             timezone=timezone,
         )
@@ -157,14 +161,14 @@ class OrderedNotebookTests(unittest.TestCase):
         for name in ("train", "run_hpo"):
             self.assertIn(name, self.ns)
 
-    def test_training_cache_and_incomplete_run_protection(self):
+    def test_training_always_creates_new_runs_without_manual_tags(self):
         self.ns["prepare_data"](self.config)
         model = MagicMock()
         fake_tf = MagicMock()
-        fake_tf.keras.models.load_model.return_value.predict.return_value = np.array([[0.2], [0.8]])
+        fake_tf.keras.models.load_model.return_value.predict.return_value = np.array([[0.2], [0.8]] * 3)
 
         def fit(*args, **kwargs):
-            directory = next((self.root / "models/experiments").iterdir())
+            directory = next(p for p in (self.root / "models/experiments").iterdir() if not (p / "best.keras").exists())
             (directory / "best.keras").write_bytes(b"checkpoint")
             (directory / "history.csv").write_text("epoch,loss\n0,0.1\n")
 
@@ -182,21 +186,64 @@ class OrderedNotebookTests(unittest.TestCase):
             },
         ):
             directory = self.ns["train"](self.config)
-            self.assertEqual(directory, self.ns["train"](self.config))
-            model.fit.assert_called_once()
+            second = self.ns["train"](self.config)
+            self.assertNotEqual(directory, second)
+            self.assertEqual(model.fit.call_count, 2)
             started = self.ns["read_json"](directory / "started.json")
             self.assertTrue(started["params"]["augmentation"])
+            self.assertNotIn("experiment_tag", started["params"])
             self.assertIn("created_utc", started)
             (directory / "completed.json").unlink()
-            with self.assertRaisesRegex(RuntimeError, "incompleta"):
-                self.ns["train"](self.config)
-            model.fit.assert_called_once()
+            third = self.ns["train"](self.config)
+            self.assertNotEqual(third, directory)
+            self.assertEqual(model.fit.call_count, 3)
 
     def test_code_fingerprint_stable_after_all_cells(self):
         cnn = self.ns["notebook_code_fingerprint"]("cnn")
-        mobile = self.ns["notebook_code_fingerprint"]("mobilenetv2")
+        mobile = self.ns["notebook_code_fingerprint"]("resnet50v2")
         self.assertEqual(cnn, self.ns["notebook_code_fingerprint"]("cnn"))
         self.assertNotEqual(cnn, mobile)
+
+    def test_resnet_adapts_head_before_unfreezing_and_recompiles(self):
+        self.ns["prepare_data"](self.config)
+        model, fake_tf = MagicMock(), MagicMock()
+        fake_tf.keras.models.load_model.return_value.predict.return_value = np.array([[0.2], [0.8]] * 3)
+
+        class BatchNorm:
+            trainable = False
+
+        base = MagicMock()
+        base.trainable = False
+        base.layers = [MagicMock() for _ in range(9)] + [BatchNorm()]
+        model.get_layer.return_value = base
+        phases = []
+
+        def fit(*args, **kwargs):
+            phases.append(base.trainable)
+            directory = next((self.root / "models/experiments").iterdir())
+            (directory / "best.keras").write_bytes(b"checkpoint")
+            (directory / "history.csv").write_text("epoch,loss\n0,0.1\n")
+
+        model.fit.side_effect = fit
+        fake_tf.keras.layers.BatchNormalization = BatchNorm
+        with patch.dict(
+            self.ns,
+            {
+                "tf": fake_tf,
+                "runtime_versions": lambda: {"tensorflow": "test"},
+                "notebook_code_fingerprint": lambda kind: "code",
+                "build_model": Mock(return_value=model),
+                "datasets": Mock(return_value={"train": [], "validation": [], "test": []}),
+                "choose_threshold": Mock(return_value=0.5),
+                "scores": Mock(return_value={"recall": 1.0}),
+            },
+        ):
+            self.ns["train"](self.config, kind="resnet50v2", fraction=0.3)
+        self.assertEqual(phases, [False, True])
+        model.compile.assert_called_once()
+        self.assertFalse(base.layers[-1].trainable)
+        self.assertTrue(base.layers[-2].trainable)
+        self.assertFalse(base.layers[0].trainable)
 
     def test_colab_cache_reuses_verified_images_and_repairs_changed_copy(self):
         manifest = self.ns["prepare_data"](self.config)

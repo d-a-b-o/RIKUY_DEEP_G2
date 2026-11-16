@@ -1,0 +1,19 @@
+{
+  "scope": "github_actions_observed_success",
+  "commit": "d168901d63b20a3158e434d897027a160c34d1e7",
+  "run_url": "https://github.com/d-a-b-o/RIKUY_DEEP_G2/actions/runs/41703755247",
+  "job_url": "https://github.com/d-a-b-o/RIKUY_DEEP_G2/actions/runs/41703755247/job/126153538948",
+  "job_conclusion": "success",
+  "step": "PT1 RIKDP-84 · Contrato real de entrada TensorFlow",
+  "step_conclusion": "success",
+  "log_summary": "19 passed in 2.53s",
+  "tensorflow_required": true,
+  "artifact": {
+    "id": 13264916908,
+    "name": "pt1-preprocessing-evidence",
+    "digest": "sha256:8944d1259d26e66be53f2cea2b09014d13a5a614f03281dac207bfb40d5560b4",
+    "expires_at": "2026-11-17T19:30:29Z"
+  },
+  "verified_on": "2026-11-08",
+  "jira_transition_performed": false
+}
