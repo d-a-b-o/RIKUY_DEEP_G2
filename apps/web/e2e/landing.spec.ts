@@ -5,6 +5,18 @@ import { expect, test } from "./fixtures";
  * Se ejecuta en cada PR: si falla, la aplicación desplegada no sirve.
  */
 test.describe("Landing", { tag: "@smoke" }, () => {
+  test("la demostración se puede pausar y respeta movimiento reducido", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    const demo = page.getByRole("figure", { name: "Vista ilustrativa del proceso de inspección" });
+    await expect(demo).toBeVisible();
+    await expect(demo.getByText("Confianza ilustrativa: 94 %")).toBeVisible();
+    await expect(demo.locator(".inspection-demo__scan")).toBeHidden();
+    const pause = demo.getByRole("button", { name: "Pausar animación" });
+    await pause.focus();
+    await page.keyboard.press("Enter");
+    await expect(demo.getByRole("button", { name: "Reanudar animación" })).toHaveAttribute("aria-pressed", "true");
+  });
   test("carga con su propuesta de valor y la llamada a la demo", async ({ landingPage, page }) => {
     await landingPage.goto();
 

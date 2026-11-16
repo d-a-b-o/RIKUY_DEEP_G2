@@ -4,16 +4,16 @@ export function Hero() {
   return (
     <section
       id="inicio"
-      className="industrial-grid relative isolate overflow-hidden border-b border-border"
+      className="industrial-grid relative isolate overflow-hidden border-b border-border bg-surface-raised/40"
     >
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -right-40 -top-40 -z-10 h-[700px] w-[700px] rounded-full bg-primary/5 blur-[120px]"
       />
-      <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 px-5 pb-14 pt-14 sm:px-8 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:pb-20 lg:pt-20">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 px-5 pb-16 pt-14 sm:px-8 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:pb-24 lg:pt-20">
         <div className="flex flex-col gap-7">
           <p className="ui-eyebrow">Visión artificial para fundición</p>
-          <h1 className="max-w-xl text-balance text-[2.65rem] font-semibold leading-[1.08] tracking-[-0.04em] sm:text-6xl lg:text-[3.8rem]">
+          <h1 className="max-w-xl text-balance text-[2.5rem] font-semibold leading-[1.08] tracking-[-0.04em] sm:text-6xl lg:text-[3.8rem]">
             Inspecciona el 100{"\u00a0"}% de tus piezas,
             <span className="text-primary"> no solo una muestra.</span>
           </h1>

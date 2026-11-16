@@ -294,3 +294,33 @@
     background: var(--surface-raised);
   }
 }
+
+/* Vista ilustrativa de inspección: capas estables, sin llamadas al modelo. */
+.inspection-demo { width: 100%; max-width: 34rem; overflow: hidden; border: 1px solid #3b5362; border-radius: 1.25rem; background: #0d1d29; color: #eff8fa; box-shadow: 0 24px 65px #07172238; }
+.inspection-demo__top { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1rem 1.25rem; border-bottom:1px solid #ffffff1c; }
+.inspection-demo__eyebrow,.inspection-demo__caption { display:block; color:#b0c9d2; font-size:.65rem; letter-spacing:.12em; font-weight:700; }
+.inspection-demo__title { margin:.3rem 0 0; font-size:1rem; font-weight:650; }
+.inspection-demo__badge { color:#c5e8ed; background:#173d49; border:1px solid #3c7580; border-radius:999px; padding:.4rem .7rem; font-size:.7rem; font-weight:650; white-space:nowrap; }
+.inspection-demo__badge span { color:#86e4ca; margin-right:.25rem; }
+.inspection-demo__viewport { position:relative; overflow:hidden; background:radial-gradient(ellipse at center,#253b49 0%,#142530 72%); }
+.inspection-demo__viewport::before { content:""; position:absolute; inset:0; background-image:linear-gradient(#ffffff09 1px,transparent 1px),linear-gradient(90deg,#ffffff09 1px,transparent 1px); background-size:2.5rem 2.5rem; }
+.inspection-demo__viewport-label { position:absolute; z-index:1; left:1rem; top:1rem; padding:.35rem .5rem; border-radius:.35rem; background:#0b1b29d9; color:#d3e9ee; font:600 .65rem var(--font-mono),monospace; }
+.inspection-demo__piece { position:relative; display:block; width:100%; height:auto; }
+.inspection-demo__scan { position:absolute; left:19%; right:19%; top:12%; height:2px; opacity:0; background:#8ff3f3; box-shadow:0 0 15px 4px #31d5dc90; animation:inspection-scan 9s ease-in-out infinite; }
+.inspection-demo__stage { position:absolute; right:1rem; bottom:1rem; min-width:9rem; height:2.2rem; border:1px solid #7eaeb6; border-radius:999px; background:#0b1b29e8; color:#e5f8fa; font-size:.75rem; font-weight:650; }
+.inspection-demo__stage span { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0; }
+.inspection-demo__capture { animation:inspection-capture 9s infinite; }.inspection-demo__analysis { animation:inspection-analysis 9s infinite; }.inspection-demo__complete { animation:inspection-complete 9s infinite; }
+.inspection-demo__bottom { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; padding:1rem 1.25rem; border-top:1px solid #ffffff1c; }
+.inspection-demo__verdict { display:flex; gap:.5rem; align-items:center; margin:.35rem 0 0; color:#a4f1c5; font-weight:750; font-size:1.3rem; }
+.inspection-demo__detail { margin:.2rem 0 0; color:#c5d7df; font-size:.75rem; }
+.inspection-demo__pause { min-height:2.75rem; padding:.55rem .75rem; border:1px solid #95b6c1; border-radius:.75rem; color:#eefbfe; background:#1b3443; font-size:.75rem; font-weight:650; }
+.inspection-demo__pause:hover { background:#294b5d; }.inspection-demo__pause:focus-visible { outline:3px solid #78e7f0; outline-offset:3px; }
+.inspection-demo[data-paused="true"] * { animation-play-state:paused; }
+@keyframes inspection-scan { 0%,25% { transform:translateY(0); opacity:0; } 30% { opacity:1; } 60% { transform:translateY(11rem); opacity:1; } 65%,100% { transform:translateY(11rem); opacity:0; } }
+@keyframes inspection-capture { 0%,27% { opacity:1; } 30%,100% { opacity:0; } }
+@keyframes inspection-analysis { 0%,28% { opacity:0; } 31%,63% { opacity:1; } 66%,100% { opacity:0; } }
+@keyframes inspection-complete { 0%,64% { opacity:0; } 67%,96% { opacity:1; } 100% { opacity:0; } }
+@media (prefers-reduced-motion: reduce) { .inspection-demo__scan { display:none; } .inspection-demo__stage span { animation:none; } .inspection-demo__stage .inspection-demo__complete { opacity:1; } }
+.inspection-demo__result { animation:inspection-result 9s ease-in-out infinite; }
+@keyframes inspection-result { 0%,62% { transform:translateY(0); } 70% { transform:translateY(-2px); } 80%,100% { transform:translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .inspection-demo__result { animation:none; opacity:1; } }
