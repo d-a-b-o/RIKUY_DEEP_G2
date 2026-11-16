@@ -19,7 +19,8 @@
     "db:check": "prisma migrate diff --from-config-datasource --to-schema prisma/schema.prisma --exit-code",
     "create:superadmin": "tsx scripts/create-superadmin.ts",
     "reset:two-factor": "tsx scripts/reset-two-factor.ts",
-    "build:vercel": "prisma migrate deploy && next build"
+    "build:vercel": "prisma migrate deploy && next build",
+    "sbom": "node scripts/generate-sbom.mjs"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.1",
@@ -43,6 +44,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
+    "@cyclonedx/cyclonedx-npm": "^7.0.1",
     "@playwright/test": "1.65.0",
     "@tailwindcss/turbopack": "^4",
     "@types/node": "^26",
@@ -51,6 +53,9 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@typescript/native": "npm:typescript@^7.0.2",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
+    "ajv-formats-draft2019": "1.6",
     "dotenv": "^18.0.10",
     "esbuild": "0.28.2",
     "eslint": "^10",

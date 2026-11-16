@@ -53,3 +53,6 @@ next-env.d.ts
 
 # Binarios WASM de TensorFlow.js (se copian en postinstall)
 /public/tfjs-wasm/
+
+# Inventario local y declaraciones de compatibilidad (npm run sbom).
+/sbom-web.cdx.json*

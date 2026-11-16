@@ -50,6 +50,7 @@ jobs:
             web:
               - "apps/web/**"
               - ".github/workflows/ci.yml"
+              - ".github/workflows/sbom.yml"
             ml:
               - "ml/**"
               - "RIKUY_DEEP_G2.ipynb"
@@ -112,6 +113,9 @@ jobs:
 
       - name: Auditoría de dependencias de producción
         run: npm audit --omit=dev --audit-level=high
+
+      - name: Validar SBOM web antes de fusionar
+        run: npm run sbom -- "$RUNNER_TEMP/sbom-web.cdx.json"
 
       - name: Migraciones
         run: npm run db:deploy
