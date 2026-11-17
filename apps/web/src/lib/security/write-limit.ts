@@ -6,6 +6,7 @@ import { getDb } from "@/lib/db";
 export type WritePolicy = { bucket: string; max: number; windowMs: number };
 
 export function writePolicy(path: string): WritePolicy {
+  if (path === "/api/telemetry/model") return { bucket: "telemetry", max: 120, windowMs: 60_000 };
   if (path === "/panel" || path.startsWith("/panel/")) return { bucket: "panel", max: 240, windowMs: 60_000 };
   if (path === "/invitacion") return { bucket: "invitation", max: 10, windowMs: 600_000 };
   return { bucket: "public", max: 5, windowMs: 600_000 };

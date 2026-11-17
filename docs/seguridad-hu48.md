@@ -129,3 +129,42 @@ Referencias: [CSP en Next](https://nextjs.org/docs/app/guides/content-security-p
 [seguridad Better Auth](https://better-auth.com/docs/reference/security),
 [cabeceras Vercel](https://vercel.com/docs/headers/request-headers),
 [ZAP Automation Framework](https://www.zaproxy.org/docs/desktop/addons/automation-framework/).
+
+## Validación HTTPS de la preview (16 de noviembre de 2026)
+
+La preview asociada al commit `5aebd5fd3293d6b9e59346fff8f2dde098370adb` de
+[PR #78](https://github.com/d-a-b-o/RIKUY_DEEP_G2/pull/78) presenta un certificado
+válido para su hostname, con cadena de confianza verificada. Se comprobaron
+conexiones TLS 1.3 y TLS 1.2, y redirección HTTP → HTTPS con código 308.
+El certificado observado vence el 29 de enero de 2027.
+
+Todas las rutas HTTPS comprobadas (`/`, `/ingresar`, `/panel`) redirigen al SSO de
+Vercel mediante Deployment Protection. La respuesta del perímetro incluye HSTS,
+pero no acredita las cabeceras emitidas por nuestra aplicación ni el acceso al
+panel. La CSP y las pantallas autenticadas en preview siguen pendientes hasta
+contar con una sesión autorizada o el bypass de automatización. No se desactivó
+Deployment Protection ni se ignoró la validación TLS.
+
+Evidencia: [https-preview.json](evidencias/RIKDP-59/https-preview.json).
+
+## Validación autenticada en producción (16 de noviembre de 2026)
+
+En `https://rikuydeep.vercel.app` se validaron el certificado real, TLS 1.3,
+redirección HTTP 308 y cabeceras de la aplicación. Con una cuenta INSPECTOR se
+comprobaron seis pantallas permitidas (200), tres rutas restringidas (403), cookies
+de sesión seguras y cierre de sesión con invalidación. Los diez documentos de la
+revisión directa usan nonces distintos y no se observaron errores de JavaScript
+ni bloqueos de CSP.
+
+ZAP 2.17.0 completó un escaneo pasivo autenticado: cero reglas con alerta alta,
+tres medias y cuatro informativas. Las medias corresponden al formulario público
+sin token CSRF reconocido por ZAP, `style-src unsafe-inline` y CORS en recursos
+estáticos públicos. Se conservan las alertas y su evaluación; el escaneo pasivo no
+demuestra explotación ni ausencia de vulnerabilidades.
+
+La cuenta no tiene 2FA activado. Esta revisión no acredita el flujo 2FA, recuperación
+por correo, cámara física, otros roles ni pruebas de escritura. Tampoco sustituye
+la validación de la preview protegida, la rotación de secretos o la activación del
+gate DAST y la protección de main.
+
+Resultados, alcance e informes: [validación de producción](evidencias/RIKDP-59/production/README.md).

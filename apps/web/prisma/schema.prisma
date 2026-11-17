@@ -60,6 +60,7 @@ enum Verdict {
 enum InferenceBackend {
   WEBGL
   WASM
+  CPU
 
   @@map("inference_backend")
 }
@@ -472,6 +473,7 @@ model ModelTelemetry {
   id             String           @id @default(uuid(7))
   companyId      String?          @map("company_id")
   modelVersionId String?          @map("model_version_id")
+  modelVersionLabel String?       @map("model_version_label")
   type           TelemetryType
   durationMs     Int?             @map("duration_ms")
   backend        InferenceBackend?
@@ -481,5 +483,6 @@ model ModelTelemetry {
   modelVersion ModelVersion? @relation(fields: [modelVersionId], references: [id], onDelete: SetNull)
 
   @@index([type, createdAt])
+  @@index([createdAt])
   @@map("model_telemetry")
 }

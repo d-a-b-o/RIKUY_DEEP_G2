@@ -18,6 +18,7 @@ import {
 } from "./manifest";
 import { resizeModelPixels } from "./preprocess";
 import { registerGraphCompatibility } from "./graph-compatibility";
+import { recordModelTelemetry } from "../monitoring/client";
 
 export type Backend = "webgl" | "wasm" | "cpu";
 export type LoadStage =
@@ -410,9 +411,12 @@ async function initializeInspectionModel(
       });
       try {
         const [defectProbability] = await output.data();
+        const inferenceMs = performance.now() - begin;
+        recordModelTelemetry({ type: "INFERENCE", version: active.version,
+          durationMs: Math.round(inferenceMs), backend: backend === "webgl" ? "WEBGL" : backend === "wasm" ? "WASM" : "CPU" });
         return {
           ...classify(defectProbability, active.threshold),
-          inferenceMs: performance.now() - begin,
+          inferenceMs,
         };
       } finally {
         output.dispose();
@@ -459,6 +463,7 @@ export async function loadInspectionModel(
         created.listeners.forEach((listener) => listener(stage, progress));
       });
     created.promise = initialization.then(start).catch((error) => {
+      recordModelTelemetry({ type: "LOAD_ERROR", stage: created.stage });
       sessions.delete(manifestUrl);
       throw modelLoadFailure(error);
     });
