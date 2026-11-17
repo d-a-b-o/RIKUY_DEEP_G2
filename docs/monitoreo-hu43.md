@@ -96,9 +96,20 @@ Validación local del 16 de noviembre de 2026:
 - Suite completa: 477 pruebas correctas y dos omitidas.
 - Monitoreo: siete pruebas correctas, incluida persistencia/deduplicación real y
   promedio 200 ms / p95 290 ms para muestras de 100, 200 y 300 ms.
-- `next build --webpack` correcto. `npm run build` con Turbopack falla en este
-  entorno al iniciar el proceso que transforma CSS; sigue pendiente verificar ese
-  compilador en CI. No se cambió el compilador predeterminado del proyecto.
+- `next build --webpack` correcto localmente. Turbopack presentó un fallo local
+  al iniciar el proceso que transforma CSS. La verificación posterior en CI de
+  main sí pasó: `npm run build` ejecutó Next.js 16.4.6 con Turbopack y compiló
+  correctamente en 6,2 segundos. No se cambió el compilador predeterminado.
+
+Verificación tras fusionar PR #81: main `461092ecd360736d8d40d97b8ca03c31f7b4c616`.
+La [ejecución CI 43992662407](https://github.com/d-a-b-o/RIKUY_DEEP_G2/actions/runs/43992662407)
+terminó correctamente, incluidos migraciones, pruebas, build Turbopack y humo
+Playwright. Se ejecutó el 16 de noviembre de 2026 entre las 20:04 y 20:07 (Lima).
+La comprobación pública posterior de `/api/health` respondió 200 con
+`status: ok` a las 20:09 (Lima). Esto acredita la comprobación de base de datos
+del endpoint desplegado; no reemplaza la revisión de pantalla autenticada ni
+la recepción de telemetría real. Las observaciones anteriores de 404 y PR
+pendiente corresponden al estado previo a esta fusión.
 
 Ejecutar generación de Prisma, tipos, lint, pruebas de monitoreo y loader, y build.
 El cierre completo requiere además aplicar la migración, revisar la pantalla con
