@@ -50,12 +50,40 @@ verificado, sin activar opciones de pago:
 2. Modelo: la URL exacta de `NEXT_PUBLIC_MODEL_MANIFEST_URL` del despliegue.
    El formulario se preparó con `https://bucket.d-a-b-o.dev/dev/manifest.json`,
    la configuración provisional del repositorio; confirmar que coincide con
-   producción antes de guardarlo. No se ha acreditado su creación.
+   producción antes de guardarlo. En una revisión posterior de Edge se confirmó
+   que el monitor `804699985` ya está creado para esta URL, activo y Up, con
+   comprobación cada cinco minutos. No fue necesario crear otro monitor.
 
 Comprobar el contacto de correo y los avisos de caída/recuperación en ambos
 monitores. La entrega real del aviso debe probarse con un recurso de prueba,
-sin provocar una caída de producción. No se ha acreditado entrega de correo.
+sin provocar una caída de producción. La evidencia disponible se detalla abajo.
 La sección Maintenance no es necesaria para estas comprobaciones.
+
+Revisión posterior en las sesiones proporcionadas por el responsable:
+
+- Monitor web `804699929`: Up, intervalo cinco minutos, contacto de alertas
+  asignado a la cuenta. Monitor del manifest `804699985`: mismas condiciones.
+- La sesión de RikuyDeep permitió abrir Empresas, pero la ruta
+  `/panel/admin/monitoreo` devolvió la pantalla 404. La sesión preparada no
+  sustituye el despliegue del código HU43, cuyo PR se dejó pendiente por indicación
+  del responsable.
+- Inicialmente no se envió ninguna notificación de prueba. La revisión automática rechazó el
+  clic en Test Notification por falta de autorización explícita para enviar correo.
+  Después, el responsable autorizó explícitamente los dos avisos. Se pulsó
+  `Send test notifications` una vez en cada monitor; ambos diálogos se cerraron
+  sin error visible. Esto acredita la solicitud en la interfaz, no la entrega
+  del correo. Se solicitó al responsable confirmar la recepción de ambos avisos.
+
+El responsable aportó posteriormente dos capturas del correo recibido el
+16 de noviembre de 2026, alrededor de las 19:50 (Lima), con los asuntos
+`TEST: Monitor is DOWN: bucket.d-a-b-o.dev/dev/manifest.json` y
+`TEST: Monitor is UP: bucket.d-a-b-o.dev/dev/manifest.json`.
+Esto confirma la recepción de los avisos de prueba de caída y recuperación
+del **monitor del manifest**. El prefijo TEST y los campos N/A indican una
+simulación: no constituyen evidencia de una caída real. Las capturas no muestran
+la dirección completa del destinatario ni acreditan la recepción del aviso del
+monitor web, que sigue pendiente de confirmar. No se copiaron direcciones de
+correo ni imágenes privadas al repositorio.
 
 Referencia oficial: [API y límites del plan gratuito](https://uptimerobot.com/api/).
 
