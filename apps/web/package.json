@@ -20,7 +20,8 @@
     "create:superadmin": "tsx scripts/create-superadmin.ts",
     "reset:two-factor": "tsx scripts/reset-two-factor.ts",
     "build:vercel": "prisma migrate deploy && next build",
-    "sbom": "node scripts/generate-sbom.mjs"
+    "sbom": "node scripts/generate-sbom.mjs",
+    "test:memory": "node scripts/pt5-memory.mjs"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.1",
