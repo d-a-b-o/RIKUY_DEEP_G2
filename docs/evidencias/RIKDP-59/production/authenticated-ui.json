@@ -1,0 +1,290 @@
+{
+  "checkedAtUtc": "2026-11-16T21:54:02.407Z",
+  "target": "https://rikuydeep.vercel.app",
+  "expectedMainCommit": "068c280d790b128374645689a5486afd56d64223",
+  "scope": "Production read-only UI checks and authenticated passive scanning; no business writes",
+  "checks": [
+    {
+      "name": "public_login_page",
+      "status": 200,
+      "url": "https://rikuydeep.vercel.app/ingresar",
+      "headers": {
+        "strict-transport-security": "max-age=31536000",
+        "content-security-policy": "default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'nonce-fhpsRqnMrLyl0h2NbeJ65nM7JkVeWFxz' 'strict-dynamic' 'wasm-unsafe-eval'; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; connect-src 'self' blob: https://bucket.d-a-b-o.dev https://73c88228d47f95782c56f01e84a79336.r2.cloudflarestorage.com; img-src 'self' data: blob: https://73c88228d47f95782c56f01e84a79336.r2.cloudflarestorage.com; font-src 'self'; worker-src 'self' blob:; media-src 'self' blob:",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "DENY",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "permissions-policy": "camera=(self), microphone=(), geolocation=(), payment=(), usb=()",
+        "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate"
+      }
+    },
+    {
+      "name": "sign_in",
+      "status": 200,
+      "twoFactorChallenge": false
+    },
+    {
+      "name": "authenticated_route",
+      "route": "/panel",
+      "expectedAllowed": true,
+      "status": 200,
+      "finalPath": "/panel",
+      "expectedResult": true,
+      "h1Count": 1,
+      "cspPresent": true,
+      "headers": {
+        "strict-transport-security": "max-age=31536000",
+        "content-security-policy": "default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'nonce-zRu9udSSOdqi+PVdUklYrWHgS8cMQSvq' 'strict-dynamic' 'wasm-unsafe-eval'; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; connect-src 'self' blob: https://bucket.d-a-b-o.dev https://73c88228d47f95782c56f01e84a79336.r2.cloudflarestorage.com; img-src 'self' data: blob: https://73c88228d47f95782c56f01e84a79336.r2.cloudflarestorage.com; font-src 'self'; worker-src 'self' blob:; media-src 'self' blob:",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "DENY",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "permissions-policy": "camera=(self), microphone=(), geolocation=(), payment=(), usb=()",
+        "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate"
+      }
+    },
+    {
+      "name": "authenticated_route",
+      "route": "/panel/cuenta/seguridad",
+      "expectedAllowed": true,
+      "status": 200,
+      "finalPath": "/panel/cuenta/seguridad",
+      "expectedResult": true,
+      "h1Count": 1,
+      "cspPresent": true,
+      "headers": {
+        "strict-transport-security": "max-age=31536000",
+        "content-security-policy": "default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'nonce-m12IbV059sRQ4Vxye5ZlXinpx7CD6z9e' 'strict-dynamic' 'wasm-unsafe-eval'; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; connect-src 'self' blob: https://bucket.d-a-b-o.dev https://73c88228d47f95782c56f01e84a79336.r2.cloudflarestorage.com; img-src 'self' data: blob: https://73c88228d47f95782c56f01e84a79336.r2.cloudflarestorage.com; font-src 'self'; worker-src 'self' blob:; media-src 'self' blob:",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "DENY",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "permissions-policy": "camera=(self), microphone=(), geolocation=(), payment=(), usb=()",
+        "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate"
+      }
+    },
+    {
+      "name": "authenticated_route",
+      "route": "/panel/catalogos",
+      "expectedAllowed": true,
+      "status": 200,
+      "finalPath": "/panel/catalogos",
+      "expectedResult": true,
+      "h1Count": 1,
+      "cspPresent": true,
+      "headers": {
+        "strict-transport-security": "max-age=31536000",
+        "content-security-policy": "default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'nonce-tkUS4Q+n0zTyyvaY4QVTmwDo/1ZYSwtX' 'strict-dynamic' 'wasm-unsafe-eval'; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; connect-src 'self' blob: https://bucket.d-a-b-o.dev https://73c88228d47f95782c56f01e84a79336.r2.cloudflarestorage.com; img-src 'self' data: blob: https://73c88228d47f95782c56f01e84a79336.r2.cloudflarestorage.com; font-src 'self'; worker-src 'self' blob:; media-src 'self' blob:",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "DENY",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "permissions-policy": "camera=(self), microphone=(), geolocation=(), payment=(), usb=()",
+        "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate"
+      }
+    },
+    {
+      "name": "authenticated_route",
+      "route": "/panel/dashboard",
+      "expectedAllowed": true,
+      "status": 200,
+      "finalPath": "/panel/dashboard",
+      "expectedResult": true,
+      "h1Count": 1,
+      "cspPresent": true,
+      "headers": {
+        "strict-transport-security": "max-age=31536000",
+        "content-security-policy": "default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'nonce-ELy+pKle88bqnqXs7BIYww6MlfbJbTva' 'strict-dynamic' 'wasm-unsafe-eval'; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; connect-src 'self' blob: https://bucket.d-a-b-o.dev https://73c88228d47f95782c56f01e84a79336.r2.cloudflarestorage.com; img-src 'self' data: blob: https://73c88228d47f95782c56f01e84a79336.r2.cloudflarestorage.com; font-src 'self'; worker-src 'self' blob:; media-src 'self' blob:",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "DENY",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "permissions-policy": "camera=(self), microphone=(), geolocation=(), payment=(), usb=()",
+        "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate"
+      }
+    },
+    {
+      "name": "authenticated_route",
+      "route": "/panel/inspecciones",
+      "expectedAllowed": true,
+      "status": 200,
+      "finalPath": "/panel/inspecciones",
+      "expectedResult": true,
+      "h1Count": 1,
+      "cspPresent": true,
+      "headers": {
+        "strict-transport-security": "max-age=31536000",
+        "content-security-policy": "default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'nonce-SenD8YxFOzHXxa6GWh/2HAWC4uylJiTx' 'strict-dynamic' 'wasm-unsafe-eval'; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; connect-src 'self' blob: https://bucket.d-a-b-o.dev https://73c88228d47f95782c56f01e84a79336.r2.cloudflarestorage.com; img-src 'self' data: blob: https://73c88228d47f95782c56f01e84a79336.r2.cloudflarestorage.com; font-src 'self'; worker-src 'self' blob:; media-src 'self' blob:",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "DENY",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "permissions-policy": "camera=(self), microphone=(), geolocation=(), payment=(), usb=()",
+        "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate"
+      }
+    },
+    {
+      "name": "authenticated_route",
+      "route": "/panel/inspeccion",
+      "expectedAllowed": true,
+      "status": 200,
+      "finalPath": "/panel/inspeccion",
+      "expectedResult": true,
+      "h1Count": 1,
+      "cspPresent": true,
+      "headers": {
+        "strict-transport-security": "max-age=31536000",
+        "content-security-policy": "default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'nonce-XiXLg8rAHSTKFSLMHPJX0S9kpukBOvs1' 'strict-dynamic' 'wasm-unsafe-eval'; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; connect-src 'self' blob: https://bucket.d-a-b-o.dev https://73c88228d47f95782c56f01e84a79336.r2.cloudflarestorage.com; img-src 'self' data: blob: https://73c88228d47f95782c56f01e84a79336.r2.cloudflarestorage.com; font-src 'self'; worker-src 'self' blob:; media-src 'self' blob:",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "DENY",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "permissions-policy": "camera=(self), microphone=(), geolocation=(), payment=(), usb=()",
+        "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate"
+      }
+    },
+    {
+      "name": "authenticated_route",
+      "route": "/panel/reportes",
+      "expectedAllowed": false,
+      "status": 403,
+      "finalPath": "/panel/reportes",
+      "expectedResult": true,
+      "h1Count": 0,
+      "cspPresent": true,
+      "headers": {
+        "strict-transport-security": "max-age=31536000",
+        "content-security-policy": "default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'nonce-YH1+wFS0j1Zft08Bg65Nq+L4WGKXL6a4' 'strict-dynamic' 'wasm-unsafe-eval'; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; connect-src 'self' blob: https://bucket.d-a-b-o.dev https://73c88228d47f95782c56f01e84a79336.r2.cloudflarestorage.com; img-src 'self' data: blob: https://73c88228d47f95782c56f01e84a79336.r2.cloudflarestorage.com; font-src 'self'; worker-src 'self' blob:; media-src 'self' blob:",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "DENY",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "permissions-policy": "camera=(self), microphone=(), geolocation=(), payment=(), usb=()",
+        "cache-control": "private, no-store"
+      }
+    },
+    {
+      "name": "authenticated_route",
+      "route": "/panel/admin/usuarios",
+      "expectedAllowed": false,
+      "status": 403,
+      "finalPath": "/panel/admin/usuarios",
+      "expectedResult": true,
+      "h1Count": 0,
+      "cspPresent": true,
+      "headers": {
+        "strict-transport-security": "max-age=31536000",
+        "content-security-policy": "default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'nonce-80aAti5iJTLodmlsIYahn3bx8VfU/rp5' 'strict-dynamic' 'wasm-unsafe-eval'; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; connect-src 'self' blob: https://bucket.d-a-b-o.dev https://73c88228d47f95782c56f01e84a79336.r2.cloudflarestorage.com; img-src 'self' data: blob: https://73c88228d47f95782c56f01e84a79336.r2.cloudflarestorage.com; font-src 'self'; worker-src 'self' blob:; media-src 'self' blob:",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "DENY",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "permissions-policy": "camera=(self), microphone=(), geolocation=(), payment=(), usb=()",
+        "cache-control": "private, no-store"
+      }
+    },
+    {
+      "name": "authenticated_route",
+      "route": "/panel/admin/empresas",
+      "expectedAllowed": false,
+      "status": 403,
+      "finalPath": "/panel/admin/empresas",
+      "expectedResult": true,
+      "h1Count": 0,
+      "cspPresent": true,
+      "headers": {
+        "strict-transport-security": "max-age=31536000",
+        "content-security-policy": "default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'nonce-a1TT10AOmqkDKvC/tatAOPgYFKMz2sAP' 'strict-dynamic' 'wasm-unsafe-eval'; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; connect-src 'self' blob: https://bucket.d-a-b-o.dev https://73c88228d47f95782c56f01e84a79336.r2.cloudflarestorage.com; img-src 'self' data: blob: https://73c88228d47f95782c56f01e84a79336.r2.cloudflarestorage.com; font-src 'self'; worker-src 'self' blob:; media-src 'self' blob:",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "DENY",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "permissions-policy": "camera=(self), microphone=(), geolocation=(), payment=(), usb=()",
+        "cache-control": "private, no-store"
+      }
+    },
+    {
+      "name": "passive_scan_navigation",
+      "route": "/",
+      "status": 200,
+      "finalPath": "/"
+    },
+    {
+      "name": "passive_scan_navigation",
+      "route": "/ingresar",
+      "status": 200,
+      "finalPath": "/ingresar"
+    },
+    {
+      "name": "passive_scan_navigation",
+      "route": "/panel",
+      "status": 200,
+      "finalPath": "/panel"
+    },
+    {
+      "name": "passive_scan_navigation",
+      "route": "/panel/cuenta/seguridad",
+      "status": 200,
+      "finalPath": "/panel/cuenta/seguridad"
+    },
+    {
+      "name": "passive_scan_navigation",
+      "route": "/panel/catalogos",
+      "status": 200,
+      "finalPath": "/panel/catalogos"
+    },
+    {
+      "name": "passive_scan_navigation",
+      "route": "/panel/dashboard",
+      "status": 200,
+      "finalPath": "/panel/dashboard"
+    },
+    {
+      "name": "passive_scan_navigation",
+      "route": "/panel/inspecciones",
+      "status": 200,
+      "finalPath": "/panel/inspecciones"
+    },
+    {
+      "name": "passive_scan_navigation",
+      "route": "/panel/inspeccion",
+      "status": 200,
+      "finalPath": "/panel/inspeccion"
+    },
+    {
+      "name": "logout_invalidates_session",
+      "status": 200,
+      "passed": true
+    }
+  ],
+  "limitations": [],
+  "account": {
+    "authenticated": true,
+    "role": "INSPECTOR",
+    "twoFactorEnabled": false
+  },
+  "cookies": [
+    {
+      "name": "__Secure-better-auth.session_token",
+      "secure": true,
+      "httpOnly": true,
+      "sameSite": "Lax"
+    }
+  ],
+  "runtimeErrorsBeforeScan": [],
+  "zapVersion": "2.17.0",
+  "authenticatedScanSessionConfirmed": true,
+  "dast": {
+    "passiveOnly": true,
+    "loginPasswordNeverProxied": true,
+    "authenticated": true,
+    "alertRulesByRisk": {
+      "0": 4,
+      "1": 0,
+      "2": 3,
+      "3": 0
+    },
+    "coverage": [
+      "/panel",
+      "/panel/cuenta/seguridad",
+      "/panel/catalogos",
+      "/panel/dashboard",
+      "/panel/inspecciones",
+      "/panel/inspeccion"
+    ],
+    "scannerContextId": "1",
+    "scannerBrowserUsesTemporaryProxyCA": true
+  },
+  "temporaryScannerSessionRemoved": true
+}

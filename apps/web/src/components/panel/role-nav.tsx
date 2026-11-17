@@ -7,6 +7,7 @@ import { PanelNav } from "./panel-nav";
 /** Enlaces del panel y el permiso que exige cada uno (HU32). La protección real está en cada página. */
 const LINKS: readonly (PanelLink & { permission?: Permission; hiddenWith?: Permission })[] = [
   { href: "/panel", label: "Inicio", icon: "grid" },
+  { href: "/panel/admin/monitoreo", label: "Salud del sistema", icon: "alert", permission: "monitoreo:ver" },
   { href: "/panel/estacion", label: "Estación", icon: "camera", permission: "estacion:operar" },
   // La cuenta técnica de una estación no hace inspecciones manuales (regla 8 de HU24).
   { href: "/panel/inspeccion", label: "Inspeccionar", icon: "scan", permission: "inspecciones:crear", hiddenWith: "estacion:operar" },

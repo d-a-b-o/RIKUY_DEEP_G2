@@ -18,6 +18,7 @@ export const FORBIDDEN_PATH = "/panel/sin-permiso";
 
 // Orden: de lo más específico a lo más general.
 export const ROUTE_RULES: readonly RouteRule[] = [
+  { prefix: "/panel/admin/monitoreo", permission: "monitoreo:ver" },
   // Pantallas ya construidas, dentro de /panel (protegido por src/proxy.ts).
   { prefix: "/panel/admin/empresas", permission: "empresas:gestionar" },
   { prefix: "/panel/admin/auditoria", permission: "auditoria:ver" },

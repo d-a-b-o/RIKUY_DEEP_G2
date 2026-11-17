@@ -1,0 +1,120 @@
+{
+  "checked_at_utc": "2026-11-16T20:15:04.746924+00:00",
+  "commit": "5aebd5fd3293d6b9e59346fff8f2dde098370adb",
+  "pull_request": "https://github.com/d-a-b-o/RIKUY_DEEP_G2/pull/78",
+  "deployment": "https://vercel.com/dabo5/rikuydeep/HeRa8LFn5QWVMM9jhxzpfSyuSHF8",
+  "tls": {
+    "hostname_and_chain_valid": true,
+    "protocol": "TLSv1.3",
+    "cipher": [
+      "TLS_AES_128_GCM_SHA256",
+      "TLSv1.3",
+      128
+    ],
+    "subject": [
+      [
+        [
+          "commonName",
+          "*.vercel.app"
+        ]
+      ]
+    ],
+    "issuer": [
+      [
+        [
+          "countryName",
+          "US"
+        ]
+      ],
+      [
+        [
+          "organizationName",
+          "Google Trust Services"
+        ]
+      ],
+      [
+        [
+          "commonName",
+          "WR1"
+        ]
+      ]
+    ],
+    "not_before": "Oct 31 11:46:10 2026 GMT",
+    "not_after": "Jan 29 11:46:09 2027 GMT",
+    "subject_alt_names": [
+      [
+        "DNS",
+        "*.vercel.app"
+      ]
+    ],
+    "certificate_sha256": "b780bccea3104338b0f1dfb618d1613104d80c3ba127e19dc9307f2c9c56dfc4",
+    "tls12_verified": {
+      "protocol": "TLSv1.2",
+      "cipher": [
+        "ECDHE-RSA-AES128-GCM-SHA256",
+        "TLSv1.2",
+        128
+      ],
+      "hostname_and_chain_valid": true
+    }
+  },
+  "requests": [
+    {
+      "url": "http://rikuydeep-git-rikdp-59-hu48-hardening-de-seguridad-dabo5.vercel.app/",
+      "status": 308,
+      "headers": {
+        "location": "https://rikuydeep-git-rikdp-59-hu48-hardening-de-seguridad-dabo5.vercel.app/",
+        "server": "Vercel"
+      },
+      "vercel_authentication_required": false,
+      "application_nonce_present": false
+    },
+    {
+      "url": "https://rikuydeep-git-rikdp-59-hu48-hardening-de-seguridad-dabo5.vercel.app/",
+      "status": 302,
+      "headers": {
+        "location": "https://vercel.com/sso-api?[query omitted]",
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-frame-options": "DENY",
+        "cache-control": "no-store, max-age=0",
+        "server": "Vercel"
+      },
+      "vercel_authentication_required": true,
+      "application_nonce_present": false
+    },
+    {
+      "url": "https://rikuydeep-git-rikdp-59-hu48-hardening-de-seguridad-dabo5.vercel.app/ingresar",
+      "status": 302,
+      "headers": {
+        "location": "https://vercel.com/sso-api?[query omitted]",
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-frame-options": "DENY",
+        "cache-control": "no-store, max-age=0",
+        "server": "Vercel"
+      },
+      "vercel_authentication_required": true,
+      "application_nonce_present": false
+    },
+    {
+      "url": "https://rikuydeep-git-rikdp-59-hu48-hardening-de-seguridad-dabo5.vercel.app/panel",
+      "status": 302,
+      "headers": {
+        "location": "https://vercel.com/sso-api?[query omitted]",
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "x-frame-options": "DENY",
+        "cache-control": "no-store, max-age=0",
+        "server": "Vercel"
+      },
+      "vercel_authentication_required": true,
+      "application_nonce_present": false
+    }
+  ],
+  "conclusions": {
+    "tls_verified": true,
+    "http_to_https_redirect_verified": true,
+    "hsts_observed_on_vercel_edge": true,
+    "application_headers_verified": false,
+    "authenticated_pages_verified": false,
+    "blocker": "Vercel Deployment Protection redirects all application routes to Vercel SSO. An authorized session or automation bypass is required."
+  }
+}
