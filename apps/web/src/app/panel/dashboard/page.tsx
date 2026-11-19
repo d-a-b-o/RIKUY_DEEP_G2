@@ -73,12 +73,8 @@ async function Dashboard({ searchParams }: { searchParams: SearchParams }) {
         <p className="ui-card p-6 text-muted-foreground">No hay inspecciones con estos filtros.</p>
       ) : (
         <>
-          <div className="grid gap-6 xl:grid-cols-2">
-            <BreakdownTable id="por-turno" title="Por turno" rows={data.byShift} />
-            <BreakdownTable id="por-estacion" title="Por estación" rows={data.byStation} />
-          </div>
-
-          <section aria-labelledby="tendencia" className="ui-card flex flex-col gap-4 p-5">
+          <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,2fr)_minmax(18rem,1fr)]">
+          <section aria-labelledby="tendencia" className="ui-card flex min-w-0 flex-col gap-4 p-5">
             <h2 id="tendencia" className="text-lg font-semibold">
               Tendencia diaria
             </h2>
@@ -115,7 +111,7 @@ async function Dashboard({ searchParams }: { searchParams: SearchParams }) {
             </details>
           </section>
 
-          <section aria-labelledby="ranking" className="ui-card flex flex-col gap-4 p-5">
+          <section aria-labelledby="ranking" className="ui-card flex min-w-0 flex-col gap-4 p-5">
             <h2 id="ranking" className="text-lg font-semibold">
               Moldes con más defectuosas
             </h2>
@@ -125,6 +121,11 @@ async function Dashboard({ searchParams }: { searchParams: SearchParams }) {
               <MoldRanking data={data.moldRanking} />
             )}
           </section>
+          </div>
+          <div className="grid gap-5 xl:grid-cols-2">
+            <BreakdownTable id="por-turno" title="Por turno" rows={data.byShift} />
+            <BreakdownTable id="por-estacion" title="Por estación" rows={data.byStation} />
+          </div>
         </>
       )}
 
@@ -152,9 +153,9 @@ function KpiTiles({ kpis }: { kpis: Kpis }) {
   return (
     <dl className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
       {tiles.map(([label, value, tone]) => (
-        <div key={label} className="ui-card p-4">
-          <dt className="text-sm text-muted-foreground">{label}</dt>
-          <dd className={`mt-1 text-2xl font-semibold tabular-nums ${tone ?? ""}`}>{value}</dd>
+        <div key={label} className="ui-card grid min-h-28 grid-cols-[2.75rem_1fr] items-center gap-x-4 p-4">
+          <dt className="contents"><span aria-hidden="true" className={`row-span-2 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-xl font-bold ${tone ?? "text-primary"}`}>{label === "% de defectos" ? "%" : label === "Defectuosas" ? "×" : "✓"}</span><span className="self-end text-sm text-muted-foreground">{label}</span></dt>
+          <dd className={`self-start text-2xl font-semibold tabular-nums ${tone ?? ""}`}>{value}</dd>
         </div>
       ))}
     </dl>
@@ -163,7 +164,7 @@ function KpiTiles({ kpis }: { kpis: Kpis }) {
 
 function BreakdownTable({ id, title, rows }: { id: string; title: string; rows: Breakdown[] }) {
   return (
-    <section aria-labelledby={id} className="ui-card flex flex-col gap-3 p-5">
+    <section aria-labelledby={id} className="ui-card flex min-w-0 flex-col gap-3 p-5">
       <h2 id={id} className="text-lg font-semibold">
         {title}
       </h2>

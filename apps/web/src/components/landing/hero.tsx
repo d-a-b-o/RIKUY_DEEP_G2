@@ -4,15 +4,11 @@ export function Hero() {
   return (
     <section
       id="inicio"
-      className="industrial-grid relative isolate overflow-hidden border-b border-border bg-surface-raised/40"
+      className="landing-hero relative isolate overflow-hidden border-b border-border bg-background text-foreground"
     >
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -right-40 -top-40 -z-10 h-[700px] w-[700px] rounded-full bg-primary/5 blur-[120px]"
-      />
-      <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 px-5 pb-16 pt-14 sm:px-8 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:pb-24 lg:pt-20">
-        <div className="flex flex-col gap-7">
-          <p className="ui-eyebrow">Visión artificial para fundición</p>
+      <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 px-5 pb-16 pt-14 sm:px-8 lg:grid-cols-[1fr_1.05fr] lg:gap-16 lg:pb-24 lg:pt-20">
+        <div className="landing-hero-copy flex flex-col gap-7">
+          <p className="ui-eyebrow">Inteligencia visual / Fundición</p>
           <h1 className="max-w-xl text-balance text-[2.5rem] font-semibold leading-[1.08] tracking-[-0.04em] sm:text-6xl lg:text-[3.8rem]">
             Inspecciona el 100{"\u00a0"}% de tus piezas,
             <span className="text-primary"> no solo una muestra.</span>
@@ -61,10 +57,10 @@ export function Hero() {
             para hasta una pieza por segundo.
           </p>
         </div>
-        <div className="flex min-w-0 flex-col gap-4 lg:pl-2">
+        <div className="landing-hero-visual flex min-w-0 flex-col gap-4 lg:pl-2">
           <p className="flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-            <span>Visión en acción</span>
-            <span className="text-primary">01 / Inspección</span>
+            <span>Vista de la aplicación</span>
+            <span className="text-primary">Inspección / Ejemplo</span>
           </p>
           <InspectionPreview />
           <p className="flex items-center gap-2 font-mono text-[10px] tracking-wide text-muted-foreground">

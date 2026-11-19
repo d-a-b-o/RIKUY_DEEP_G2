@@ -91,15 +91,18 @@ export function Solution() {
             para decidir qué hacer con los defectos.
           </p>
         </div>
-        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((feature) => (
+        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {features.map((feature, index) => (
             <li
               key={feature.title}
-              className="ui-card flex flex-col gap-3 p-6 transition-colors hover:border-primary/60"
+              className={`landing-feature flex flex-col gap-3 rounded-2xl border border-border bg-surface p-7 ${index < 2 ? "landing-feature--lead lg:col-span-2" : ""}`}
             >
-              <span className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg border border-primary/25 bg-primary/10 text-primary">
+              <div className="mb-4 flex items-start justify-between gap-3">
+              <span className="landing-feature-icon flex h-12 w-12 items-center justify-center rounded-xl border border-primary/25 bg-primary/10 text-primary">
                 {feature.icon}
               </span>
+              <span aria-hidden="true" className="font-mono text-xs tracking-widest text-muted-foreground">0{index + 1}</span>
+              </div>
               <h3 className="text-lg font-semibold">{feature.title}</h3>
               <p className="leading-7 text-muted-foreground">{feature.body}</p>
             </li>

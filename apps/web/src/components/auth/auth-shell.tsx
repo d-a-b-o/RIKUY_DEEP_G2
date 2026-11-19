@@ -20,7 +20,7 @@ export function AuthShell({
     <main className="grid min-h-dvh bg-background lg:grid-cols-2">
       <aside
         aria-label="RikuyDeep"
-        className="industrial-grid hidden flex-col justify-between border-r border-border p-10 xl:p-14 lg:flex"
+        className="panel-sidebar industrial-grid hidden flex-col justify-between border-r border-border bg-surface-raised p-10 xl:p-14 lg:flex"
       >
         <Link
           href="/"
