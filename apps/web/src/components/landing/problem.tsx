@@ -30,11 +30,11 @@ export function Problem() {
             una persona que revisa lo que alcanza al final de la línea.
           </p>
         </div>
-        <ul className="grid gap-4 md:grid-cols-3">
+        <ul className="grid gap-0 border-t border-border md:grid-cols-3">
           {problems.map((problem, index) => (
             <li
               key={problem.title}
-              className="ui-card flex flex-col gap-3 p-6 sm:p-7"
+              className="flex flex-col gap-3 border-b border-border py-7 md:border-b-0 md:border-r md:px-7 md:first:pl-0 md:last:border-r-0"
             >
               <span
                 aria-hidden="true"

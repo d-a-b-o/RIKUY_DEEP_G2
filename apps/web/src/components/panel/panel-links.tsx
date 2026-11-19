@@ -18,7 +18,7 @@ export function PanelLinks({ links, pathname }: { links: readonly PanelLink[]; p
             <Link
               href={link.href}
               aria-current={isCurrent(pathname, link.href) ? "page" : undefined}
-              className="flex min-h-12 items-center gap-3 rounded-lg border border-transparent px-4 text-sm font-medium text-muted-foreground transition-colors hover:bg-surface aria-[current=page]:border-primary/30 aria-[current=page]:bg-primary/10 aria-[current=page]:text-primary"
+              className="flex min-h-12 items-center gap-3 rounded-lg border border-transparent px-4 text-sm font-medium text-muted-foreground transition-colors hover:bg-surface aria-[current=page]:border-primary/30 aria-[current=page]:border-l-4 aria-[current=page]:border-l-primary aria-[current=page]:bg-primary/15 aria-[current=page]:text-foreground"
             >
               <Icon name={link.icon} />
               {link.label}

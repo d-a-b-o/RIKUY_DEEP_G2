@@ -557,7 +557,7 @@ export function StationKiosk({ initial, manifestUrl }: { initial: StationContext
         </p>
       ) : null}
 
-      <div className="grid flex-1 gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+      <div className="grid flex-1 gap-4 lg:grid-cols-[minmax(0,1.7fr)_minmax(20rem,1fr)]">
         <section aria-label="Cámara de la estación" className="relative overflow-hidden rounded-xl bg-acero-950">
           <video ref={videoRef} muted playsInline aria-label="Vista de la cámara" className="aspect-video w-full object-cover" />
           <div aria-hidden="true" className="pointer-events-none absolute inset-0 flex items-center justify-center">
@@ -581,7 +581,7 @@ export function StationKiosk({ initial, manifestUrl }: { initial: StationContext
           ) : null}
         </section>
 
-        <section aria-label="Resultado y contadores" className="flex flex-col gap-4">
+        <section aria-label="Resultado y contadores" className="ui-card flex flex-col gap-4 p-5">
           <div aria-live="polite">
             {last ? (
               <p

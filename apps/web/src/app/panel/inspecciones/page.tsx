@@ -61,8 +61,14 @@ async function History({ searchParams }: { searchParams: SearchParams }) {
       {page.rows.length === 0 ? (
         <p className="ui-card p-6 text-muted-foreground">No hay inspecciones con estos filtros.</p>
       ) : (
-        <div className="ui-card overflow-x-auto" tabIndex={0} role="region" aria-label="Inspecciones (se desplaza de lado)">
-          <table className="w-full min-w-[760px] text-left text-sm">
+        <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1.7fr)_minmax(18rem,1fr)]">
+        <div className="ui-card overflow-hidden">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-5 py-4">
+            <h2 className="font-semibold">Últimas inspecciones</h2>
+            <span className="text-xs text-muted-foreground">Resultados de la página actual</span>
+          </div>
+        <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Inspecciones (se desplaza de lado)">
+          <table className="history-table w-full min-w-[760px] text-left text-sm max-sm:min-w-0">
             <caption className="sr-only">Inspecciones</caption>
             <thead className="border-b border-border text-muted-foreground">
               <tr className="[&_th]:px-4 [&_th]:py-3 [&_th]:font-medium">
@@ -79,22 +85,22 @@ async function History({ searchParams }: { searchParams: SearchParams }) {
             </thead>
             <tbody>
               {page.rows.map((row) => (
-                <tr key={row.id} className="border-b border-border/60 last:border-0 [&_td]:px-4 [&_td]:py-3">
-                  <td className="whitespace-nowrap tabular-nums">{dateTime.format(row.capturedAt)}</td>
-                  <td>
+                <tr key={row.id} className="border-b border-border/60 transition-colors last:border-0 hover:bg-primary/5 [&_td]:px-4 [&_td]:py-3">
+                  <td data-label="Fecha" className="whitespace-nowrap tabular-nums">{dateTime.format(row.capturedAt)}</td>
+                  <td data-label="Veredicto">
                     <span className={`inline-flex rounded-full border px-2.5 py-0.5 text-xs font-medium ${verdictClass(row.currentVerdict)}`}>
                       {VERDICT_LABELS[row.currentVerdict]}
                     </span>
                     {row.corrected ? <span className="ml-2 text-xs text-muted-foreground">corregida</span> : null}
                   </td>
-                  <td className="tabular-nums">{percent(row.confidence)}</td>
-                  <td>
+                  <td data-label="Confianza" className="tabular-nums">{percent(row.confidence)}</td>
+                  <td data-label="Pieza · molde">
                     {row.part} · {row.mold}
                   </td>
-                  <td>
+                  <td data-label="Lote · turno">
                     {row.batch} · {row.shift}
                   </td>
-                  <td>
+                  <td data-label="Origen">
                     {SOURCE_LABELS[row.source]}
                     <span className="block text-xs text-muted-foreground">{row.author}</span>
                   </td>
@@ -107,6 +113,21 @@ async function History({ searchParams }: { searchParams: SearchParams }) {
               ))}
             </tbody>
           </table>
+        </div>
+        </div>
+        <aside className="ui-card p-5" aria-labelledby="reciente-title">
+          <p className="text-xs font-semibold uppercase tracking-widest text-primary">Trazabilidad</p>
+          <h2 id="reciente-title" className="mt-2 text-lg font-semibold">Inspección más reciente</h2>
+          <p className="mt-1 text-sm text-muted-foreground">Resumen del primer registro de esta página.</p>
+          <dl className="mt-5 space-y-3 border-y border-border py-5 text-sm">
+            <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Fecha</dt><dd className="text-right font-medium">{dateTime.format(page.rows[0].capturedAt)}</dd></div>
+            <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Pieza · molde</dt><dd className="text-right font-medium">{page.rows[0].part} · {page.rows[0].mold}</dd></div>
+            <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Lote · turno</dt><dd className="text-right font-medium">{page.rows[0].batch} · {page.rows[0].shift}</dd></div>
+            <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Confianza</dt><dd className="font-medium">{percent(page.rows[0].confidence)}</dd></div>
+            <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Veredicto</dt><dd className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${verdictClass(page.rows[0].currentVerdict)}`}>{VERDICT_LABELS[page.rows[0].currentVerdict]}</dd></div>
+          </dl>
+          <Link href={`${PATH}/${page.rows[0].id}`} className="ui-button mt-5 w-full">Ver detalle y trazabilidad</Link>
+        </aside>
         </div>
       )}
 
@@ -149,7 +170,7 @@ function Select({
   options: readonly FilterOption[];
 }) {
   return (
-    <label className="flex flex-col gap-1 text-sm">
+    <label className="flex min-w-0 flex-col gap-1 text-sm">
       <span className="text-muted-foreground">{label}</span>
       <select name={name} defaultValue={value ?? ""} className="ui-input">
         <option value="">Todos</option>
@@ -174,12 +195,12 @@ function FilterForm({
   const sources = Object.entries(SOURCE_LABELS).map(([id, label]) => ({ id, label }));
   return (
     <form method="get" action={PATH} className="ui-card flex flex-col gap-4 p-5" aria-label="Filtros">
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <label className="flex flex-col gap-1 text-sm">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <label className="flex min-w-0 flex-col gap-1 text-sm">
           <span className="text-muted-foreground">Desde</span>
           <input type="date" name="desde" defaultValue={filters.desde} className="ui-input" />
         </label>
-        <label className="flex flex-col gap-1 text-sm">
+        <label className="flex min-w-0 flex-col gap-1 text-sm">
           <span className="text-muted-foreground">Hasta</span>
           <input type="date" name="hasta" defaultValue={filters.hasta} className="ui-input" />
         </label>

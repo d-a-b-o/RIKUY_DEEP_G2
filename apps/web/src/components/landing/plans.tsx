@@ -81,9 +81,9 @@ export function Plans() {
           {plans.map((plan) => (
             <li
               key={plan.name}
-              className={`flex flex-col gap-6 rounded-2xl border bg-background p-6 sm:p-7 ${
+              className={`landing-plan flex flex-col gap-6 rounded-2xl border bg-background p-6 sm:p-7 ${
                 plan.featured
-                  ? "border-primary shadow-[0_0_40px_#22b8cf10]"
+                  ? "landing-plan--featured border-primary"
                   : "border-border"
               }`}
             >
@@ -100,7 +100,7 @@ export function Plans() {
                   {plan.audience}
                 </p>
               </div>
-              <ul className="flex flex-1 flex-col gap-3 text-sm leading-6">
+              <ul className="flex flex-1 flex-col gap-3 border-t border-border pt-5 text-sm leading-6">
                 {plan.features.map((feature) => (
                   <li key={feature} className="flex gap-2.5">
                     <Check />

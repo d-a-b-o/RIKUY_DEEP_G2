@@ -9,14 +9,14 @@ import { BASE_LINKS, RoleNav } from "./role-nav";
 
 export function PanelShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-dvh bg-background lg:grid lg:grid-cols-[240px_minmax(0,1fr)]">
+    <div className="panel-workspace min-h-dvh bg-background text-foreground lg:grid lg:grid-cols-[210px_minmax(0,1fr)]">
       <a
         href="#contenido-panel"
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
       >
         Saltar al contenido
       </a>
-      <aside className="flex flex-col border-b border-border bg-surface-raised lg:sticky lg:top-0 lg:h-dvh lg:border-b-0 lg:border-r">
+      <aside className="panel-sidebar flex flex-col border-b border-border bg-surface-raised lg:sticky lg:top-0 lg:h-dvh lg:overflow-y-auto lg:border-b-0 lg:border-r">
         <div className="flex min-h-20 items-center justify-between gap-4 px-5 lg:px-6">
           <Link
             href="/panel"
@@ -30,9 +30,7 @@ export function PanelShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
         <div className="px-4 pb-4 lg:pt-8">
-          <div className="mb-3 flex justify-end lg:hidden">
-            <ThemeToggle />
-          </div>
+          <div className="mb-3 flex justify-end lg:hidden"><ThemeToggle /></div>
           <p className="mb-4 hidden px-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground lg:block">
             Espacio de trabajo
           </p>
@@ -69,7 +67,7 @@ export function PanelShell({ children }: { children: React.ReactNode }) {
         </header>
         <main
           id="contenido-panel"
-          className="mx-auto w-full max-w-7xl px-5 py-8 sm:px-8 sm:py-10"
+          className="mx-auto w-full max-w-[1600px] px-5 py-8 sm:px-8 sm:py-10"
         >
           {children}
         </main>
