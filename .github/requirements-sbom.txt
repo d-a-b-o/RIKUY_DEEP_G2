@@ -1,1 +1,1 @@
-cyclonedx-bom==8.0.1
+cyclonedx-bom==9.0.0
