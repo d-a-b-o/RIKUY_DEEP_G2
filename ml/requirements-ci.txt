@@ -3,7 +3,7 @@
 # y las pruebas unitarias no lo usan.
 numpy>=2.5.4,<3
 pillow>=13,<14
-scikit-learn>=1.5,<2
+scikit-learn>=1.9.1,<2
 pytest>=9.2.0,<10
 ruff>=0.17.5,<0.18
 kagglehub
