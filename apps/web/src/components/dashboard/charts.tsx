@@ -178,7 +178,7 @@ export function MoldRanking({ data }: { data: Breakdown[] }) {
   return (
     <ol className="flex flex-col gap-3">
       {data.map((m, i) => (
-        <li key={m.id ?? i} className="grid grid-cols-[minmax(0,9rem)_1fr] items-center gap-3 text-sm sm:grid-cols-[minmax(0,12rem)_1fr]">
+        <li key={m.id ?? i} className="grid min-w-0 gap-2 rounded-lg bg-background px-3 py-2 text-sm">
           <span className="truncate" title={m.label}>
             {i + 1}. {m.label}
           </span>

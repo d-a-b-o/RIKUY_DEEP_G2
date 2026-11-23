@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "project": {
+    "name": "RIKUY_DEEP_G2",
+    "productType": "Control visual de calidad para fundición",
+    "stack": ["Next.js", "React", "Tailwind CSS"]
+  },
+  "sources": {
+    "tokens": ["apps/web/src/app/globals.css"],
+    "components": ["apps/web/src/components/landing", "apps/web/src/components/panel"],
+    "assets": ["apps/web/public/brand"],
+    "instructions": ["apps/web/AGENTS.md"]
+  },
+  "design": {
+    "colorMode": "light and dark",
+    "colors": {},
+    "typography": {},
+    "spacing": {},
+    "radius": {},
+    "shadows": {},
+    "motion": {},
+    "density": "unknown"
+  },
+  "components": {
+    "installed": [],
+    "preferredPrimitives": [],
+    "patterns": []
+  },
+  "constraints": {
+    "must": [],
+    "avoid": []
+  },
+  "decisions": ["La landing, el acceso y el panel comparten la dirección Trace Studio: superficies cálidas, navegación oscura y acentos naranja, con versión clara y oscura. La imagen de la pieza procede de la referencia y la demostración se identifica como ilustrativa."],
+  "evidence": [],
+  "generatedAt": "2026-11-19T03:31:31.881Z"
+}

@@ -142,39 +142,16 @@ export function Inspector({ manifestUrl }: { manifestUrl: string }) {
         <ModelStatus state={modelState} onRetry={retry} />
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
+      <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1.7fr)_minmax(19rem,1fr)]">
         <section
           aria-labelledby="entrada"
           aria-busy={!ready}
-          className="ui-card p-5 sm:p-6"
+          className="ui-card overflow-hidden p-5 sm:p-6"
         >
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 id="entrada" className="text-lg font-semibold">
-              Pieza a inspeccionar
-            </h2>
-            <div
-              role="group"
-              aria-label="Origen de la imagen"
-              className="flex rounded-lg border border-input-border bg-background p-1 text-sm"
-            >
-              {(["upload", "camera"] as const).map((value) => (
-                <button
-                  key={value}
-                  type="button"
-                  aria-pressed={mode === value}
-                  onClick={() => {
-                    setInputError(null);
-                    setMode(value);
-                  }}
-                  className="flex min-h-11 items-center gap-2 rounded-md px-3 py-2 font-medium text-muted-foreground aria-pressed:bg-primary aria-pressed:text-primary-foreground"
-                >
-                  <Icon
-                    name={value === "upload" ? "upload" : "camera"}
-                    className="h-4 w-4"
-                  />
-                  {value === "upload" ? "Subir imagen" : "Cámara"}
-                </button>
-              ))}
+            <div>
+              <p className="mb-1 text-xs font-semibold uppercase tracking-[0.15em] text-primary">Estación de inspección</p>
+              <h2 id="entrada" className="text-xl font-semibold">Pieza a inspeccionar</h2>
             </div>
           </div>
           <div className="mt-5">
@@ -203,22 +180,9 @@ export function Inspector({ manifestUrl }: { manifestUrl: string }) {
         </section>
 
         <section aria-labelledby="resultado" className="ui-card p-5 sm:p-6">
-          <h2 id="resultado" className="text-lg font-semibold">
-            Resultado
-          </h2>
-          <div className="mt-5 grid gap-5 sm:grid-cols-[160px_minmax(0,1fr)] lg:grid-cols-1 xl:grid-cols-[160px_minmax(0,1fr)]">
-            <figure className="flex flex-col gap-2">
-              <canvas
-                ref={previewRef}
-                width={400}
-                height={400}
-                aria-label="Imagen que analizó el modelo"
-                className="aspect-square w-40 max-w-full rounded-lg border border-border bg-background"
-              />
-              <figcaption className="text-xs text-muted-foreground">
-                Lo que ve el modelo: recorte cuadrado a 400×400.
-              </figcaption>
-            </figure>
+          <p className="mb-1 text-xs font-semibold uppercase tracking-[0.15em] text-primary">Análisis local</p>
+          <h2 id="resultado" className="text-xl font-semibold">Resultado</h2>
+          <div className="mt-5 flex flex-col gap-6">
             <div aria-live="polite" aria-busy={busy}>
               {busy ? (
                 <p
@@ -236,9 +200,56 @@ export function Inspector({ manifestUrl }: { manifestUrl: string }) {
                 </p>
               )}
             </div>
+            <figure className="flex flex-col gap-2 border-t border-border pt-5">
+              <canvas
+                ref={previewRef}
+                width={400}
+                height={400}
+                aria-label="Imagen que analizó el modelo"
+                className="aspect-square w-40 max-w-full rounded-lg border border-border bg-background"
+              />
+              <figcaption className="text-xs text-muted-foreground">
+                Lo que ve el modelo: recorte cuadrado a 400×400.
+              </figcaption>
+            </figure>
+          </div>
+          <div className="mt-6 border-t border-border pt-5">
+            <p className="mb-3 text-sm font-medium">Origen de la imagen</p>
+            <div role="group" aria-label="Origen de la imagen" className="grid grid-cols-2 gap-2">
+              {(["camera", "upload"] as const).map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  aria-pressed={mode === value}
+                  onClick={() => {
+                    setInputError(null);
+                    setMode(value);
+                  }}
+                  className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium text-muted-foreground aria-pressed:border-primary aria-pressed:bg-primary/15 aria-pressed:text-primary"
+                >
+                  <Icon name={value === "upload" ? "upload" : "camera"} className="h-4 w-4" />
+                  {value === "upload" ? "Subir imagen" : "Cámara"}
+                </button>
+              ))}
+            </div>
           </div>
         </section>
       </div>
+      <section className="ui-card px-5 py-5 sm:px-6" aria-labelledby="flujo-inspeccion">
+        <h2 id="flujo-inspeccion" className="font-semibold">Flujo de inspección</h2>
+        <ol className="mt-4 grid gap-4 sm:grid-cols-3">
+          {[
+            ["1", "Selecciona el origen", "Usa la cámara o sube una imagen."],
+            ["2", "Analiza la pieza", "Encuadra la pieza y ejecuta la inspección."],
+            ["3", "Revisa el resultado", "Consulta el veredicto y la confianza."],
+          ].map(([number, title, description]) => (
+            <li key={number} className="flex items-start gap-3">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/15 text-sm font-bold text-primary">{number}</span>
+              <div><p className="text-sm font-semibold">{title}</p><p className="mt-1 text-xs leading-5 text-muted-foreground">{description}</p></div>
+            </li>
+          ))}
+        </ol>
+      </section>
     </div>
   );
 }
